@@ -1,0 +1,22 @@
+meta {
+  name: OpenAPI Document
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/swagger/v1/swagger.json
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  Retrieves the generated OpenAPI document exposed by the ASP.NET Core API.
+
+  Use this request as the Bruno equivalent of checking Swagger's JSON contract.
+  Feature tickets should add their endpoint requests to this collection as the API grows.
+}

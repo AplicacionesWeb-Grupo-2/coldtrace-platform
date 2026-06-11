@@ -20,7 +20,10 @@ CREATE DATABASE IF NOT EXISTS coldtrace_platform;
 3. Confirm the app starts and applies pending EF Core migrations without errors.
 4. Open `/swagger/index.html`.
 5. Open `/swagger/v1/swagger.json`.
-6. Confirm future bounded contexts can be added under:
+6. Open the Bruno collection in `bruno/ColdTrace Platform`.
+7. Run the `API Foundation / OpenAPI Document` request.
+8. Run the `API Foundation / Swagger UI` request.
+9. Confirm future bounded contexts can be added under:
    - `Domain/Model`
    - `Application`
    - `Infrastructure/Persistence/EFC/Repositories`
