@@ -11,13 +11,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <!-- Identity-related packages present in the Aplicaciones Web Learning Center reference. -->
-        <PackageReference Include="BCrypt.Net-Next" Version="4.2.0"/>
-        <PackageReference Include="Cortex.Mediator" Version="3.1.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3"/>
-        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.18.0"/>
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0"/>
         <!-- Entity Framework Core related packages -->
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.8"/>
@@ -25,14 +18,13 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational.Design" Version="1.1.6"/>
         <!-- MySQL Entity Framework Core related packages -->
         <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.7"/>
         <!-- Naming convention conversion related packages -->
         <PackageReference Include="Humanizer" Version="3.0.10"/>
         <!-- Swagger related packages -->
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.7"/>
     </ItemGroup>
 
     <ItemGroup>
