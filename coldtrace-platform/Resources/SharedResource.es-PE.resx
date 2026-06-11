@@ -42,4 +42,16 @@
     <data name="UnexpectedErrorCreatingOrganization" xml:space="preserve">
         <value>Ocurrio un error inesperado al crear la organizacion.</value>
     </data>
+    <data name="InvalidOrganizationSignUpRequest" xml:space="preserve">
+        <value>La solicitud de registro de organizacion no es valida.</value>
+    </data>
+    <data name="UserEmailDuplicated" xml:space="preserve">
+        <value>El correo del usuario ya esta registrado.</value>
+    </data>
+    <data name="InitialRoleNotFound" xml:space="preserve">
+        <value>No se encontro el rol inicial de registro.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingOrganizationSignUp" xml:space="preserve">
+        <value>Ocurrio un error inesperado al registrar la organizacion.</value>
+    </data>
 </root>

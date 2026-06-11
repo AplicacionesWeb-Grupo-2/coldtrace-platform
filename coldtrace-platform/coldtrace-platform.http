@@ -27,3 +27,19 @@ Accept: application/json
 }
 
 ###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organization-sign-ups
+Content-Type: application/json
+Accept: application/json
+
+{
+  "legalName": "ColdTrace Sign Up SAC",
+  "commercialName": "ColdTrace Sign Up",
+  "taxId": "20987654321",
+  "contactEmail": "owner@signup.demo",
+  "firstName": "Mauricio",
+  "lastName": "Pajes",
+  "email": "mauricio@signup.demo"
+}
+
+###
