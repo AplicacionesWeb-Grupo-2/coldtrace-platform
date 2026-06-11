@@ -15,4 +15,11 @@ public interface IRoleRepository : IBaseRepository<Role>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
     /// <returns>The role when found; otherwise null.</returns>
     Task<Role?> FindByNameAsync(string name, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Lists roles with their permission metadata.
+    /// </summary>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>Roles with permissions.</returns>
+    Task<IEnumerable<Role>> ListWithPermissionsAsync(CancellationToken cancellationToken = default);
 }

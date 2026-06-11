@@ -15,4 +15,14 @@ public interface IUserRepository : IBaseRepository<User>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
     /// <returns>True when a user with the same email exists.</returns>
     Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Finds users by owning organization.
+    /// </summary>
+    /// <param name="organizationId">Organization identifier.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>Users that belong to the organization.</returns>
+    Task<IEnumerable<User>> FindAllByOrganizationIdAsync(
+        int organizationId,
+        CancellationToken cancellationToken = default);
 }
