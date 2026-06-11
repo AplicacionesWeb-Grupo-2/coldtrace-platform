@@ -14,7 +14,7 @@ ASP.NET Core backend for the ColdTrace Aplicaciones Web project.
 
 - `main`: stable branch
 - `develop`: integration branch
-- `mpajes2006/appweb-51-t-44-aspnet-core-api-foundation`: current APPWEB-51 work branch
+- `feature/t-44-api-foundation`: current APPWEB-51 work branch
 
 ## Local Setup
 
@@ -29,6 +29,16 @@ The development connection string is configured in:
 ```text
 coldtrace-platform/appsettings.Development.json
 ```
+
+If your local MySQL root password is not `password`, override it in the Rider run
+configuration instead of committing a personal password:
+
+```text
+ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-password>;database=coldtrace_platform
+```
+
+Use the .NET 10 SDK configured under `~/.dotnet/dotnet`. The system `dotnet`
+under `/usr/local/share/dotnet` only has older SDKs on this machine.
 
 Manual validation for APPWEB-51 is documented in:
 

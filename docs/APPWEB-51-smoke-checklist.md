@@ -5,13 +5,24 @@ Ticket: T-44 - ASP.NET Core API Foundation
 ## Prerequisites
 
 - MySQL is running locally.
+- Rider is using the .NET 10 SDK from `~/.dotnet/dotnet`.
 - The local schema exists:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS coldtrace_platform;
 ```
 
-- The local connection string matches `coldtrace-platform/appsettings.Development.json`.
+- The local connection string matches `coldtrace-platform/appsettings.Development.json`,
+  or Rider overrides it with this environment variable:
+
+```text
+ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-password>;database=coldtrace_platform
+```
+
+- EF Core migrations are versioned under
+  `coldtrace-platform/Shared/Infrastructure/Persistence/EFC/Migrations`.
+- The sensitive data logging warning is expected in `Development`; it should not
+  be enabled for production credentials.
 
 ## Manual Checks
 
