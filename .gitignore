@@ -16,5 +16,3 @@ coverage/
 
 *.nupkg
 *.snupkg
-
-**/.bruno/

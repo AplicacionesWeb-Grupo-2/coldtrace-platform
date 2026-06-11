@@ -46,9 +46,3 @@ Manual validation for APPWEB-51 is documented in:
 ```text
 docs/APPWEB-51-smoke-checklist.md
 ```
-
-Bruno API documentation is versioned in:
-
-```text
-bruno/ColdTrace Platform
-```
