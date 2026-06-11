@@ -104,3 +104,41 @@ Accept: application/json
 }
 
 ###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways/1
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways
+Content-Type: application/json
+Accept: application/json
+
+{
+  "locationId": 1,
+  "uuid": "GW-001",
+  "name": "Main Gateway",
+  "network": "cold-room-wifi",
+  "status": "active"
+}
+
+###
+
+PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "locationId": 1,
+  "uuid": "GW-001",
+  "name": "Main Gateway",
+  "network": "cold-room-wifi-backup",
+  "status": "active"
+}
+
+###

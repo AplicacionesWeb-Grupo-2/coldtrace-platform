@@ -84,8 +84,11 @@ builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
 
 // Asset Management Bounded Context Injection Configuration
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<IGatewayRepository, GatewayRepository>();
 builder.Services.AddScoped<ILocationCommandService, LocationCommandService>();
 builder.Services.AddScoped<ILocationQueryService, LocationQueryService>();
+builder.Services.AddScoped<IGatewayCommandService, GatewayCommandService>();
+builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
 
 var app = builder.Build();
 
