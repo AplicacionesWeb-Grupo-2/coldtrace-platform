@@ -9,7 +9,10 @@ using ColdTrace.Platform.Shared.Infrastructure.Interfaces.ASP.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Localization;
+using MySql.Data.MySqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -78,7 +81,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
+    ApplyPendingMigrations(context);
 }
 
 app.UseExceptionHandler();
@@ -103,3 +106,71 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static void ApplyPendingMigrations(DbContext context)
+{
+    EnsureMySqlDatabaseExists(context);
+
+    var appliedMigrations = GetAppliedMigrations(context);
+    var currentMigration = appliedMigrations.LastOrDefault() ?? Migration.InitialDatabase;
+    var migrator = context.GetService<IMigrator>();
+
+    foreach (var migration in context.Database.GetMigrations().Where(migration => !appliedMigrations.Contains(migration)))
+    {
+        var script = migrator.GenerateScript(currentMigration, migration);
+        ExecuteMigrationScript(context, script);
+        appliedMigrations.Add(migration);
+        currentMigration = migration;
+    }
+}
+
+static void EnsureMySqlDatabaseExists(DbContext context)
+{
+    var connectionStringBuilder = new MySqlConnectionStringBuilder(context.Database.GetConnectionString());
+    var database = connectionStringBuilder.Database;
+    if (string.IsNullOrWhiteSpace(database)) return;
+
+    connectionStringBuilder.Database = string.Empty;
+    using var connection = new MySqlConnection(connectionStringBuilder.ConnectionString);
+    connection.Open();
+
+    using var command = connection.CreateCommand();
+    command.CommandText = $"CREATE DATABASE IF NOT EXISTS `{database.Replace("`", "``")}`;";
+    command.ExecuteNonQuery();
+}
+
+static List<string> GetAppliedMigrations(DbContext context)
+{
+    using var connection = new MySqlConnection(context.Database.GetConnectionString());
+    connection.Open();
+
+    if (!MigrationHistoryTableExists(connection)) return [];
+
+    using var command = connection.CreateCommand();
+    command.CommandText = "SELECT `MigrationId` FROM `__EFMigrationsHistory` ORDER BY `MigrationId`;";
+
+    using var reader = command.ExecuteReader();
+    var migrations = new List<string>();
+    while (reader.Read())
+    {
+        migrations.Add(reader.GetString(0));
+    }
+
+    return migrations;
+}
+
+static bool MigrationHistoryTableExists(MySqlConnection connection)
+{
+    using var command = connection.CreateCommand();
+    command.CommandText =
+        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '__EFMigrationsHistory';";
+    return Convert.ToInt32(command.ExecuteScalar()) > 0;
+}
+
+static void ExecuteMigrationScript(DbContext context, string script)
+{
+    foreach (var statement in script.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+    {
+        context.Database.ExecuteSqlRaw(statement);
+    }
+}
