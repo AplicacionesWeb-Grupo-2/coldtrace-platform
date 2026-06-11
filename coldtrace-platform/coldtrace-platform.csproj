@@ -2,13 +2,70 @@
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>14.0</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>coldtrace_platform</RootNamespace>
+        <InvariantGlobalization>false</InvariantGlobalization>
+        <RootNamespace>ColdTrace.Platform</RootNamespace>
+        <AssemblyName>ColdTrace.Platform</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5"/>
+        <!-- Identity-related packages present in the Aplicaciones Web Learning Center reference. -->
+        <PackageReference Include="BCrypt.Net-Next" Version="4.2.0"/>
+        <PackageReference Include="Cortex.Mediator" Version="3.1.2"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3"/>
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.18.0"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0"/>
+        <!-- Entity Framework Core related packages -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational.Design" Version="1.1.6"/>
+        <!-- MySQL Entity Framework Core related packages -->
+        <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.7"/>
+        <!-- Naming convention conversion related packages -->
+        <PackageReference Include="Humanizer" Version="3.0.10"/>
+        <!-- Swagger related packages -->
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Alerts\Application\"/>
+        <Folder Include="Alerts\Domain\Model\"/>
+        <Folder Include="Alerts\Infrastructure\Persistence\EFC\Repositories\"/>
+        <Folder Include="Alerts\Interfaces\REST\Resources\"/>
+        <Folder Include="Alerts\Interfaces\REST\Transform\"/>
+        <Folder Include="AssetManagement\Application\"/>
+        <Folder Include="AssetManagement\Domain\Model\"/>
+        <Folder Include="AssetManagement\Infrastructure\Persistence\EFC\Repositories\"/>
+        <Folder Include="AssetManagement\Interfaces\REST\Resources\"/>
+        <Folder Include="AssetManagement\Interfaces\REST\Transform\"/>
+        <Folder Include="IdentityAccess\Application\"/>
+        <Folder Include="IdentityAccess\Domain\Model\"/>
+        <Folder Include="IdentityAccess\Infrastructure\Persistence\EFC\Repositories\"/>
+        <Folder Include="IdentityAccess\Interfaces\REST\Resources\"/>
+        <Folder Include="IdentityAccess\Interfaces\REST\Transform\"/>
+        <Folder Include="MaintenanceManagement\Application\"/>
+        <Folder Include="MaintenanceManagement\Domain\Model\"/>
+        <Folder Include="MaintenanceManagement\Infrastructure\Persistence\EFC\Repositories\"/>
+        <Folder Include="MaintenanceManagement\Interfaces\REST\Resources\"/>
+        <Folder Include="MaintenanceManagement\Interfaces\REST\Transform\"/>
+        <Folder Include="Monitoring\Application\"/>
+        <Folder Include="Monitoring\Domain\Model\"/>
+        <Folder Include="Monitoring\Infrastructure\Persistence\EFC\Repositories\"/>
+        <Folder Include="Monitoring\Interfaces\REST\Resources\"/>
+        <Folder Include="Monitoring\Interfaces\REST\Transform\"/>
+        <Folder Include="Reports\Application\"/>
+        <Folder Include="Reports\Domain\Model\"/>
+        <Folder Include="Reports\Infrastructure\Persistence\EFC\Repositories\"/>
+        <Folder Include="Reports\Interfaces\REST\Resources\"/>
+        <Folder Include="Reports\Interfaces\REST\Transform\"/>
     </ItemGroup>
 
 </Project>
