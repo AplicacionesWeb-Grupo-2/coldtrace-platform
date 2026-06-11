@@ -69,4 +69,22 @@
     <data name="UnexpectedErrorGettingUsers" xml:space="preserve">
         <value>An unexpected error occurred while getting users.</value>
     </data>
+    <data name="InvalidLocationRequest" xml:space="preserve">
+        <value>The location request is invalid.</value>
+    </data>
+    <data name="LocationNameDuplicated" xml:space="preserve">
+        <value>Location name already exists in this organization.</value>
+    </data>
+    <data name="LocationNotFound" xml:space="preserve">
+        <value>Location was not found.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingLocation" xml:space="preserve">
+        <value>An unexpected error occurred while creating the location.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingLocation" xml:space="preserve">
+        <value>An unexpected error occurred while updating the location.</value>
+    </data>
+    <data name="UnexpectedErrorGettingLocations" xml:space="preserve">
+        <value>An unexpected error occurred while getting locations.</value>
+    </data>
 </root>

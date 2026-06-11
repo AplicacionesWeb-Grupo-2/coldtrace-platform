@@ -1,3 +1,8 @@
+using ColdTrace.Platform.AssetManagement.Application.Internal.CommandServices;
+using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
+using ColdTrace.Platform.AssetManagement.Application.Services;
+using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.AssetManagement.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
@@ -76,6 +81,11 @@ builder.Services.AddScoped<IOrganizationSignUpCommandService, OrganizationSignUp
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
+
+// Asset Management Bounded Context Injection Configuration
+builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<ILocationCommandService, LocationCommandService>();
+builder.Services.AddScoped<ILocationQueryService, LocationQueryService>();
 
 var app = builder.Build();
 

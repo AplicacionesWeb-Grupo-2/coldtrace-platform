@@ -1,3 +1,4 @@
+using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
@@ -102,6 +103,25 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .WithMany()
             .HasForeignKey(user => user.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<Location>().HasKey(location => location.Id);
+        builder.Entity<Location>().Property(location => location.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Location>().Property(location => location.Name).IsRequired().HasMaxLength(200);
+        builder.Entity<Location>().Property(location => location.Type).IsRequired().HasMaxLength(80);
+        builder.Entity<Location>().Property(location => location.Address).HasMaxLength(256);
+        builder.Entity<Location>().Property(location => location.Description).HasMaxLength(512);
+        builder.Entity<Location>().Property(location => location.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<Location>().Property(location => location.CreatedAt);
+        builder.Entity<Location>().Property(location => location.UpdatedAt);
+        builder.Entity<Location>()
+            .HasIndex(location => new { location.OrganizationId, location.Name })
+            .IsUnique();
+        builder.Entity<Location>()
+            .HasOne(location => location.Organization)
+            .WithMany()
+            .HasForeignKey(location => location.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_locations_organizations_organization_id");
 
         builder.UseSnakeCaseNamingConvention();
     }
