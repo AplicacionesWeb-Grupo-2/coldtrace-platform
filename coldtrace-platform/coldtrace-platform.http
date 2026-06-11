@@ -1,6 +1,11 @@
 @coldtrace_platform_HostAddress = http://localhost:5269
 
-GET {{coldtrace_platform_HostAddress}}/weatherforecast/
+GET {{coldtrace_platform_HostAddress}}/swagger/index.html
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/swagger/v1/swagger.json
 Accept: application/json
 
 ###
