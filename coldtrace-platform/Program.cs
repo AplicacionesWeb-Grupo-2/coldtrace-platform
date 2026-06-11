@@ -73,6 +73,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrganizationCommandService, OrganizationCommandService>();
 builder.Services.AddScoped<IOrganizationQueryService, OrganizationQueryService>();
 builder.Services.AddScoped<IOrganizationSignUpCommandService, OrganizationSignUpCommandService>();
+builder.Services.AddScoped<IUserCommandService, UserCommandService>();
+builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
 
 var app = builder.Build();
 

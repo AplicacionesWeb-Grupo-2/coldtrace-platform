@@ -33,6 +33,19 @@ public class User
     }
 
     /// <summary>
+    ///     Creates a user from a create command with validated identifiers.
+    /// </summary>
+    /// <param name="command">Command containing user identity data and references.</param>
+    public User(CreateUserCommand command)
+    {
+        FirstName = command.FirstName;
+        LastName = command.LastName;
+        Email = command.Email;
+        OrganizationId = command.OrganizationId;
+        RoleId = command.RoleId;
+    }
+
+    /// <summary>
     ///     Gets the server-generated user identifier.
     /// </summary>
     public int Id { get; private set; }

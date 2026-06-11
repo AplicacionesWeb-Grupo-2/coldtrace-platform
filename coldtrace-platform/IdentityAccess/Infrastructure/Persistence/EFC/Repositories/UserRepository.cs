@@ -19,4 +19,14 @@ public class UserRepository(AppDbContext context) : BaseRepository<User>(context
         return await Context.Set<User>()
             .AnyAsync(user => user.Email == normalizedEmail, cancellationToken);
     }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<User>> FindAllByOrganizationIdAsync(
+        int organizationId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<User>()
+            .Where(user => user.OrganizationId == organizationId)
+            .ToListAsync(cancellationToken);
+    }
 }

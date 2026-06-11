@@ -20,4 +20,13 @@ public class RoleRepository(AppDbContext context) : BaseRepository<Role>(context
             .Include(role => role.Permissions)
             .FirstOrDefaultAsync(role => role.Name == normalizedName, cancellationToken);
     }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<Role>> ListWithPermissionsAsync(CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<Role>()
+            .Include(role => role.Permissions)
+            .OrderBy(role => role.Id)
+            .ToListAsync(cancellationToken);
+    }
 }

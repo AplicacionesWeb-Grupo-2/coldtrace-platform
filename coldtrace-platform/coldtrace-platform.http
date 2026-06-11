@@ -43,3 +43,26 @@ Accept: application/json
 }
 
 ###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/roles
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/users
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "Andrea",
+  "lastName": "Torres",
+  "email": "andrea@signup.demo",
+  "roleId": 2
+}
+
+###

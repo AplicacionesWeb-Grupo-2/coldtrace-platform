@@ -54,4 +54,19 @@
     <data name="UnexpectedErrorCreatingOrganizationSignUp" xml:space="preserve">
         <value>Ocurrio un error inesperado al registrar la organizacion.</value>
     </data>
+    <data name="InvalidUserRequest" xml:space="preserve">
+        <value>La solicitud de usuario no es valida.</value>
+    </data>
+    <data name="OrganizationNotFound" xml:space="preserve">
+        <value>No se encontro la organizacion.</value>
+    </data>
+    <data name="RoleNotFound" xml:space="preserve">
+        <value>No se encontro el rol.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingUser" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear el usuario.</value>
+    </data>
+    <data name="UnexpectedErrorGettingUsers" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener usuarios.</value>
+    </data>
 </root>
