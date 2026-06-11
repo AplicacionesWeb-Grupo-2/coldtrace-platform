@@ -87,4 +87,22 @@
     <data name="UnexpectedErrorGettingLocations" xml:space="preserve">
         <value>An unexpected error occurred while getting locations.</value>
     </data>
+    <data name="InvalidGatewayRequest" xml:space="preserve">
+        <value>The gateway request is invalid.</value>
+    </data>
+    <data name="GatewayUuidDuplicated" xml:space="preserve">
+        <value>Gateway UUID already exists in this organization.</value>
+    </data>
+    <data name="GatewayNotFound" xml:space="preserve">
+        <value>Gateway was not found.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingGateway" xml:space="preserve">
+        <value>An unexpected error occurred while creating the gateway.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingGateway" xml:space="preserve">
+        <value>An unexpected error occurred while updating the gateway.</value>
+    </data>
+    <data name="UnexpectedErrorGettingGateways" xml:space="preserve">
+        <value>An unexpected error occurred while getting gateways.</value>
+    </data>
 </root>

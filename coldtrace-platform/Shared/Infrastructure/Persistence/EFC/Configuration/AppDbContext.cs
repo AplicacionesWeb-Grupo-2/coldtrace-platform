@@ -123,6 +123,30 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("f_k_locations_organizations_organization_id");
 
+        builder.Entity<Gateway>().HasKey(gateway => gateway.Id);
+        builder.Entity<Gateway>().Property(gateway => gateway.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Gateway>().Property(gateway => gateway.Uuid).IsRequired().HasMaxLength(128);
+        builder.Entity<Gateway>().Property(gateway => gateway.Name).IsRequired().HasMaxLength(200);
+        builder.Entity<Gateway>().Property(gateway => gateway.Network).IsRequired().HasMaxLength(120);
+        builder.Entity<Gateway>().Property(gateway => gateway.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<Gateway>().Property(gateway => gateway.CreatedAt);
+        builder.Entity<Gateway>().Property(gateway => gateway.UpdatedAt);
+        builder.Entity<Gateway>()
+            .HasIndex(gateway => new { gateway.OrganizationId, gateway.Uuid })
+            .IsUnique();
+        builder.Entity<Gateway>()
+            .HasOne(gateway => gateway.Organization)
+            .WithMany()
+            .HasForeignKey(gateway => gateway.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_gateways_organizations_organization_id");
+        builder.Entity<Gateway>()
+            .HasOne(gateway => gateway.Location)
+            .WithMany()
+            .HasForeignKey(gateway => gateway.LocationId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_gateways_locations_location_id");
+
         builder.UseSnakeCaseNamingConvention();
     }
 
