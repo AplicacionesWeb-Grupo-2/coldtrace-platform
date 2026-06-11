@@ -12,8 +12,9 @@ Ticket: T-44 - ASP.NET Core API Foundation
 CREATE DATABASE IF NOT EXISTS coldtrace_platform;
 ```
 
-- The local connection string matches `coldtrace-platform/appsettings.Development.json`,
-  or Rider overrides it with this environment variable:
+- The local connection string uses the default `root` / `root` credentials from
+  `coldtrace-platform/appsettings.Development.json`, or Rider overrides it with
+  this environment variable:
 
 ```text
 ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-password>;database=coldtrace_platform

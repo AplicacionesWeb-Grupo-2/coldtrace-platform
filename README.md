@@ -30,8 +30,9 @@ The development connection string is configured in:
 coldtrace-platform/appsettings.Development.json
 ```
 
-If your local MySQL root password is not `password`, override it in the Rider run
-configuration instead of committing a personal password:
+The default local MySQL credentials are `root` / `root`. If your local MySQL
+password is different, override it in the Rider run configuration instead of
+committing a personal password:
 
 ```text
 ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-password>;database=coldtrace_platform
