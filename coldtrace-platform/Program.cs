@@ -65,8 +65,11 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Identity Access Bounded Context Injection Configuration
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrganizationCommandService, OrganizationCommandService>();
 builder.Services.AddScoped<IOrganizationQueryService, OrganizationQueryService>();
+builder.Services.AddScoped<IOrganizationSignUpCommandService, OrganizationSignUpCommandService>();
 
 var app = builder.Build();
 
