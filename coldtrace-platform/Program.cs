@@ -1,4 +1,9 @@
 using ColdTrace.Platform.Resources;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
+using ColdTrace.Platform.IdentityAccess.Application.Services;
+using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using ColdTrace.Platform.Shared.Infrastructure.Interfaces.ASP.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
@@ -57,6 +62,11 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 
 // Shared Bounded Context Injection Configuration
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Identity Access Bounded Context Injection Configuration
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IOrganizationCommandService, OrganizationCommandService>();
+builder.Services.AddScoped<IOrganizationQueryService, OrganizationQueryService>();
 
 var app = builder.Build();
 

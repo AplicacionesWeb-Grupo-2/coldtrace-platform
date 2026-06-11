@@ -9,3 +9,21 @@ GET {{coldtrace_platform_HostAddress}}/swagger/v1/swagger.json
 Accept: application/json
 
 ###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations
+Content-Type: application/json
+Accept: application/json
+
+{
+  "legalName": "ColdTrace Demo SAC",
+  "commercialName": "ColdTrace Demo",
+  "taxId": "20123456789",
+  "contactEmail": "admin@coldtrace.demo"
+}
+
+###

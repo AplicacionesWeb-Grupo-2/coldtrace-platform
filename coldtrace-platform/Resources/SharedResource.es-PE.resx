@@ -30,4 +30,16 @@
     <data name="ResourceConflict" xml:space="preserve">
         <value>La solicitud entra en conflicto con el estado actual del recurso.</value>
     </data>
+    <data name="InvalidOrganizationRequest" xml:space="preserve">
+        <value>La solicitud de organizacion contiene valores no validos.</value>
+    </data>
+    <data name="OrganizationContactEmailDuplicated" xml:space="preserve">
+        <value>El correo de contacto de la organizacion ya esta registrado.</value>
+    </data>
+    <data name="OrganizationTaxIdDuplicated" xml:space="preserve">
+        <value>El identificador tributario de la organizacion ya esta registrado.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingOrganization" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear la organizacion.</value>
+    </data>
 </root>
