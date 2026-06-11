@@ -66,3 +66,41 @@ Accept: application/json
 }
 
 ###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations/1
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Main Cold Room",
+  "type": "cold-room",
+  "address": "Av. Industrial 123",
+  "description": "Primary refrigerated storage area",
+  "status": "active"
+}
+
+###
+
+PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Main Cold Room",
+  "type": "cold-room",
+  "address": "Av. Industrial 123",
+  "description": "Primary refrigerated storage area updated",
+  "status": "active"
+}
+
+###
