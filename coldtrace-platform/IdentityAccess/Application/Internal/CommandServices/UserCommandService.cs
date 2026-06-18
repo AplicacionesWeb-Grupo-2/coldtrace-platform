@@ -1,5 +1,5 @@
 using ColdTrace.Platform.IdentityAccess.Application.Errors;
-using ColdTrace.Platform.IdentityAccess.Application.Services;
+using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Commands;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
@@ -67,6 +67,68 @@ public class UserCommandService(
         {
             logger.LogError(ex, "Unexpected error creating user with email {Email}", command.Email);
             return new Result<User, CreateUserError>.Failure(CreateUserError.UnexpectedError);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<User, AssignUserRoleError>> Handle(
+        AssignUserRoleCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for user role assignment: {OrganizationId}",
+                command.OrganizationId);
+            return new Result<User, AssignUserRoleError>.Failure(AssignUserRoleError.OrganizationNotFound);
+        }
+
+        var user = await userRepository.FindByIdAndOrganizationIdAsync(
+            command.UserId,
+            command.OrganizationId,
+            cancellationToken);
+        if (user is null)
+        {
+            logger.LogWarning(
+                "User not found for role assignment: {OrganizationId} {UserId}",
+                command.OrganizationId,
+                command.UserId);
+            return new Result<User, AssignUserRoleError>.Failure(AssignUserRoleError.UserNotFound);
+        }
+
+        var role = await roleRepository.FindByIdAsync(command.RoleId, cancellationToken);
+        if (role is null)
+        {
+            logger.LogWarning("Role not found for user role assignment: {RoleId}", command.RoleId);
+            return new Result<User, AssignUserRoleError>.Failure(AssignUserRoleError.RoleNotFound);
+        }
+
+        try
+        {
+            user.AssignRole(command);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            return new Result<User, AssignUserRoleError>.Success(user);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogError(
+                ex,
+                "Database update failed assigning role {RoleId} to user {UserId} in organization {OrganizationId}",
+                command.RoleId,
+                command.UserId,
+                command.OrganizationId);
+            return new Result<User, AssignUserRoleError>.Failure(AssignUserRoleError.UnexpectedError);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error assigning role {RoleId} to user {UserId} in organization {OrganizationId}",
+                command.RoleId,
+                command.UserId,
+                command.OrganizationId);
+            return new Result<User, AssignUserRoleError>.Failure(AssignUserRoleError.UnexpectedError);
         }
     }
 

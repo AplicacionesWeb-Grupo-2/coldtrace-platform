@@ -1,5 +1,5 @@
 using ColdTrace.Platform.AssetManagement.Application.Errors;
-using ColdTrace.Platform.AssetManagement.Application.Services;
+using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;

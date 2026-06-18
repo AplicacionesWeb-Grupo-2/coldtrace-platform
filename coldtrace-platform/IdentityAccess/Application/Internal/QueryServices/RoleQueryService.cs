@@ -1,4 +1,4 @@
-using ColdTrace.Platform.IdentityAccess.Application.Services;
+using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Queries;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;

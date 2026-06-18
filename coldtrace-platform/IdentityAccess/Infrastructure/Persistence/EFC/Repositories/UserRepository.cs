@@ -29,4 +29,16 @@ public class UserRepository(AppDbContext context) : BaseRepository<User>(context
             .Where(user => user.OrganizationId == organizationId)
             .ToListAsync(cancellationToken);
     }
+
+    /// <inheritdoc />
+    public async Task<User?> FindByIdAndOrganizationIdAsync(
+        int userId,
+        int organizationId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<User>()
+            .FirstOrDefaultAsync(
+                user => user.Id == userId && user.OrganizationId == organizationId,
+                cancellationToken);
+    }
 }

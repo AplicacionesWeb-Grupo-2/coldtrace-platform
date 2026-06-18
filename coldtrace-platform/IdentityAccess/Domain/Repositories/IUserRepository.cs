@@ -25,4 +25,16 @@ public interface IUserRepository : IBaseRepository<User>
     Task<IEnumerable<User>> FindAllByOrganizationIdAsync(
         int organizationId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Finds a user by id and owning organization.
+    /// </summary>
+    /// <param name="userId">User identifier.</param>
+    /// <param name="organizationId">Organization identifier.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>The user when it belongs to the organization; otherwise null.</returns>
+    Task<User?> FindByIdAndOrganizationIdAsync(
+        int userId,
+        int organizationId,
+        CancellationToken cancellationToken = default);
 }

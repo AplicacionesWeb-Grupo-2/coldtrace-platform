@@ -1,4 +1,4 @@
-using ColdTrace.Platform.Shared.Domain.Model;
+using ColdTrace.Platform.Shared.Domain.Model.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 

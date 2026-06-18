@@ -6,6 +6,11 @@ namespace ColdTrace.Platform.AssetManagement.Application.Errors;
 public enum GetGatewayByIdAndOrganizationError
 {
     /// <summary>
+    ///     The organization was not found.
+    /// </summary>
+    OrganizationNotFound,
+
+    /// <summary>
     ///     The gateway was not found in the organization.
     /// </summary>
     GatewayNotFound,

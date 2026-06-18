@@ -1,5 +1,5 @@
 using ColdTrace.Platform.AssetManagement.Application.Errors;
-using ColdTrace.Platform.AssetManagement.Application.Services;
+using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
@@ -51,6 +51,16 @@ public class GatewayQueryService(
         GetGatewayByIdAndOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
+        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for gateway by id query: {OrganizationId}",
+                query.OrganizationId);
+            return new Result<Gateway, GetGatewayByIdAndOrganizationError>.Failure(
+                GetGatewayByIdAndOrganizationError.OrganizationNotFound);
+        }
+
         try
         {
             var gateway = await gatewayRepository.FindByIdAndOrganizationIdAsync(

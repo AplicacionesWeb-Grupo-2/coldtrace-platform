@@ -3,7 +3,7 @@ using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Commands;
 using ColdTrace.Platform.Shared.Application.Patterns;
 
-namespace ColdTrace.Platform.IdentityAccess.Application.Services;
+namespace ColdTrace.Platform.IdentityAccess.Domain.Services;
 
 /// <summary>
 ///     Application service contract for user commands.
@@ -18,5 +18,15 @@ public interface IUserCommandService
     /// <returns>A result with the created user or a creation error.</returns>
     Task<Result<User, CreateUserError>> Handle(
         CreateUserCommand command,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Handles assignment of a role to an existing organization user.
+    /// </summary>
+    /// <param name="command">Command containing organization, user and target role identifiers.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result with the updated user or a role assignment error.</returns>
+    Task<Result<User, AssignUserRoleError>> Handle(
+        AssignUserRoleCommand command,
         CancellationToken cancellationToken = default);
 }

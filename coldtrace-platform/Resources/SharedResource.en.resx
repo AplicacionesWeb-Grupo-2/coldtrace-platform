@@ -60,11 +60,17 @@
     <data name="OrganizationNotFound" xml:space="preserve">
         <value>Organization was not found.</value>
     </data>
+    <data name="UserNotFound" xml:space="preserve">
+        <value>User was not found.</value>
+    </data>
     <data name="RoleNotFound" xml:space="preserve">
         <value>Role was not found.</value>
     </data>
     <data name="UnexpectedErrorCreatingUser" xml:space="preserve">
         <value>An unexpected error occurred while creating the user.</value>
+    </data>
+    <data name="UnexpectedErrorAssigningUserRole" xml:space="preserve">
+        <value>An unexpected error occurred while assigning the user role.</value>
     </data>
     <data name="UnexpectedErrorGettingUsers" xml:space="preserve">
         <value>An unexpected error occurred while getting users.</value>

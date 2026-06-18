@@ -1,5 +1,5 @@
 using System.Net.Mime;
-using ColdTrace.Platform.IdentityAccess.Application.Services;
+using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Queries;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Resources;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Transform;

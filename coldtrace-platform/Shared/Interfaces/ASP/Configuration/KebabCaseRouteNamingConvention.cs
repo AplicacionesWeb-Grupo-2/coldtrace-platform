@@ -1,7 +1,7 @@
-using ColdTrace.Platform.Shared.Infrastructure.Interfaces.ASP.Configuration.Extensions;
+using ColdTrace.Platform.Shared.Interfaces.ASP.Configuration.Extensions;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
-namespace ColdTrace.Platform.Shared.Infrastructure.Interfaces.ASP.Configuration;
+namespace ColdTrace.Platform.Shared.Interfaces.ASP.Configuration;
 
 /// <summary>
 ///     An MVC controller-model convention that rewrites [controller] route tokens

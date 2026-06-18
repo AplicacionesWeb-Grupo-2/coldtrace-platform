@@ -31,6 +31,8 @@ public static class ActionResultFromGetLocationByIdResultAssembler
             Result<Location, GetLocationByIdAndOrganizationError>.Failure failure =>
                 failure.Error switch
                 {
+                    GetLocationByIdAndOrganizationError.OrganizationNotFound =>
+                        controller.NotFound(localizer["OrganizationNotFound"].Value),
                     GetLocationByIdAndOrganizationError.LocationNotFound =>
                         controller.NotFound(localizer["LocationNotFound"].Value),
                     GetLocationByIdAndOrganizationError.UnexpectedError =>

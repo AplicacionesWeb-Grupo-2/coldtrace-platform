@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace ColdTrace.Platform.Shared.Infrastructure.Interfaces.ASP.Configuration.Extensions;
+namespace ColdTrace.Platform.Shared.Interfaces.ASP.Configuration.Extensions;
 
 /// <summary>
 ///     String utility extensions used by the ASP.NET Core infrastructure layer.

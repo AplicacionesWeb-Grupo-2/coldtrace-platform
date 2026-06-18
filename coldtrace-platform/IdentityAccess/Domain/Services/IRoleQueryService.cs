@@ -1,7 +1,7 @@
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Queries;
 
-namespace ColdTrace.Platform.IdentityAccess.Application.Services;
+namespace ColdTrace.Platform.IdentityAccess.Domain.Services;
 
 /// <summary>
 ///     Application service contract for role queries.

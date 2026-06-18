@@ -3,7 +3,7 @@ using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Commands;
 using ColdTrace.Platform.Shared.Application.Patterns;
 
-namespace ColdTrace.Platform.IdentityAccess.Application.Services;
+namespace ColdTrace.Platform.IdentityAccess.Domain.Services;
 
 /// <summary>
 ///     Application service contract for organization command operations.

@@ -94,4 +94,13 @@ public class User
     ///     Gets the assigned role.
     /// </summary>
     public Role Role { get; private set; } = null!;
+
+    /// <summary>
+    ///     Assigns a role to the user.
+    /// </summary>
+    /// <param name="command">Command containing the target role identifier.</param>
+    public void AssignRole(AssignUserRoleCommand command)
+    {
+        RoleId = command.RoleId;
+    }
 }

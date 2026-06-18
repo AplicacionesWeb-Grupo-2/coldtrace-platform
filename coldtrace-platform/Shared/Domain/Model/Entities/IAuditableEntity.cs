@@ -1,4 +1,4 @@
-namespace ColdTrace.Platform.Shared.Domain.Model;
+namespace ColdTrace.Platform.Shared.Domain.Model.Entities;
 
 /// <summary>
 ///     Marks an entity as carrying audit timestamps managed by the persistence layer.

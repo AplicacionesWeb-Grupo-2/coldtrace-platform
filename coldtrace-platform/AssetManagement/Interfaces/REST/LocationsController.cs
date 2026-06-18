@@ -1,5 +1,5 @@
 using System.Net.Mime;
-using ColdTrace.Platform.AssetManagement.Application.Services;
+using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Transform;
