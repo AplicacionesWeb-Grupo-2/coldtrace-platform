@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Localization;
 using MySql.Data.MySqlClient;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure Lower Case URLs
@@ -89,6 +90,9 @@ builder.Services.AddScoped<ILocationCommandService, LocationCommandService>();
 builder.Services.AddScoped<ILocationQueryService, LocationQueryService>();
 builder.Services.AddScoped<IGatewayCommandService, GatewayCommandService>();
 builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
+builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+builder.Services.AddScoped<IAssetCommandService, AssetCommandService>();
+builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
 
 var app = builder.Build();
 
