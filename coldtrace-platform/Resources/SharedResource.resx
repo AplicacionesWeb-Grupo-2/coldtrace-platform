@@ -135,4 +135,22 @@
     <data name="UnexpectedErrorGettingMaintenanceSchedules" xml:space="preserve">
         <value>An unexpected error occurred while getting maintenance schedules.</value>
     </data>
+    <data name="InvalidTechnicalServiceRequestRequest" xml:space="preserve">
+        <value>The technical service request contains invalid values.</value>
+    </data>
+    <data name="TechnicalServiceRequestNotFound" xml:space="preserve">
+        <value>Technical service request was not found.</value>
+    </data>
+    <data name="TechnicalServiceRequestInvalidTransition" xml:space="preserve">
+        <value>The requested status transition is not allowed.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingTechnicalServiceRequest" xml:space="preserve">
+        <value>An unexpected error occurred while creating the technical service request.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingTechnicalServiceRequest" xml:space="preserve">
+        <value>An unexpected error occurred while updating the technical service request.</value>
+    </data>
+    <data name="UnexpectedErrorGettingTechnicalServiceRequests" xml:space="preserve">
+        <value>An unexpected error occurred while getting technical service requests.</value>
+    </data>
 </root>

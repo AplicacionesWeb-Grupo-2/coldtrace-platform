@@ -103,6 +103,9 @@ builder.Services.AddScoped<IAssetQueryService, AssetQueryService>();
 builder.Services.AddScoped<IMaintenanceScheduleRepository, MaintenanceScheduleRepository>();
 builder.Services.AddScoped<IMaintenanceScheduleCommandService, MaintenanceScheduleCommandService>();
 builder.Services.AddScoped<IMaintenanceScheduleQueryService, MaintenanceScheduleQueryService>();
+builder.Services.AddScoped<ITechnicalServiceRequestRepository, TechnicalServiceRequestRepository>();
+builder.Services.AddScoped<ITechnicalServiceRequestCommandService, TechnicalServiceRequestCommandService>();
+builder.Services.AddScoped<ITechnicalServiceRequestQueryService, TechnicalServiceRequestQueryService>();
 
 var app = builder.Build();
 
