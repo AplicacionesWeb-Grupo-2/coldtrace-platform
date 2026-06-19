@@ -93,6 +93,9 @@ builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<IAssetCommandService, AssetCommandService>();
 builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
+builder.Services.AddScoped<IIotDeviceRepository, IotDeviceRepository>();
+builder.Services.AddScoped<IIotDeviceCommandService, IotDeviceCommandService>();
+builder.Services.AddScoped<IIotDeviceQueryService, IotDeviceQueryService>();
 
 var app = builder.Build();
 

@@ -174,6 +174,39 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(asset => asset.LocationId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_assets_locations_location_id");
+
+        builder.Entity<IotDevice>().HasKey(device => device.Id);
+        builder.Entity<IotDevice>().Property(device => device.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<IotDevice>().Property(device => device.Uuid).IsRequired().HasMaxLength(128);
+        builder.Entity<IotDevice>().Property(device => device.Name).IsRequired().HasMaxLength(200);
+        builder.Entity<IotDevice>().Property(device => device.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<IotDevice>().Property(device => device.CreatedAt);
+        builder.Entity<IotDevice>().Property(device => device.UpdatedAt);
+        builder.Entity<IotDevice>()
+            .HasIndex(device => new { device.OrganizationId, device.Uuid })
+            .IsUnique();
+        builder.Entity<IotDevice>()
+            .HasIndex(device => device.GatewayId);
+        builder.Entity<IotDevice>()
+            .HasIndex(device => device.AssetId);
+        builder.Entity<IotDevice>()
+            .HasOne(device => device.Organization)
+            .WithMany()
+            .HasForeignKey(device => device.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_iot_devices_organizations_organization_id");
+        builder.Entity<IotDevice>()
+            .HasOne(device => device.Gateway)
+            .WithMany()
+            .HasForeignKey(device => device.GatewayId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_iot_devices_gateways_gateway_id");
+        builder.Entity<IotDevice>()
+            .HasOne(device => device.Asset)
+            .WithMany()
+            .HasForeignKey(device => device.AssetId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("f_k_iot_devices_assets_asset_id");
         
         builder.UseSnakeCaseNamingConvention();
     }

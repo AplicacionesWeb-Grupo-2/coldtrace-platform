@@ -148,6 +148,67 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("gateways");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<int?>("AssetId")
+                        .HasColumnType("int")
+                        .HasColumnName("asset_id");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("GatewayId")
+                        .HasColumnType("int")
+                        .HasColumnName("gateway_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("name");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("Uuid")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("uuid");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_iot_devices");
+
+                    b.HasIndex("AssetId")
+                        .HasDatabaseName("i_x_iot_devices_asset_id");
+
+                    b.HasIndex("GatewayId")
+                        .HasDatabaseName("i_x_iot_devices_gateway_id");
+
+                    b.HasIndex("OrganizationId", "Uuid")
+                        .IsUnique()
+                        .HasDatabaseName("i_x_iot_devices_organization_id_uuid");
+
+                    b.ToTable("iot_devices");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Location", b =>
                 {
                     b.Property<int>("Id")
@@ -414,6 +475,35 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasConstraintName("f_k_gateways_organizations_organization_id");
 
                     b.Navigation("Location");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("f_k_iot_devices_assets_asset_id");
+
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", "Gateway")
+                        .WithMany()
+                        .HasForeignKey("GatewayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_iot_devices_gateways_gateway_id");
+
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_iot_devices_organizations_organization_id");
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Gateway");
 
                     b.Navigation("Organization");
                 });
