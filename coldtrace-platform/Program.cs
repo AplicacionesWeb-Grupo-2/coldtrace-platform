@@ -13,6 +13,11 @@ using ColdTrace.Platform.MaintenanceManagement.Application.Internal.QueryService
 using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
 using ColdTrace.Platform.MaintenanceManagement.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Reports.Application.Internal.CommandServices;
+using ColdTrace.Platform.Reports.Application.Internal.QueryServices;
+using ColdTrace.Platform.Reports.Domain.Repositories;
+using ColdTrace.Platform.Reports.Domain.Services;
+using ColdTrace.Platform.Reports.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
@@ -88,6 +93,11 @@ builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IIncidentCommandService, IncidentCommandService>();
 builder.Services.AddScoped<IIncidentQueryService, IncidentQueryService>();
 builder.Services.AddScoped<INotificationQueryService, NotificationQueryService>();
+
+// Reports Bounded Context Injection Configuration
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportCommandService, ReportCommandService>();
+builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
 
 // Identity Access Bounded Context Injection Configuration
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();

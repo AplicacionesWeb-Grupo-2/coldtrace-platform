@@ -3,6 +3,7 @@ using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.Reports.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -241,6 +242,36 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(notification => notification.IncidentId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("f_k_notifications_incidents_incident_id");
+
+        builder.Entity<Report>().HasKey(report => report.Id);
+        builder.Entity<Report>().Property(report => report.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Report>().Property(report => report.Uuid).IsRequired().HasMaxLength(128);
+        builder.Entity<Report>().Property(report => report.Type).IsRequired().HasMaxLength(80);
+        builder.Entity<Report>().Property(report => report.Title).IsRequired().HasMaxLength(200);
+        builder.Entity<Report>().Property(report => report.PeriodStart).IsRequired();
+        builder.Entity<Report>().Property(report => report.PeriodEnd).IsRequired();
+        builder.Entity<Report>().Property(report => report.GeneratedAt).IsRequired();
+        builder.Entity<Report>().Property(report => report.AssetCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.ReadingCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.OutOfRangeReadingCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.IncidentCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.OpenIncidentCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.AverageTemperature);
+        builder.Entity<Report>().Property(report => report.AverageHumidity);
+        builder.Entity<Report>().Property(report => report.CompliancePercentage);
+        builder.Entity<Report>().Property(report => report.CreatedAt);
+        builder.Entity<Report>().Property(report => report.UpdatedAt);
+        builder.Entity<Report>()
+            .HasIndex(report => new { report.OrganizationId, report.GeneratedAt });
+        builder.Entity<Report>()
+            .HasIndex(report => new { report.OrganizationId, report.Uuid })
+            .IsUnique();
+        builder.Entity<Report>()
+            .HasOne(report => report.Organization)
+            .WithMany()
+            .HasForeignKey(report => report.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_reports_organizations_organization_id");
         
         builder.Entity<MaintenanceSchedule>().HasKey(s => s.Id);
         builder.Entity<MaintenanceSchedule>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
