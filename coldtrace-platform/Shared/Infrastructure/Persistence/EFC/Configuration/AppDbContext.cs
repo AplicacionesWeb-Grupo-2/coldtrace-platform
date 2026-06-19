@@ -3,6 +3,8 @@ using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
 using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
+using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.Reports.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Interceptors;
 using Microsoft.EntityFrameworkCore;
