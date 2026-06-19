@@ -111,4 +111,28 @@
     <data name="UnexpectedErrorGettingGateways" xml:space="preserve">
         <value>An unexpected error occurred while getting gateways.</value>
     </data>
+    <data name="AssetNotFound" xml:space="preserve">
+        <value>Asset was not found.</value>
+    </data>
+    <data name="InvalidMaintenanceScheduleRequest" xml:space="preserve">
+        <value>The maintenance schedule request is invalid.</value>
+    </data>
+    <data name="MaintenanceScheduleNotFound" xml:space="preserve">
+        <value>Maintenance schedule was not found.</value>
+    </data>
+    <data name="MaintenanceScheduleDuplicateActive" xml:space="preserve">
+        <value>The asset already has an active maintenance schedule.</value>
+    </data>
+    <data name="MaintenanceScheduleInvalidTransition" xml:space="preserve">
+        <value>The requested status transition is not allowed.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingMaintenanceSchedule" xml:space="preserve">
+        <value>An unexpected error occurred while creating the maintenance schedule.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingMaintenanceSchedule" xml:space="preserve">
+        <value>An unexpected error occurred while updating the maintenance schedule.</value>
+    </data>
+    <data name="UnexpectedErrorGettingMaintenanceSchedules" xml:space="preserve">
+        <value>An unexpected error occurred while getting maintenance schedules.</value>
+    </data>
 </root>

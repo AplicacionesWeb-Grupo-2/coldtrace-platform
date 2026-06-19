@@ -3,6 +3,11 @@ using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.MaintenanceManagement.Application.Internal.CommandServices;
+using ColdTrace.Platform.MaintenanceManagement.Application.Internal.QueryServices;
+using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
+using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
+using ColdTrace.Platform.MaintenanceManagement.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
@@ -86,13 +91,18 @@ builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
 // Asset Management Bounded Context Injection Configuration
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IGatewayRepository, GatewayRepository>();
+builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<ILocationCommandService, LocationCommandService>();
 builder.Services.AddScoped<ILocationQueryService, LocationQueryService>();
 builder.Services.AddScoped<IGatewayCommandService, GatewayCommandService>();
 builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
-builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<IAssetCommandService, AssetCommandService>();
-builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
+builder.Services.AddScoped<IAssetQueryService, AssetQueryService>();
+
+// Maintenance Management Bounded Context Injection Configuration
+builder.Services.AddScoped<IMaintenanceScheduleRepository, MaintenanceScheduleRepository>();
+builder.Services.AddScoped<IMaintenanceScheduleCommandService, MaintenanceScheduleCommandService>();
+builder.Services.AddScoped<IMaintenanceScheduleQueryService, MaintenanceScheduleQueryService>();
 
 var app = builder.Build();
 
