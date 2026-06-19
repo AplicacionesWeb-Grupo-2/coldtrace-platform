@@ -201,3 +201,30 @@ Accept: application/json
 }
 
 ###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/sensor-readings
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/sensor-readings/1
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1/sensor-readings
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1/sensor-readings
+Content-Type: application/json
+Accept: application/json
+
+{
+  "metric": "temperature",
+  "value": 4.25,
+  "unit": "C"
+}
+
+###

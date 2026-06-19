@@ -150,4 +150,19 @@
     <data name="UnexpectedErrorGettingIotDevices" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener dispositivos IoT.</value>
     </data>
+    <data name="InvalidSensorReadingRequest" xml:space="preserve">
+        <value>La solicitud de lectura del sensor no es valida.</value>
+    </data>
+    <data name="SensorReadingNotFound" xml:space="preserve">
+        <value>No se encontro la lectura del sensor.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingSensorReading" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear la lectura del sensor.</value>
+    </data>
+    <data name="UnexpectedErrorGettingSensorReading" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener la lectura del sensor.</value>
+    </data>
+    <data name="UnexpectedErrorGettingSensorReadings" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener lecturas del sensor.</value>
+    </data>
 </root>
