@@ -199,6 +199,36 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("f_k_maintenance_schedules_assets_asset_id");
 
+        builder.Entity<TechnicalServiceRequest>().HasKey(r => r.Id);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Code).IsRequired().HasMaxLength(16);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.AssetLocationId).IsRequired();
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.AssetName).HasMaxLength(200);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.IncidentId);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.IssueDescription).IsRequired().HasMaxLength(1024);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Priority).IsRequired().HasMaxLength(32);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.RequestedBy).HasMaxLength(256);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.RequestedAt).IsRequired();
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.ClosedAt);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.ClosureSummary).HasMaxLength(1024);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Evidence).HasMaxLength(1024);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.ClosedBy).HasMaxLength(256);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.CreatedAt);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.UpdatedAt);
+        builder.Entity<TechnicalServiceRequest>()
+            .HasOne(r => r.Organization)
+            .WithMany()
+            .HasForeignKey(r => r.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_technical_service_requests_organizations_organization_id");
+        builder.Entity<TechnicalServiceRequest>()
+            .HasOne(r => r.Asset)
+            .WithMany()
+            .HasForeignKey(r => r.AssetId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_technical_service_requests_assets_asset_id");
+
         builder.UseSnakeCaseNamingConvention();
     }
 
