@@ -1,3 +1,8 @@
+using ColdTrace.Platform.Alerts.Application.Internal.CommandServices;
+using ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
+using ColdTrace.Platform.Alerts.Domain.Repositories;
+using ColdTrace.Platform.Alerts.Domain.Services;
+using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.AssetManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
@@ -76,6 +81,13 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 
 // Shared Bounded Context Injection Configuration
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Alerts Bounded Context Injection Configuration
+builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IIncidentCommandService, IncidentCommandService>();
+builder.Services.AddScoped<IIncidentQueryService, IncidentQueryService>();
+builder.Services.AddScoped<INotificationQueryService, NotificationQueryService>();
 
 // Identity Access Bounded Context Injection Configuration
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();

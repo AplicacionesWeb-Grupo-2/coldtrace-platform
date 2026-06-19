@@ -1,3 +1,4 @@
+using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
@@ -175,6 +176,71 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(asset => asset.LocationId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_assets_locations_location_id");
+
+        builder.Entity<Incident>().HasKey(incident => incident.Id);
+        builder.Entity<Incident>().Property(incident => incident.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Incident>().Property(incident => incident.DeviceId);
+        builder.Entity<Incident>().Property(incident => incident.ReadingId);
+        builder.Entity<Incident>().Property(incident => incident.AssetName).HasMaxLength(200);
+        builder.Entity<Incident>().Property(incident => incident.DeviceName).HasMaxLength(200);
+        builder.Entity<Incident>().Property(incident => incident.Type).IsRequired().HasMaxLength(120);
+        builder.Entity<Incident>().Property(incident => incident.Severity).IsRequired().HasMaxLength(32);
+        builder.Entity<Incident>().Property(incident => incident.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<Incident>().Property(incident => incident.Value).HasMaxLength(120);
+        builder.Entity<Incident>().Property(incident => incident.DetectedAt).IsRequired();
+        builder.Entity<Incident>().Property(incident => incident.AcknowledgedAt);
+        builder.Entity<Incident>().Property(incident => incident.AcknowledgedBy).HasMaxLength(256);
+        builder.Entity<Incident>().Property(incident => incident.ResolvedAt);
+        builder.Entity<Incident>().Property(incident => incident.ResolvedBy).HasMaxLength(256);
+        builder.Entity<Incident>().Property(incident => incident.ResolutionNotes).HasMaxLength(1024);
+        builder.Entity<Incident>().Property(incident => incident.LastNotificationStatus).HasMaxLength(32);
+        builder.Entity<Incident>().Property(incident => incident.LastNotificationAt);
+        builder.Entity<Incident>().Property(incident => incident.NotificationCount).IsRequired();
+        builder.Entity<Incident>().Property(incident => incident.CreatedAt);
+        builder.Entity<Incident>().Property(incident => incident.UpdatedAt);
+        builder.Entity<Incident>()
+            .HasIndex(incident => new { incident.OrganizationId, incident.Status });
+        builder.Entity<Incident>()
+            .HasIndex(incident => new { incident.OrganizationId, incident.AssetId });
+        builder.Entity<Incident>()
+            .HasIndex(incident => new { incident.OrganizationId, incident.ReadingId });
+        builder.Entity<Incident>()
+            .HasOne(incident => incident.Organization)
+            .WithMany()
+            .HasForeignKey(incident => incident.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_incidents_organizations_organization_id");
+        builder.Entity<Incident>()
+            .HasOne(incident => incident.Asset)
+            .WithMany()
+            .HasForeignKey(incident => incident.AssetId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("f_k_incidents_assets_asset_id");
+
+        builder.Entity<Notification>().HasKey(notification => notification.Id);
+        builder.Entity<Notification>().Property(notification => notification.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Notification>().Property(notification => notification.Channel).IsRequired().HasMaxLength(32);
+        builder.Entity<Notification>().Property(notification => notification.Recipient).HasMaxLength(256);
+        builder.Entity<Notification>().Property(notification => notification.Message).IsRequired().HasMaxLength(512);
+        builder.Entity<Notification>().Property(notification => notification.Status).IsRequired().HasMaxLength(32);
+        builder.Entity<Notification>().Property(notification => notification.DeliveredAt);
+        builder.Entity<Notification>().Property(notification => notification.FailureReason).HasMaxLength(512);
+        builder.Entity<Notification>().Property(notification => notification.CreatedAt);
+        builder.Entity<Notification>().Property(notification => notification.UpdatedAt);
+        builder.Entity<Notification>()
+            .HasIndex(notification => new { notification.OrganizationId, notification.IncidentId });
+        builder.Entity<Notification>()
+            .HasOne(notification => notification.Organization)
+            .WithMany()
+            .HasForeignKey(notification => notification.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_notifications_organizations_organization_id");
+        builder.Entity<Notification>()
+            .HasOne(notification => notification.Incident)
+            .WithMany()
+            .HasForeignKey(notification => notification.IncidentId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_notifications_incidents_incident_id");
         
         builder.Entity<MaintenanceSchedule>().HasKey(s => s.Id);
         builder.Entity<MaintenanceSchedule>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();

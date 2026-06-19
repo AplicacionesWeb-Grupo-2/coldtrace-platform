@@ -153,4 +153,34 @@
     <data name="UnexpectedErrorGettingTechnicalServiceRequests" xml:space="preserve">
         <value>An unexpected error occurred while getting technical service requests.</value>
     </data>
+    <data name="InvalidIncidentRequest" xml:space="preserve">
+        <value>The incident request is invalid.</value>
+    </data>
+    <data name="IncidentNotFound" xml:space="preserve">
+        <value>Incident was not found.</value>
+    </data>
+    <data name="IncidentAlreadyAcknowledged" xml:space="preserve">
+        <value>The incident is already acknowledged.</value>
+    </data>
+    <data name="IncidentAlreadyResolved" xml:space="preserve">
+        <value>The incident is already resolved.</value>
+    </data>
+    <data name="InvalidIncidentLifecycleTransition" xml:space="preserve">
+        <value>The requested incident lifecycle transition is not allowed.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingIncident" xml:space="preserve">
+        <value>An unexpected error occurred while creating the incident.</value>
+    </data>
+    <data name="UnexpectedErrorAcknowledgingIncident" xml:space="preserve">
+        <value>An unexpected error occurred while acknowledging the incident.</value>
+    </data>
+    <data name="UnexpectedErrorResolvingIncident" xml:space="preserve">
+        <value>An unexpected error occurred while resolving the incident.</value>
+    </data>
+    <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
+        <value>An unexpected error occurred while getting incidents.</value>
+    </data>
+    <data name="UnexpectedErrorGettingNotifications" xml:space="preserve">
+        <value>An unexpected error occurred while getting notifications.</value>
+    </data>
 </root>
