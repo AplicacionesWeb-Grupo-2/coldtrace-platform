@@ -1,3 +1,8 @@
+using ColdTrace.Platform.Alerts.Application.Internal.CommandServices;
+using ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
+using ColdTrace.Platform.Alerts.Domain.Repositories;
+using ColdTrace.Platform.Alerts.Domain.Services;
+using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.AssetManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
@@ -8,6 +13,16 @@ using ColdTrace.Platform.Monitoring.Application.Internal.QueryServices;
 using ColdTrace.Platform.Monitoring.Domain.Repositories;
 using ColdTrace.Platform.Monitoring.Domain.Services;
 using ColdTrace.Platform.Monitoring.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.MaintenanceManagement.Application.Internal.CommandServices;
+using ColdTrace.Platform.MaintenanceManagement.Application.Internal.QueryServices;
+using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
+using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
+using ColdTrace.Platform.MaintenanceManagement.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Reports.Application.Internal.CommandServices;
+using ColdTrace.Platform.Reports.Application.Internal.QueryServices;
+using ColdTrace.Platform.Reports.Domain.Repositories;
+using ColdTrace.Platform.Reports.Domain.Services;
+using ColdTrace.Platform.Reports.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
@@ -75,6 +90,18 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 // Shared Bounded Context Injection Configuration
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Alerts Bounded Context Injection Configuration
+builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IIncidentCommandService, IncidentCommandService>();
+builder.Services.AddScoped<IIncidentQueryService, IncidentQueryService>();
+builder.Services.AddScoped<INotificationQueryService, NotificationQueryService>();
+
+// Reports Bounded Context Injection Configuration
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
+builder.Services.AddScoped<IReportCommandService, ReportCommandService>();
+builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
+
 // Identity Access Bounded Context Injection Configuration
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
@@ -89,11 +116,11 @@ builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
 // Asset Management Bounded Context Injection Configuration
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IGatewayRepository, GatewayRepository>();
+builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<ILocationCommandService, LocationCommandService>();
 builder.Services.AddScoped<ILocationQueryService, LocationQueryService>();
 builder.Services.AddScoped<IGatewayCommandService, GatewayCommandService>();
 builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
-builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<IAssetCommandService, AssetCommandService>();
 builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
 builder.Services.AddScoped<IIotDeviceRepository, IotDeviceRepository>();
@@ -104,6 +131,15 @@ builder.Services.AddScoped<IIotDeviceQueryService, IotDeviceQueryService>();
 builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
 builder.Services.AddScoped<ISensorReadingCommandService, SensorReadingCommandService>();
 builder.Services.AddScoped<ISensorReadingQueryService, SensorReadingQueryService>();
+builder.Services.AddScoped<IAssetQueryService, AssetQueryService>();
+
+// Maintenance Management Bounded Context Injection Configuration
+builder.Services.AddScoped<IMaintenanceScheduleRepository, MaintenanceScheduleRepository>();
+builder.Services.AddScoped<IMaintenanceScheduleCommandService, MaintenanceScheduleCommandService>();
+builder.Services.AddScoped<IMaintenanceScheduleQueryService, MaintenanceScheduleQueryService>();
+builder.Services.AddScoped<ITechnicalServiceRequestRepository, TechnicalServiceRequestRepository>();
+builder.Services.AddScoped<ITechnicalServiceRequestCommandService, TechnicalServiceRequestCommandService>();
+builder.Services.AddScoped<ITechnicalServiceRequestQueryService, TechnicalServiceRequestQueryService>();
 
 var app = builder.Build();
 

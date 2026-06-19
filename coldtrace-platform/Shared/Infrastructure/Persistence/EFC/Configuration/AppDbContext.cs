@@ -1,3 +1,4 @@
+using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
@@ -235,7 +236,154 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(reading => reading.IotDeviceId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("f_k_sensor_readings_iot_devices_iot_device_id");
+        builder.Entity<Incident>().HasKey(incident => incident.Id);
+        builder.Entity<Incident>().Property(incident => incident.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Incident>().Property(incident => incident.DeviceId);
+        builder.Entity<Incident>().Property(incident => incident.ReadingId);
+        builder.Entity<Incident>().Property(incident => incident.AssetName).HasMaxLength(200);
+        builder.Entity<Incident>().Property(incident => incident.DeviceName).HasMaxLength(200);
+        builder.Entity<Incident>().Property(incident => incident.Type).IsRequired().HasMaxLength(120);
+        builder.Entity<Incident>().Property(incident => incident.Severity).IsRequired().HasMaxLength(32);
+        builder.Entity<Incident>().Property(incident => incident.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<Incident>().Property(incident => incident.Value).HasMaxLength(120);
+        builder.Entity<Incident>().Property(incident => incident.DetectedAt).IsRequired();
+        builder.Entity<Incident>().Property(incident => incident.AcknowledgedAt);
+        builder.Entity<Incident>().Property(incident => incident.AcknowledgedBy).HasMaxLength(256);
+        builder.Entity<Incident>().Property(incident => incident.ResolvedAt);
+        builder.Entity<Incident>().Property(incident => incident.ResolvedBy).HasMaxLength(256);
+        builder.Entity<Incident>().Property(incident => incident.ResolutionNotes).HasMaxLength(1024);
+        builder.Entity<Incident>().Property(incident => incident.LastNotificationStatus).HasMaxLength(32);
+        builder.Entity<Incident>().Property(incident => incident.LastNotificationAt);
+        builder.Entity<Incident>().Property(incident => incident.NotificationCount).IsRequired();
+        builder.Entity<Incident>().Property(incident => incident.CreatedAt);
+        builder.Entity<Incident>().Property(incident => incident.UpdatedAt);
+        builder.Entity<Incident>()
+            .HasIndex(incident => new { incident.OrganizationId, incident.Status });
+        builder.Entity<Incident>()
+            .HasIndex(incident => new { incident.OrganizationId, incident.AssetId });
+        builder.Entity<Incident>()
+            .HasIndex(incident => new { incident.OrganizationId, incident.ReadingId });
+        builder.Entity<Incident>()
+            .HasOne(incident => incident.Organization)
+            .WithMany()
+            .HasForeignKey(incident => incident.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_incidents_organizations_organization_id");
+        builder.Entity<Incident>()
+            .HasOne(incident => incident.Asset)
+            .WithMany()
+            .HasForeignKey(incident => incident.AssetId)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("f_k_incidents_assets_asset_id");
+
+        builder.Entity<Notification>().HasKey(notification => notification.Id);
+        builder.Entity<Notification>().Property(notification => notification.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Notification>().Property(notification => notification.Channel).IsRequired().HasMaxLength(32);
+        builder.Entity<Notification>().Property(notification => notification.Recipient).HasMaxLength(256);
+        builder.Entity<Notification>().Property(notification => notification.Message).IsRequired().HasMaxLength(512);
+        builder.Entity<Notification>().Property(notification => notification.Status).IsRequired().HasMaxLength(32);
+        builder.Entity<Notification>().Property(notification => notification.DeliveredAt);
+        builder.Entity<Notification>().Property(notification => notification.FailureReason).HasMaxLength(512);
+        builder.Entity<Notification>().Property(notification => notification.CreatedAt);
+        builder.Entity<Notification>().Property(notification => notification.UpdatedAt);
+        builder.Entity<Notification>()
+            .HasIndex(notification => new { notification.OrganizationId, notification.IncidentId });
+        builder.Entity<Notification>()
+            .HasOne(notification => notification.Organization)
+            .WithMany()
+            .HasForeignKey(notification => notification.OrganizationId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_notifications_organizations_organization_id");
+        builder.Entity<Notification>()
+            .HasOne(notification => notification.Incident)
+            .WithMany()
+            .HasForeignKey(notification => notification.IncidentId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_notifications_incidents_incident_id");
+
+        builder.Entity<Report>().HasKey(report => report.Id);
+        builder.Entity<Report>().Property(report => report.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Report>().Property(report => report.Uuid).IsRequired().HasMaxLength(128);
+        builder.Entity<Report>().Property(report => report.Type).IsRequired().HasMaxLength(80);
+        builder.Entity<Report>().Property(report => report.Title).IsRequired().HasMaxLength(200);
+        builder.Entity<Report>().Property(report => report.PeriodStart).IsRequired();
+        builder.Entity<Report>().Property(report => report.PeriodEnd).IsRequired();
+        builder.Entity<Report>().Property(report => report.GeneratedAt).IsRequired();
+        builder.Entity<Report>().Property(report => report.AssetCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.ReadingCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.OutOfRangeReadingCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.IncidentCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.OpenIncidentCount).IsRequired();
+        builder.Entity<Report>().Property(report => report.AverageTemperature);
+        builder.Entity<Report>().Property(report => report.AverageHumidity);
+        builder.Entity<Report>().Property(report => report.CompliancePercentage);
+        builder.Entity<Report>().Property(report => report.CreatedAt);
+        builder.Entity<Report>().Property(report => report.UpdatedAt);
+        builder.Entity<Report>()
+            .HasIndex(report => new { report.OrganizationId, report.GeneratedAt });
+        builder.Entity<Report>()
+            .HasIndex(report => new { report.OrganizationId, report.Uuid })
+            .IsUnique();
+        builder.Entity<Report>()
+            .HasOne(report => report.Organization)
+            .WithMany()
+            .HasForeignKey(report => report.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_reports_organizations_organization_id");
         
+        builder.Entity<MaintenanceSchedule>().HasKey(s => s.Id);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Uuid).IsRequired().HasMaxLength(32);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.ScheduledDate).IsRequired();
+        builder.Entity<MaintenanceSchedule>().Property(s => s.FrequencyDays);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.ResponsibleUserId);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Observations).HasMaxLength(512);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.CreatedAt);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.UpdatedAt);
+        builder.Entity<MaintenanceSchedule>()
+            .HasOne(s => s.Organization)
+            .WithMany()
+            .HasForeignKey(s => s.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_maintenance_schedules_organizations_organization_id");
+        builder.Entity<MaintenanceSchedule>()
+            .HasOne(s => s.Asset)
+            .WithMany()
+            .HasForeignKey(s => s.AssetId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_maintenance_schedules_assets_asset_id");
+
+        builder.Entity<TechnicalServiceRequest>().HasKey(r => r.Id);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Code).IsRequired().HasMaxLength(16);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.AssetLocationId).IsRequired();
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.AssetName).HasMaxLength(200);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.IncidentId);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.IssueDescription).IsRequired().HasMaxLength(1024);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Priority).IsRequired().HasMaxLength(32);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.RequestedBy).HasMaxLength(256);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.RequestedAt).IsRequired();
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.ClosedAt);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.ClosureSummary).HasMaxLength(1024);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Evidence).HasMaxLength(1024);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.ClosedBy).HasMaxLength(256);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.CreatedAt);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.UpdatedAt);
+        builder.Entity<TechnicalServiceRequest>()
+            .HasOne(r => r.Organization)
+            .WithMany()
+            .HasForeignKey(r => r.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_technical_service_requests_organizations_organization_id");
+        builder.Entity<TechnicalServiceRequest>()
+            .HasOne(r => r.Asset)
+            .WithMany()
+            .HasForeignKey(r => r.AssetId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_technical_service_requests_assets_asset_id");
+
         builder.UseSnakeCaseNamingConvention();
     }
 
