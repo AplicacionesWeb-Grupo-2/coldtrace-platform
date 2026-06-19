@@ -3,6 +3,11 @@ using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Monitoring.Application.Internal.CommandServices;
+using ColdTrace.Platform.Monitoring.Application.Internal.QueryServices;
+using ColdTrace.Platform.Monitoring.Domain.Repositories;
+using ColdTrace.Platform.Monitoring.Domain.Services;
+using ColdTrace.Platform.Monitoring.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
@@ -96,6 +101,11 @@ builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
 builder.Services.AddScoped<IIotDeviceRepository, IotDeviceRepository>();
 builder.Services.AddScoped<IIotDeviceCommandService, IotDeviceCommandService>();
 builder.Services.AddScoped<IIotDeviceQueryService, IotDeviceQueryService>();
+
+// Monitoring Bounded Context Injection Configuration
+builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
+builder.Services.AddScoped<ISensorReadingCommandService, SensorReadingCommandService>();
+builder.Services.AddScoped<ISensorReadingQueryService, SensorReadingQueryService>();
 
 var app = builder.Build();
 

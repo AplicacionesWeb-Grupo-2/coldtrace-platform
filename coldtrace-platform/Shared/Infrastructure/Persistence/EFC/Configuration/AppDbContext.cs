@@ -1,6 +1,7 @@
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
+using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -207,6 +208,33 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(device => device.AssetId)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("f_k_iot_devices_assets_asset_id");
+
+        builder.Entity<SensorReading>().HasKey(reading => reading.Id);
+        builder.Entity<SensorReading>().Property(reading => reading.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<SensorReading>().Property(reading => reading.Metric).IsRequired().HasMaxLength(80);
+        builder.Entity<SensorReading>().Property(reading => reading.Value).IsRequired().HasPrecision(12, 4);
+        builder.Entity<SensorReading>().Property(reading => reading.Unit).IsRequired().HasMaxLength(32);
+        builder.Entity<SensorReading>().Property(reading => reading.RecordedAt).IsRequired();
+        builder.Entity<SensorReading>().Property(reading => reading.CreatedAt);
+        builder.Entity<SensorReading>().Property(reading => reading.UpdatedAt);
+        builder.Entity<SensorReading>()
+            .HasIndex(reading => reading.OrganizationId);
+        builder.Entity<SensorReading>()
+            .HasIndex(reading => reading.IotDeviceId);
+        builder.Entity<SensorReading>()
+            .HasIndex(reading => new { reading.OrganizationId, reading.RecordedAt });
+        builder.Entity<SensorReading>()
+            .HasOne(reading => reading.Organization)
+            .WithMany()
+            .HasForeignKey(reading => reading.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_sensor_readings_organizations_organization_id");
+        builder.Entity<SensorReading>()
+            .HasOne(reading => reading.IotDevice)
+            .WithMany()
+            .HasForeignKey(reading => reading.IotDeviceId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_sensor_readings_iot_devices_iot_device_id");
         
         builder.UseSnakeCaseNamingConvention();
     }

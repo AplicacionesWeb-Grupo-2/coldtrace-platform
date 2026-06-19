@@ -209,6 +209,66 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("iot_devices");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.Monitoring.Domain.Model.Aggregates.SensorReading", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("recorded_at");
+
+                    b.Property<int>("IotDeviceId")
+                        .HasColumnType("int")
+                        .HasColumnName("iot_device_id");
+
+                    b.Property<string>("Metric")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("metric");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("unit");
+
+                    b.Property<decimal>("Value")
+                        .IsRequired()
+                        .HasPrecision(12, 4)
+                        .HasColumnType("decimal(12,4)")
+                        .HasColumnName("value");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_sensor_readings");
+
+                    b.HasIndex("IotDeviceId")
+                        .HasDatabaseName("i_x_sensor_readings_iot_device_id");
+
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("i_x_sensor_readings_organization_id");
+
+                    b.HasIndex("OrganizationId", "RecordedAt")
+                        .HasDatabaseName("i_x_sensor_readings_organization_id_recorded_at");
+
+                    b.ToTable("sensor_readings");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Location", b =>
                 {
                     b.Property<int>("Id")
@@ -504,6 +564,27 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.Navigation("Asset");
 
                     b.Navigation("Gateway");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.Monitoring.Domain.Model.Aggregates.SensorReading", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", "IotDevice")
+                        .WithMany()
+                        .HasForeignKey("IotDeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_sensor_readings_iot_devices_iot_device_id");
+
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_sensor_readings_organizations_organization_id");
+
+                    b.Navigation("IotDevice");
 
                     b.Navigation("Organization");
                 });
