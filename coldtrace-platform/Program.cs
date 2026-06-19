@@ -123,6 +123,7 @@ builder.Services.AddScoped<IGatewayCommandService, GatewayCommandService>();
 builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
 builder.Services.AddScoped<IAssetCommandService, AssetCommandService>();
 builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
+
 builder.Services.AddScoped<IIotDeviceRepository, IotDeviceRepository>();
 builder.Services.AddScoped<IIotDeviceCommandService, IotDeviceCommandService>();
 builder.Services.AddScoped<IIotDeviceQueryService, IotDeviceQueryService>();
@@ -140,6 +141,11 @@ builder.Services.AddScoped<IMaintenanceScheduleQueryService, MaintenanceSchedule
 builder.Services.AddScoped<ITechnicalServiceRequestRepository, TechnicalServiceRequestRepository>();
 builder.Services.AddScoped<ITechnicalServiceRequestCommandService, TechnicalServiceRequestCommandService>();
 builder.Services.AddScoped<ITechnicalServiceRequestQueryService, TechnicalServiceRequestQueryService>();
+
+builder.Services.AddScoped<IAssetSettingsRepository, AssetSettingsRepository>();
+builder.Services.AddScoped<IAssetSettingsCommandService, AssetSettingsCommandService>();
+builder.Services.AddScoped<IAssetSettingsQueryService, AssetSettingsQueryService>();//HU-50
+
 
 var app = builder.Build();
 
