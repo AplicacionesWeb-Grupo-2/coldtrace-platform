@@ -111,4 +111,43 @@
     <data name="UnexpectedErrorGettingGateways" xml:space="preserve">
         <value>An unexpected error occurred while getting gateways.</value>
     </data>
+    <data name="InvalidAssetRequest" xml:space="preserve">
+        <value>The asset request is invalid.</value>
+    </data>
+    <data name="AssetUuidDuplicated" xml:space="preserve">
+        <value>Asset UUID already exists in this organization.</value>
+    </data>
+    <data name="AssetNotFound" xml:space="preserve">
+        <value>Asset was not found.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingAsset" xml:space="preserve">
+        <value>An unexpected error occurred while creating the asset.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingAsset" xml:space="preserve">
+        <value>An unexpected error occurred while updating the asset.</value>
+    </data>
+    <data name="UnexpectedErrorGettingAssets" xml:space="preserve">
+        <value>An unexpected error occurred while getting assets.</value>
+    </data>
+    <data name="InvalidIotDeviceRequest" xml:space="preserve">
+        <value>The IoT device request is invalid.</value>
+    </data>
+    <data name="IotDeviceUuidDuplicated" xml:space="preserve">
+        <value>IoT device UUID already exists in this organization.</value>
+    </data>
+    <data name="IotDeviceNotFound" xml:space="preserve">
+        <value>IoT device was not found.</value>
+    </data>
+    <data name="IotDeviceAssetLocationNotCompatible" xml:space="preserve">
+        <value>The selected asset is not located at the same gateway location.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingIotDevice" xml:space="preserve">
+        <value>An unexpected error occurred while creating the IoT device.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingIotDevice" xml:space="preserve">
+        <value>An unexpected error occurred while updating the IoT device.</value>
+    </data>
+    <data name="UnexpectedErrorGettingIotDevices" xml:space="preserve">
+        <value>An unexpected error occurred while getting IoT devices.</value>
+    </data>
 </root>

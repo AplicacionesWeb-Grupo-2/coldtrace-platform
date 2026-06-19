@@ -111,4 +111,43 @@
     <data name="UnexpectedErrorGettingGateways" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener gateways.</value>
     </data>
+    <data name="InvalidAssetRequest" xml:space="preserve">
+        <value>La solicitud de activo no es valida.</value>
+    </data>
+    <data name="AssetUuidDuplicated" xml:space="preserve">
+        <value>El UUID del activo ya existe en esta organizacion.</value>
+    </data>
+    <data name="AssetNotFound" xml:space="preserve">
+        <value>No se encontro el activo.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingAsset" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear el activo.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingAsset" xml:space="preserve">
+        <value>Ocurrio un error inesperado al actualizar el activo.</value>
+    </data>
+    <data name="UnexpectedErrorGettingAssets" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener activos.</value>
+    </data>
+    <data name="InvalidIotDeviceRequest" xml:space="preserve">
+        <value>La solicitud de dispositivo IoT no es valida.</value>
+    </data>
+    <data name="IotDeviceUuidDuplicated" xml:space="preserve">
+        <value>El UUID del dispositivo IoT ya existe en esta organizacion.</value>
+    </data>
+    <data name="IotDeviceNotFound" xml:space="preserve">
+        <value>No se encontro el dispositivo IoT.</value>
+    </data>
+    <data name="IotDeviceAssetLocationNotCompatible" xml:space="preserve">
+        <value>El activo seleccionado no esta en la misma ubicacion del gateway.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingIotDevice" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear el dispositivo IoT.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingIotDevice" xml:space="preserve">
+        <value>Ocurrio un error inesperado al actualizar el dispositivo IoT.</value>
+    </data>
+    <data name="UnexpectedErrorGettingIotDevices" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener dispositivos IoT.</value>
+    </data>
 </root>
