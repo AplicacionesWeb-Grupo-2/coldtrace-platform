@@ -147,6 +147,34 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_gateways_locations_location_id");
 
+        //HU-48
+        
+        builder.Entity<Asset>().HasKey(asset => asset.Id);
+        builder.Entity<Asset>().Property(asset => asset.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Asset>().Property(asset => asset.Uuid).IsRequired().HasMaxLength(128);
+        builder.Entity<Asset>().Property(asset => asset.Type).IsRequired().HasMaxLength(80);
+        builder.Entity<Asset>().Property(asset => asset.Name).IsRequired().HasMaxLength(200);
+        builder.Entity<Asset>().Property(asset => asset.Capacity).IsRequired();
+        builder.Entity<Asset>().Property(asset => asset.Description).HasMaxLength(512);
+        builder.Entity<Asset>().Property(asset => asset.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<Asset>().Property(asset => asset.CreatedAt);
+        builder.Entity<Asset>().Property(asset => asset.UpdatedAt);
+        builder.Entity<Asset>()
+            .HasIndex(asset => new { asset.OrganizationId, asset.Uuid })
+            .IsUnique();
+        builder.Entity<Asset>()
+            .HasOne(asset => asset.Organization)
+            .WithMany()
+            .HasForeignKey(asset => asset.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_assets_organizations_organization_id");
+        builder.Entity<Asset>()
+            .HasOne(asset => asset.Location)
+            .WithMany()
+            .HasForeignKey(asset => asset.LocationId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_assets_locations_location_id");
+        
         builder.UseSnakeCaseNamingConvention();
     }
 

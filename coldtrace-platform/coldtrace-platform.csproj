@@ -35,9 +35,6 @@
         <Folder Include="Alerts\Interfaces\REST\Transform\"/>
         <Folder Include="AssetManagement\Application\"/>
         <Folder Include="AssetManagement\Domain\Model\"/>
-        <Folder Include="AssetManagement\Infrastructure\Persistence\EFC\Repositories\"/>
-        <Folder Include="AssetManagement\Interfaces\REST\Resources\"/>
-        <Folder Include="AssetManagement\Interfaces\REST\Transform\"/>
         <Folder Include="IdentityAccess\Application\"/>
         <Folder Include="IdentityAccess\Domain\Model\"/>
         <Folder Include="IdentityAccess\Infrastructure\Persistence\EFC\Repositories\"/>
