@@ -1,6 +1,7 @@
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
+using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Interceptors;
 using Microsoft.EntityFrameworkCore;
@@ -175,6 +176,29 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_assets_locations_location_id");
         
+        builder.Entity<MaintenanceSchedule>().HasKey(s => s.Id);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Uuid).IsRequired().HasMaxLength(32);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.ScheduledDate).IsRequired();
+        builder.Entity<MaintenanceSchedule>().Property(s => s.FrequencyDays);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.ResponsibleUserId);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Observations).HasMaxLength(512);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.CreatedAt);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.UpdatedAt);
+        builder.Entity<MaintenanceSchedule>()
+            .HasOne(s => s.Organization)
+            .WithMany()
+            .HasForeignKey(s => s.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_maintenance_schedules_organizations_organization_id");
+        builder.Entity<MaintenanceSchedule>()
+            .HasOne(s => s.Asset)
+            .WithMany()
+            .HasForeignKey(s => s.AssetId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_maintenance_schedules_assets_asset_id");
+
         builder.UseSnakeCaseNamingConvention();
     }
 
