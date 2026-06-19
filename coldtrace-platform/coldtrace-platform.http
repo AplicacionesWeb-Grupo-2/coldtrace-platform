@@ -142,3 +142,89 @@ Accept: application/json
 }
 
 ###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/assets
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/assets
+Content-Type: application/json
+Accept: application/json
+
+{
+  "locationId": 1,
+  "uuid": "ASSET-001",
+  "type": "cold-room",
+  "name": "Main Asset",
+  "capacity": 12.5,
+  "description": "Asset used to validate IoT device assignment",
+  "status": "active"
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices
+Content-Type: application/json
+Accept: application/json
+
+{
+  "gatewayId": 1,
+  "assetId": 1,
+  "uuid": "DEV-001",
+  "name": "Main Sensor",
+  "status": "active"
+}
+
+###
+
+PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "gatewayId": 1,
+  "assetId": 1,
+  "uuid": "DEV-001",
+  "name": "Main Sensor",
+  "status": "active"
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/sensor-readings
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/sensor-readings/1
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1/sensor-readings
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1/sensor-readings
+Content-Type: application/json
+Accept: application/json
+
+{
+  "metric": "temperature",
+  "value": 4.25,
+  "unit": "C"
+}
+
+###

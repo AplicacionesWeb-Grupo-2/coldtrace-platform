@@ -111,37 +111,58 @@
     <data name="UnexpectedErrorGettingGateways" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener gateways.</value>
     </data>
+    <data name="InvalidAssetRequest" xml:space="preserve">
+        <value>La solicitud de activo no es valida.</value>
+    </data>
+    <data name="AssetUuidDuplicated" xml:space="preserve">
+        <value>El UUID del activo ya existe en esta organizacion.</value>
+    </data>
     <data name="AssetNotFound" xml:space="preserve">
-        <value>No se encontro el asset.</value>
+        <value>No se encontro el activo.</value>
     </data>
-    <data name="InvalidIncidentRequest" xml:space="preserve">
-        <value>La solicitud de incidente no es valida.</value>
+    <data name="UnexpectedErrorCreatingAsset" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear el activo.</value>
     </data>
-    <data name="IncidentNotFound" xml:space="preserve">
-        <value>No se encontro el incidente.</value>
+    <data name="UnexpectedErrorUpdatingAsset" xml:space="preserve">
+        <value>Ocurrio un error inesperado al actualizar el activo.</value>
     </data>
-    <data name="IncidentAlreadyAcknowledged" xml:space="preserve">
-        <value>El incidente ya fue reconocido.</value>
+    <data name="UnexpectedErrorGettingAssets" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener activos.</value>
     </data>
-    <data name="IncidentAlreadyResolved" xml:space="preserve">
-        <value>El incidente ya fue resuelto.</value>
+    <data name="InvalidIotDeviceRequest" xml:space="preserve">
+        <value>La solicitud de dispositivo IoT no es valida.</value>
     </data>
-    <data name="InvalidIncidentLifecycleTransition" xml:space="preserve">
-        <value>La transicion de ciclo de vida del incidente no esta permitida.</value>
+    <data name="IotDeviceUuidDuplicated" xml:space="preserve">
+        <value>El UUID del dispositivo IoT ya existe en esta organizacion.</value>
     </data>
-    <data name="UnexpectedErrorCreatingIncident" xml:space="preserve">
-        <value>Ocurrio un error inesperado al crear el incidente.</value>
+    <data name="IotDeviceNotFound" xml:space="preserve">
+        <value>No se encontro el dispositivo IoT.</value>
     </data>
-    <data name="UnexpectedErrorAcknowledgingIncident" xml:space="preserve">
-        <value>Ocurrio un error inesperado al reconocer el incidente.</value>
+    <data name="IotDeviceAssetLocationNotCompatible" xml:space="preserve">
+        <value>El activo seleccionado no esta en la misma ubicacion del gateway.</value>
     </data>
-    <data name="UnexpectedErrorResolvingIncident" xml:space="preserve">
-        <value>Ocurrio un error inesperado al resolver el incidente.</value>
+    <data name="UnexpectedErrorCreatingIotDevice" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear el dispositivo IoT.</value>
     </data>
-    <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
-        <value>Ocurrio un error inesperado al obtener incidentes.</value>
+    <data name="UnexpectedErrorUpdatingIotDevice" xml:space="preserve">
+        <value>Ocurrio un error inesperado al actualizar el dispositivo IoT.</value>
     </data>
-    <data name="UnexpectedErrorGettingNotifications" xml:space="preserve">
-        <value>Ocurrio un error inesperado al obtener notificaciones.</value>
+    <data name="UnexpectedErrorGettingIotDevices" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener dispositivos IoT.</value>
+    </data>
+    <data name="InvalidSensorReadingRequest" xml:space="preserve">
+        <value>La solicitud de lectura del sensor no es valida.</value>
+    </data>
+    <data name="SensorReadingNotFound" xml:space="preserve">
+        <value>No se encontro la lectura del sensor.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingSensorReading" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear la lectura del sensor.</value>
+    </data>
+    <data name="UnexpectedErrorGettingSensorReading" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener la lectura del sensor.</value>
+    </data>
+    <data name="UnexpectedErrorGettingSensorReadings" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener lecturas del sensor.</value>
     </data>
 </root>

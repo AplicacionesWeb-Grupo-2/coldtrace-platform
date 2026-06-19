@@ -8,6 +8,11 @@ using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Monitoring.Application.Internal.CommandServices;
+using ColdTrace.Platform.Monitoring.Application.Internal.QueryServices;
+using ColdTrace.Platform.Monitoring.Domain.Repositories;
+using ColdTrace.Platform.Monitoring.Domain.Services;
+using ColdTrace.Platform.Monitoring.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.MaintenanceManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.MaintenanceManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
@@ -29,8 +34,6 @@ using ColdTrace.Platform.Shared.Interfaces.ASP.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Localization;
 using MySql.Data.MySqlClient;
 
@@ -119,6 +122,15 @@ builder.Services.AddScoped<ILocationQueryService, LocationQueryService>();
 builder.Services.AddScoped<IGatewayCommandService, GatewayCommandService>();
 builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
 builder.Services.AddScoped<IAssetCommandService, AssetCommandService>();
+builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
+builder.Services.AddScoped<IIotDeviceRepository, IotDeviceRepository>();
+builder.Services.AddScoped<IIotDeviceCommandService, IotDeviceCommandService>();
+builder.Services.AddScoped<IIotDeviceQueryService, IotDeviceQueryService>();
+
+// Monitoring Bounded Context Injection Configuration
+builder.Services.AddScoped<ISensorReadingRepository, SensorReadingRepository>();
+builder.Services.AddScoped<ISensorReadingCommandService, SensorReadingCommandService>();
+builder.Services.AddScoped<ISensorReadingQueryService, SensorReadingQueryService>();
 builder.Services.AddScoped<IAssetQueryService, AssetQueryService>();
 
 // Maintenance Management Bounded Context Injection Configuration
@@ -166,17 +178,7 @@ static void ApplyPendingMigrations(DbContext context)
 {
     EnsureMySqlDatabaseExists(context);
 
-    var appliedMigrations = GetAppliedMigrations(context);
-    var currentMigration = appliedMigrations.LastOrDefault() ?? Migration.InitialDatabase;
-    var migrator = context.GetService<IMigrator>();
-
-    foreach (var migration in context.Database.GetMigrations().Where(migration => !appliedMigrations.Contains(migration)))
-    {
-        var script = migrator.GenerateScript(currentMigration, migration);
-        ExecuteMigrationScript(context, script);
-        appliedMigrations.Add(migration);
-        currentMigration = migration;
-    }
+    context.Database.Migrate();
 }
 
 static void EnsureMySqlDatabaseExists(DbContext context)
@@ -192,40 +194,4 @@ static void EnsureMySqlDatabaseExists(DbContext context)
     using var command = connection.CreateCommand();
     command.CommandText = $"CREATE DATABASE IF NOT EXISTS `{database.Replace("`", "``")}`;";
     command.ExecuteNonQuery();
-}
-
-static List<string> GetAppliedMigrations(DbContext context)
-{
-    using var connection = new MySqlConnection(context.Database.GetConnectionString());
-    connection.Open();
-
-    if (!MigrationHistoryTableExists(connection)) return [];
-
-    using var command = connection.CreateCommand();
-    command.CommandText = "SELECT `MigrationId` FROM `__EFMigrationsHistory` ORDER BY `MigrationId`;";
-
-    using var reader = command.ExecuteReader();
-    var migrations = new List<string>();
-    while (reader.Read())
-    {
-        migrations.Add(reader.GetString(0));
-    }
-
-    return migrations;
-}
-
-static bool MigrationHistoryTableExists(MySqlConnection connection)
-{
-    using var command = connection.CreateCommand();
-    command.CommandText =
-        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '__EFMigrationsHistory';";
-    return Convert.ToInt32(command.ExecuteScalar()) > 0;
-}
-
-static void ExecuteMigrationScript(DbContext context, string script)
-{
-    foreach (var statement in script.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-    {
-        context.Database.ExecuteSqlRaw(statement);
-    }
 }
