@@ -175,6 +175,33 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_assets_locations_location_id");
         
+        //HU-50
+        builder.Entity<AssetSettings>().HasKey(s => s.Id);
+        builder.Entity<AssetSettings>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<AssetSettings>().Property(s => s.OrganizationId).IsRequired();
+        builder.Entity<AssetSettings>().Property(s => s.AssetId);
+        builder.Entity<AssetSettings>().Property(s => s.TemperatureMin).IsRequired();
+        builder.Entity<AssetSettings>().Property(s => s.TemperatureMax).IsRequired();
+        builder.Entity<AssetSettings>().Property(s => s.HumidityMin).IsRequired();
+        builder.Entity<AssetSettings>().Property(s => s.HumidityMax).IsRequired();
+        builder.Entity<AssetSettings>().Property(s => s.ReadingFrequencySeconds).IsRequired();
+        builder.Entity<AssetSettings>().Property(s => s.AlertThresholdMinutes).IsRequired();
+        builder.Entity<AssetSettings>().Property(s => s.CreatedAt);
+        builder.Entity<AssetSettings>().Property(s => s.UpdatedAt);
+        builder.Entity<AssetSettings>()
+            .HasOne(s => s.Organization)
+            .WithMany()
+            .HasForeignKey(s => s.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_asset_settings_organizations_organization_id");
+        builder.Entity<AssetSettings>()
+            .HasOne(s => s.Asset)
+            .WithMany()
+            .HasForeignKey(s => s.AssetId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .IsRequired(false)
+            .HasConstraintName("f_k_asset_settings_assets_asset_id");
+        
         builder.UseSnakeCaseNamingConvention();
     }
 

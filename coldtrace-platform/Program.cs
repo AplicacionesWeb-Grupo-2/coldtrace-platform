@@ -93,6 +93,9 @@ builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<IAssetCommandService, AssetCommandService>();
 builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
+builder.Services.AddScoped<IAssetSettingsRepository, AssetSettingsRepository>();
+builder.Services.AddScoped<IAssetSettingsCommandService, AssetSettingsCommandService>();
+builder.Services.AddScoped<IAssetSettingsQueryService, AssetSettingsQueryService>();//HU-50
 
 var app = builder.Build();
 
