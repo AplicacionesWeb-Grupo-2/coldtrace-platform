@@ -22,6 +22,7 @@ DATABASE_NAME="${DATABASE_NAME:-coldtrace_platform}"
 DATABASE_USER="${DATABASE_USER:-coldtrace_app}"
 DB_SECRET_NAME="${DB_SECRET_NAME:-coldtrace-db-password}"
 MAX_INSTANCES="${MAX_INSTANCES:-1}"
+CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:-https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app,http://localhost:5173}"
 BUILD_IMAGE="${BUILD_IMAGE:-true}"
 DRY_RUN="${DRY_RUN:-false}"
 SMOKE_ENDPOINT_PATH="${SMOKE_ENDPOINT_PATH:-/api/v1/roles}"
@@ -48,6 +49,7 @@ export DATABASE_NAME
 export DATABASE_USER
 export DB_SECRET_NAME
 export MAX_INSTANCES
+export CORS_ALLOWED_ORIGINS
 export CLOUD_RUN_SERVICE_ACCOUNT
 export IMAGE_URI
 

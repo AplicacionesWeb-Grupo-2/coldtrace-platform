@@ -120,7 +120,10 @@ DATABASE_URL=127.0.0.1
 DATABASE_SCHEMA=coldtrace_platform
 DATABASE_USER=coldtrace_app
 DATABASE_PASSWORD=<from Secret Manager>
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app,http://localhost:5173
 ```
+
+`CORS_ALLOWED_ORIGINS` is a comma-separated allowlist for browser clients. Keep the stable Vercel production domain in the list and add temporary deployment URLs only when they must be tested directly.
 
 The Cloud Run service account must have `roles/cloudsql.client`. The sidecar runs `gcr.io/cloud-sql-connectors/cloud-sql-proxy:2` against the Cloud SQL instance connection name and exposes MySQL locally on port `3306`.
 
