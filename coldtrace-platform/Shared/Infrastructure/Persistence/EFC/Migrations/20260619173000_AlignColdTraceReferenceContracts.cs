@@ -193,29 +193,29 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                 maxLength: 1024,
                 nullable: true);
 
-            migrationBuilder.DropIndex(
-                name: "i_x_asset_settings_organization_id",
-                table: "asset_settings");
-
             migrationBuilder.RenameColumn(
                 name: "temperature_min",
                 table: "asset_settings",
-                newName: "minimum_temperature");
+                newName: "minimum_temperature")
+                .Annotation("Relational:ColumnType", "double");
 
             migrationBuilder.RenameColumn(
                 name: "temperature_max",
                 table: "asset_settings",
-                newName: "maximum_temperature");
+                newName: "maximum_temperature")
+                .Annotation("Relational:ColumnType", "double");
 
             migrationBuilder.RenameColumn(
                 name: "humidity_min",
                 table: "asset_settings",
-                newName: "minimum_humidity");
+                newName: "minimum_humidity")
+                .Annotation("Relational:ColumnType", "double");
 
             migrationBuilder.RenameColumn(
                 name: "humidity_max",
                 table: "asset_settings",
-                newName: "maximum_humidity");
+                newName: "maximum_humidity")
+                .Annotation("Relational:ColumnType", "double");
 
             migrationBuilder.AddColumn<string>(
                 name: "uuid",
@@ -372,27 +372,26 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
             migrationBuilder.RenameColumn(
                 name: "minimum_temperature",
                 table: "asset_settings",
-                newName: "temperature_min");
+                newName: "temperature_min")
+                .Annotation("Relational:ColumnType", "double");
 
             migrationBuilder.RenameColumn(
                 name: "maximum_temperature",
                 table: "asset_settings",
-                newName: "temperature_max");
+                newName: "temperature_max")
+                .Annotation("Relational:ColumnType", "double");
 
             migrationBuilder.RenameColumn(
                 name: "minimum_humidity",
                 table: "asset_settings",
-                newName: "humidity_min");
+                newName: "humidity_min")
+                .Annotation("Relational:ColumnType", "double");
 
             migrationBuilder.RenameColumn(
                 name: "maximum_humidity",
                 table: "asset_settings",
-                newName: "humidity_max");
-
-            migrationBuilder.CreateIndex(
-                name: "i_x_asset_settings_organization_id",
-                table: "asset_settings",
-                column: "organization_id");
+                newName: "humidity_max")
+                .Annotation("Relational:ColumnType", "double");
 
             migrationBuilder.DropIndex(
                 name: "i_x_sensor_readings_asset_id",

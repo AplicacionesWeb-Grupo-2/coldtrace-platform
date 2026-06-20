@@ -1,0 +1,14 @@
+.git/
+.idea/
+.vs/
+.vscode/
+
+**/bin/
+**/obj/
+
+bruno/
+docs/
+
+*.user
+*.suo
+*.log
