@@ -8,7 +8,7 @@
         <InvariantGlobalization>false</InvariantGlobalization>
         <RootNamespace>ColdTrace.Platform</RootNamespace>
         <AssemblyName>ColdTrace.Platform</AssemblyName>
-        <Version>1.0.0</Version>
+        <Version>1.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>
