@@ -38,6 +38,9 @@ coldtrace-platform/
   Shared/
 docs/
 bruno/
+deploy/
+scripts/
+.github/workflows/
 ```
 
 Each bounded context follows the same high-level structure:
@@ -97,6 +100,15 @@ Swagger JSON:
 http://localhost:5271/swagger/v1/swagger.json
 ```
 
+For a complete Docker-based environment, run:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+See [docs/DEVELOPMENT_AND_DEPLOYMENT.md](docs/DEVELOPMENT_AND_DEPLOYMENT.md) for the local environment, CI workflow, Cloud Run deployment script, and rollback process.
+
 ## Database
 
 The application creates the configured MySQL database if it does not exist, ensures the EF migrations history table exists, and applies pending migrations on startup.
@@ -111,6 +123,18 @@ DATABASE_PASSWORD=<from Secret Manager>
 ```
 
 The Cloud Run service account must have `roles/cloudsql.client`. The sidecar runs `gcr.io/cloud-sql-connectors/cloud-sql-proxy:2` against the Cloud SQL instance connection name and exposes MySQL locally on port `3306`.
+
+The Cloud Run manifest is versioned as a template in:
+
+```text
+deploy/cloud-run/service.template.yaml
+```
+
+Deployment is automated through:
+
+```bash
+scripts/deploy-cloud-run.sh
+```
 
 The current schema contains 18 domain tables plus EF Core's `__EFMigrationsHistory` table:
 
@@ -159,9 +183,12 @@ Core commands:
 
 ```bash
 /Users/mauriciopajes/.dotnet/dotnet build coldtrace-platform/coldtrace-platform.csproj
+DRY_RUN=true scripts/deploy-cloud-run.sh
 ```
 
 See [docs/SMOKE_TESTING.md](docs/SMOKE_TESTING.md) for the current smoke flow and [docs](docs) for ticket-level manual checklists.
+
+GitHub Actions also runs restore, release build, optional tests, and Docker image build through [.github/workflows/backend-ci.yml](.github/workflows/backend-ci.yml).
 
 ## Branching
 

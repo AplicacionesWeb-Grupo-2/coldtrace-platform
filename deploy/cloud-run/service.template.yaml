@@ -1,0 +1,74 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  annotations:
+    run.googleapis.com/ingress: all
+  labels:
+    cloud.googleapis.com/location: ${GCP_REGION}
+  name: ${SERVICE_NAME}
+  namespace: '${GCP_PROJECT_NUMBER}'
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: '${MAX_INSTANCES}'
+        run.googleapis.com/client-name: gcloud
+        run.googleapis.com/container-dependencies: '{"coldtrace-platform":["cloud-sql-proxy"]}'
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/startup-cpu-boost: 'true'
+    spec:
+      containerConcurrency: 80
+      containers:
+      - name: coldtrace-platform
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Production
+        - name: ConnectionStrings__DefaultConnection
+          value: server=%DATABASE_URL%;port=3306;user=%DATABASE_USER%;password=%DATABASE_PASSWORD%;database=%DATABASE_SCHEMA%;sslmode=Disabled;AllowPublicKeyRetrieval=True
+        - name: DATABASE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: ${DB_SECRET_NAME}
+        - name: DATABASE_URL
+          value: 127.0.0.1
+        - name: DATABASE_SCHEMA
+          value: ${DATABASE_NAME}
+        - name: DATABASE_USER
+          value: ${DATABASE_USER}
+        image: ${IMAGE_URI}
+        ports:
+        - containerPort: 8080
+          name: http1
+        resources:
+          limits:
+            cpu: '1'
+            memory: 1Gi
+        startupProbe:
+          failureThreshold: 1
+          periodSeconds: 240
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 240
+      - name: cloud-sql-proxy
+        args:
+        - --structured-logs
+        - --address=0.0.0.0
+        - --port=3306
+        - ${DB_INSTANCE_CONNECTION_NAME}
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2
+        resources:
+          limits:
+            cpu: '1'
+            memory: 256Mi
+        startupProbe:
+          failureThreshold: 12
+          periodSeconds: 10
+          tcpSocket:
+            port: 3306
+          timeoutSeconds: 5
+      serviceAccountName: ${CLOUD_RUN_SERVICE_ACCOUNT}
+      timeoutSeconds: 300
+  traffic:
+  - latestRevision: true
+    percent: 100
