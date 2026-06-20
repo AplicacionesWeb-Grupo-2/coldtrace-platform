@@ -1,0 +1,48 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'release/**'
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore coldtrace-platform/coldtrace-platform.csproj
+
+      - name: Build
+        run: dotnet build coldtrace-platform/coldtrace-platform.csproj --configuration Release --no-restore
+
+      - name: Test
+        shell: bash
+        run: |
+          mapfile -t test_projects < <(find . -name '*Tests.csproj' -o -name '*.Tests.csproj')
+          if [ "${#test_projects[@]}" -eq 0 ]; then
+            echo "No test projects found."
+            exit 0
+          fi
+
+          for project in "${test_projects[@]}"; do
+            dotnet test "$project" --configuration Release
+          done
+
+      - name: Docker build
+        run: docker build -t coldtrace-platform:ci .

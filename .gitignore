@@ -10,6 +10,9 @@ obj/
 *.sln.docstates
 
 .DS_Store
+.env
+.env.*
+!.env.example
 
 TestResults/
 coverage/
