@@ -101,6 +101,17 @@ http://localhost:5271/swagger/v1/swagger.json
 
 The application creates the configured MySQL database if it does not exist, ensures the EF migrations history table exists, and applies pending migrations on startup.
 
+In Cloud Run, production connects to Cloud SQL through a Cloud SQL Auth Proxy sidecar. The API container connects to the proxy over local TCP, so the deployed service does not depend on the database public IP.
+
+```text
+DATABASE_URL=127.0.0.1
+DATABASE_SCHEMA=coldtrace_platform
+DATABASE_USER=coldtrace_app
+DATABASE_PASSWORD=<from Secret Manager>
+```
+
+The Cloud Run service account must have `roles/cloudsql.client`. The sidecar runs `gcr.io/cloud-sql-connectors/cloud-sql-proxy:2` against the Cloud SQL instance connection name and exposes MySQL locally on port `3306`.
+
 The current schema contains 18 domain tables plus EF Core's `__EFMigrationsHistory` table:
 
 ```text
