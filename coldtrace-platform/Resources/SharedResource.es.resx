@@ -165,4 +165,55 @@
     <data name="UnexpectedErrorGettingSensorReadings" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener lecturas del sensor.</value>
     </data>
+    <data name="InvalidIncidentRequest" xml:space="preserve">
+        <value>La solicitud de incidente no es valida.</value>
+    </data>
+    <data name="IncidentNotFound" xml:space="preserve">
+        <value>No se encontro el incidente.</value>
+    </data>
+    <data name="IncidentAlreadyAcknowledged" xml:space="preserve">
+        <value>El incidente ya fue reconocido.</value>
+    </data>
+    <data name="IncidentAlreadyResolved" xml:space="preserve">
+        <value>El incidente ya fue resuelto.</value>
+    </data>
+    <data name="IncidentAlreadyEscalated" xml:space="preserve">
+        <value>El incidente ya fue escalado.</value>
+    </data>
+    <data name="InvalidIncidentLifecycleTransition" xml:space="preserve">
+        <value>La transicion del ciclo de vida del incidente no esta permitida.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingIncident" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear el incidente.</value>
+    </data>
+    <data name="UnexpectedErrorAcknowledgingIncident" xml:space="preserve">
+        <value>Ocurrio un error inesperado al reconocer el incidente.</value>
+    </data>
+    <data name="UnexpectedErrorEscalatingIncident" xml:space="preserve">
+        <value>Ocurrio un error inesperado al escalar el incidente.</value>
+    </data>
+    <data name="UnexpectedErrorRegisteringIncidentCorrectiveAction" xml:space="preserve">
+        <value>Ocurrio un error inesperado al registrar la accion correctiva del incidente.</value>
+    </data>
+    <data name="UnexpectedErrorResolvingIncident" xml:space="preserve">
+        <value>Ocurrio un error inesperado al resolver el incidente.</value>
+    </data>
+    <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener incidentes.</value>
+    </data>
+    <data name="UnexpectedErrorGettingNotifications" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener notificaciones.</value>
+    </data>
+    <data name="InvalidReportRequest" xml:space="preserve">
+        <value>La solicitud de reporte no es valida.</value>
+    </data>
+    <data name="ReportNotFound" xml:space="preserve">
+        <value>No se encontro el reporte.</value>
+    </data>
+    <data name="UnexpectedErrorGeneratingReport" xml:space="preserve">
+        <value>Ocurrio un error inesperado al generar el reporte.</value>
+    </data>
+    <data name="UnexpectedErrorGettingReports" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener reportes.</value>
+    </data>
 </root>

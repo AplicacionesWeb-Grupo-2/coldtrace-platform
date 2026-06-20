@@ -27,13 +27,27 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset?>("AcknowledgedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("acknowledged_at");
 
                     b.Property<string>("AcknowledgedBy")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)")
                         .HasColumnName("acknowledged_by");
+
+                    b.Property<string>("CorrectiveAction")
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("corrective_action");
+
+                    b.Property<DateTimeOffset?>("CorrectiveActionRegisteredAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("corrective_action_registered_at");
+
+                    b.Property<string>("CorrectiveActionRegisteredBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("corrective_action_registered_by");
 
                     b.Property<int?>("AssetId")
                         .HasColumnType("int")
@@ -45,11 +59,11 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("asset_name");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset>("DetectedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("detected_at");
 
                     b.Property<int?>("DeviceId")
@@ -61,8 +75,22 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnType("varchar(200)")
                         .HasColumnName("device_name");
 
+                    b.Property<DateTimeOffset?>("EscalatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("escalated_at");
+
+                    b.Property<string>("EscalatedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("escalated_by");
+
+                    b.Property<string>("EscalationReason")
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("escalation_reason");
+
                     b.Property<DateTimeOffset?>("LastNotificationAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("last_notification_at");
 
                     b.Property<string>("LastNotificationStatus")
@@ -88,7 +116,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("resolution_notes");
 
                     b.Property<DateTimeOffset?>("ResolvedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("resolved_at");
 
                     b.Property<string>("ResolvedBy")
@@ -115,7 +143,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("type");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("Value")
@@ -155,11 +183,11 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("channel");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset?>("DeliveredAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("delivered_at");
 
                     b.Property<string>("FailureReason")
@@ -193,7 +221,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("status");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -220,7 +248,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("capacity");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<string>("Description")
@@ -255,7 +283,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("type");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("Uuid")
@@ -277,65 +305,6 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("assets");
                 });
 
-            modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.AssetSettings", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<int>("AlertThresholdMinutes")
-                        .HasColumnType("int")
-                        .HasColumnName("alert_threshold_minutes");
-
-                    b.Property<int?>("AssetId")
-                        .HasColumnType("int")
-                        .HasColumnName("asset_id");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("created_at");
-
-                    b.Property<double>("HumidityMax")
-                        .HasColumnType("double")
-                        .HasColumnName("humidity_max");
-
-                    b.Property<double>("HumidityMin")
-                        .HasColumnType("double")
-                        .HasColumnName("humidity_min");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int")
-                        .HasColumnName("organization_id");
-
-                    b.Property<int>("ReadingFrequencySeconds")
-                        .HasColumnType("int")
-                        .HasColumnName("reading_frequency_seconds");
-
-                    b.Property<double>("TemperatureMax")
-                        .HasColumnType("double")
-                        .HasColumnName("temperature_max");
-
-                    b.Property<double>("TemperatureMin")
-                        .HasColumnType("double")
-                        .HasColumnName("temperature_min");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("p_k_asset_settings");
-
-                    b.HasIndex("AssetId")
-                        .HasDatabaseName("i_x_asset_settings_asset_id");
-
-                    b.HasIndex("OrganizationId")
-                        .HasDatabaseName("i_x_asset_settings_organization_id");
-
-                    b.ToTable("asset_settings");
-                });
-
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", b =>
                 {
                     b.Property<int>("Id")
@@ -344,7 +313,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("id");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<int>("LocationId")
@@ -374,7 +343,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("status");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("Uuid")
@@ -396,6 +365,94 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("gateways");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.AssetSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<int?>("AssetId")
+                        .HasColumnType("int")
+                        .HasColumnName("asset_id");
+
+                    b.Property<int>("AlertThresholdMinutes")
+                        .HasColumnType("int")
+                        .HasColumnName("alert_threshold_minutes");
+
+                    b.Property<int>("CalibrationFrequencyDays")
+                        .HasColumnType("int")
+                        .HasColumnName("calibration_frequency_days");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("HumidityUnit")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("humidity_unit");
+
+                    b.Property<double>("MaximumHumidity")
+                        .HasColumnType("double")
+                        .HasColumnName("maximum_humidity");
+
+                    b.Property<double>("MaximumTemperature")
+                        .HasColumnType("double")
+                        .HasColumnName("maximum_temperature");
+
+                    b.Property<double>("MinimumHumidity")
+                        .HasColumnType("double")
+                        .HasColumnName("minimum_humidity");
+
+                    b.Property<double>("MinimumTemperature")
+                        .HasColumnType("double")
+                        .HasColumnName("minimum_temperature");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<int>("ReadingFrequencySeconds")
+                        .HasColumnType("int")
+                        .HasColumnName("reading_frequency_seconds");
+
+                    b.Property<string>("TemperatureUnit")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("temperature_unit");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("Uuid")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("uuid");
+
+                    b.Property<string>("WeightUnit")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("varchar(16)")
+                        .HasColumnName("weight_unit");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_asset_settings");
+
+                    b.HasIndex("AssetId")
+                        .HasDatabaseName("i_x_asset_settings_asset_id");
+
+                    b.HasIndex("OrganizationId", "AssetId")
+                        .IsUnique()
+                        .HasDatabaseName("i_x_asset_settings_organization_id_asset_id");
+
+                    b.ToTable("asset_settings");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", b =>
                 {
                     b.Property<int>("Id")
@@ -407,13 +464,44 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnType("int")
                         .HasColumnName("asset_id");
 
+                    b.Property<string>("CalibrationStatus")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("calibration_status");
+
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
+
+                    b.Property<string>("DeviceType")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("varchar(80)")
+                        .HasColumnName("device_type");
 
                     b.Property<int>("GatewayId")
                         .HasColumnType("int")
                         .HasColumnName("gateway_id");
+
+                    b.Property<DateOnly>("LastCalibrationDate")
+                        .HasConversion(new ValueConverter<DateOnly, DateTime>(
+                            date => date.ToDateTime(TimeOnly.MinValue),
+                            dateTime => DateOnly.FromDateTime(dateTime)))
+                        .HasColumnType("date")
+                        .HasColumnName("last_calibration_date");
+
+                    b.Property<string>("MeasurementType")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("measurement_type");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("model");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -425,6 +513,17 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnType("int")
                         .HasColumnName("organization_id");
 
+                    b.Property<DateOnly>("NextCalibrationDate")
+                        .HasConversion(new ValueConverter<DateOnly, DateTime>(
+                            date => date.ToDateTime(TimeOnly.MinValue),
+                            dateTime => DateOnly.FromDateTime(dateTime)))
+                        .HasColumnType("date")
+                        .HasColumnName("next_calibration_date");
+
+                    b.Property<int>("ReadingFrequencySeconds")
+                        .HasColumnType("int")
+                        .HasColumnName("reading_frequency_seconds");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(64)
@@ -432,7 +531,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("status");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("Uuid")
@@ -464,46 +563,76 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int")
+                        .HasColumnName("asset_id");
+
+                    b.Property<int?>("BatteryLevel")
+                        .HasColumnType("int")
+                        .HasColumnName("battery_level");
+
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
-                    b.Property<DateTimeOffset>("RecordedAt")
-                        .HasColumnType("datetime")
-                        .HasColumnName("recorded_at");
+                    b.Property<int>("GatewayId")
+                        .HasColumnType("int")
+                        .HasColumnName("gateway_id");
+
+                    b.Property<double?>("Humidity")
+                        .HasPrecision(8, 2)
+                        .HasColumnType("double")
+                        .HasColumnName("humidity");
+
+                    b.Property<bool?>("ImageCaptured")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("image_captured");
 
                     b.Property<int>("IotDeviceId")
                         .HasColumnType("int")
                         .HasColumnName("iot_device_id");
 
-                    b.Property<string>("Metric")
-                        .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("varchar(80)")
-                        .HasColumnName("metric");
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int")
+                        .HasColumnName("location_id");
+
+                    b.Property<bool?>("MotionDetected")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("motion_detected");
 
                     b.Property<int>("OrganizationId")
                         .HasColumnType("int")
                         .HasColumnName("organization_id");
 
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar(32)")
-                        .HasColumnName("unit");
+                    b.Property<bool>("OutOfRange")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("out_of_range");
 
-                    b.Property<decimal>("Value")
-                        .IsRequired()
-                        .HasPrecision(12, 4)
-                        .HasColumnType("decimal(12,4)")
-                        .HasColumnName("value");
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("recorded_at");
+
+                    b.Property<int?>("SignalStrength")
+                        .HasColumnType("int")
+                        .HasColumnName("signal_strength");
+
+                    b.Property<double?>("Temperature")
+                        .HasPrecision(8, 2)
+                        .HasColumnType("double")
+                        .HasColumnName("temperature");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
                         .HasName("p_k_sensor_readings");
+
+                    b.HasIndex("AssetId")
+                        .HasDatabaseName("i_x_sensor_readings_asset_id");
+
+                    b.HasIndex("GatewayId")
+                        .HasDatabaseName("i_x_sensor_readings_gateway_id");
 
                     b.HasIndex("IotDeviceId")
                         .HasDatabaseName("i_x_sensor_readings_iot_device_id");
@@ -513,6 +642,9 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 
                     b.HasIndex("OrganizationId", "RecordedAt")
                         .HasDatabaseName("i_x_sensor_readings_organization_id_recorded_at");
+
+                    b.HasIndex("OrganizationId", "AssetId", "RecordedAt")
+                        .HasDatabaseName("i_x_sensor_readings_organization_id_asset_id_recorded_at");
 
                     b.ToTable("sensor_readings");
                 });
@@ -530,7 +662,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("address");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<string>("Description")
@@ -561,7 +693,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("type");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -594,7 +726,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("contact_email");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<string>("LegalName")
@@ -609,7 +741,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("tax_id");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -757,7 +889,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("asset_id");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<int?>("FrequencyDays")
@@ -778,7 +910,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("responsible_user_id");
 
                     b.Property<DateTimeOffset>("ScheduledDate")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("scheduled_date");
 
                     b.Property<string>("Status")
@@ -788,13 +920,13 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("status");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("Uuid")
                         .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar(32)")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("uuid");
 
                     b.HasKey("Id")
@@ -830,7 +962,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("asset_name");
 
                     b.Property<DateTimeOffset?>("ClosedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("closed_at");
 
                     b.Property<string>("ClosedBy")
@@ -845,12 +977,12 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(16)
-                        .HasColumnType("varchar(16)")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("code");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<string>("Evidence")
@@ -879,7 +1011,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("priority");
 
                     b.Property<DateTimeOffset>("RequestedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("requested_at");
 
                     b.Property<string>("RequestedBy")
@@ -894,7 +1026,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("status");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
@@ -933,11 +1065,11 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("compliance_percentage");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("created_at");
 
                     b.Property<DateTimeOffset>("GeneratedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("generated_at");
 
                     b.Property<int>("IncidentCount")
@@ -957,11 +1089,11 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("out_of_range_reading_count");
 
                     b.Property<DateTimeOffset>("PeriodEnd")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("period_end");
 
                     b.Property<DateTimeOffset>("PeriodStart")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("period_start");
 
                     b.Property<int>("ReadingCount")
@@ -981,7 +1113,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnName("type");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("updated_at");
 
                     b.Property<string>("Uuid")
@@ -1067,6 +1199,48 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.AssetSettings", b =>
                 {
+                    b.OwnsMany("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.AssetSettingsAssetType", "AssetTypeEntries", b1 =>
+                        {
+                            b1.Property<int>("AssetSettingsId")
+                                .HasColumnType("int")
+                                .HasColumnName("asset_settings_id");
+
+                            b1.Property<string>("AssetType")
+                                .HasMaxLength(255)
+                                .HasColumnType("varchar(255)")
+                                .HasColumnName("asset_type");
+
+                            b1.HasKey("AssetSettingsId", "AssetType")
+                                .HasName("p_k_asset_settings_asset_types");
+
+                            b1.ToTable("asset_settings_asset_types", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AssetSettingsId")
+                                .HasConstraintName("f_k_asset_settings_asset_types_asset_settings_id");
+                        });
+
+                    b.OwnsMany("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.AssetSettingsIotDeviceType", "IotDeviceTypeEntries", b1 =>
+                        {
+                            b1.Property<int>("AssetSettingsId")
+                                .HasColumnType("int")
+                                .HasColumnName("asset_settings_id");
+
+                            b1.Property<string>("IotDeviceType")
+                                .HasMaxLength(255)
+                                .HasColumnType("varchar(255)")
+                                .HasColumnName("iot_device_type");
+
+                            b1.HasKey("AssetSettingsId", "IotDeviceType")
+                                .HasName("p_k_asset_settings_iot_device_types");
+
+                            b1.ToTable("asset_settings_iot_device_types", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AssetSettingsId")
+                                .HasConstraintName("f_k_asset_settings_iot_device_types_asset_settings_id");
+                        });
+
                     b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
                         .WithMany()
                         .HasForeignKey("AssetId")
@@ -1081,6 +1255,10 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasConstraintName("f_k_asset_settings_organizations_organization_id");
 
                     b.Navigation("Asset");
+
+                    b.Navigation("AssetTypeEntries");
+
+                    b.Navigation("IotDeviceTypeEntries");
 
                     b.Navigation("Organization");
                 });
@@ -1108,6 +1286,27 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", b =>
                 {
+                    b.OwnsMany("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDeviceMeasurementParameter", "MeasurementParameterEntries", b1 =>
+                        {
+                            b1.Property<int>("IotDeviceId")
+                                .HasColumnType("int")
+                                .HasColumnName("iot_device_id");
+
+                            b1.Property<string>("MeasurementParameter")
+                                .HasMaxLength(255)
+                                .HasColumnType("varchar(255)")
+                                .HasColumnName("measurement_parameter");
+
+                            b1.HasKey("IotDeviceId", "MeasurementParameter")
+                                .HasName("p_k_iot_device_measurement_parameters");
+
+                            b1.ToTable("iot_device_measurement_parameters", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("IotDeviceId")
+                                .HasConstraintName("f_k_iot_device_measurement_parameters_iot_device_id");
+                        });
+
                     b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
                         .WithMany()
                         .HasForeignKey("AssetId")
@@ -1132,11 +1331,27 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 
                     b.Navigation("Gateway");
 
+                    b.Navigation("MeasurementParameterEntries");
+
                     b.Navigation("Organization");
                 });
 
             modelBuilder.Entity("ColdTrace.Platform.Monitoring.Domain.Model.Aggregates.SensorReading", b =>
                 {
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_sensor_readings_assets_asset_id");
+
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", "Gateway")
+                        .WithMany()
+                        .HasForeignKey("GatewayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_sensor_readings_gateways_gateway_id");
+
                     b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", "IotDevice")
                         .WithMany()
                         .HasForeignKey("IotDeviceId")
@@ -1150,6 +1365,10 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("f_k_sensor_readings_organizations_organization_id");
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Gateway");
 
                     b.Navigation("IotDevice");
 

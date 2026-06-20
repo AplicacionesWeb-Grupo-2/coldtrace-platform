@@ -2,8 +2,8 @@ using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
-using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
 using ColdTrace.Platform.Reports.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration.Extensions;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Interceptors;
@@ -179,11 +179,95 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_assets_locations_location_id");
 
+        builder.Entity<AssetSettings>().HasKey(settings => settings.Id);
+        builder.Entity<AssetSettings>().Property(settings => settings.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<AssetSettings>().Property(settings => settings.Uuid).IsRequired().HasMaxLength(128);
+        builder.Entity<AssetSettings>().Ignore(settings => settings.AssetTypes);
+        builder.Entity<AssetSettings>().Ignore(settings => settings.IotDeviceTypes);
+        builder.Entity<AssetSettings>().OwnsMany(settings => settings.AssetTypeEntries, assetTypesBuilder =>
+        {
+            assetTypesBuilder.ToTable("asset_settings_asset_types");
+            assetTypesBuilder.Property<int>("AssetSettingsId").HasColumnName("asset_settings_id").IsRequired();
+            assetTypesBuilder.Property(entry => entry.AssetType).HasColumnName("asset_type").IsRequired()
+                .HasMaxLength(255);
+            assetTypesBuilder.HasKey("AssetSettingsId", nameof(AssetSettingsAssetType.AssetType));
+            assetTypesBuilder.WithOwner()
+                .HasForeignKey("AssetSettingsId")
+                .HasConstraintName("f_k_asset_settings_asset_types_asset_settings_id");
+        });
+        builder.Entity<AssetSettings>().OwnsMany(settings => settings.IotDeviceTypeEntries, iotDeviceTypesBuilder =>
+        {
+            iotDeviceTypesBuilder.ToTable("asset_settings_iot_device_types");
+            iotDeviceTypesBuilder.Property<int>("AssetSettingsId").HasColumnName("asset_settings_id").IsRequired();
+            iotDeviceTypesBuilder.Property(entry => entry.IotDeviceType).HasColumnName("iot_device_type")
+                .IsRequired().HasMaxLength(255);
+            iotDeviceTypesBuilder.HasKey("AssetSettingsId", nameof(AssetSettingsIotDeviceType.IotDeviceType));
+            iotDeviceTypesBuilder.WithOwner()
+                .HasForeignKey("AssetSettingsId")
+                .HasConstraintName("f_k_asset_settings_iot_device_types_asset_settings_id");
+        });
+        builder.Entity<AssetSettings>().Property(settings => settings.MinimumTemperature).IsRequired();
+        builder.Entity<AssetSettings>().Property(settings => settings.MaximumTemperature).IsRequired();
+        builder.Entity<AssetSettings>().Property(settings => settings.MinimumHumidity).IsRequired();
+        builder.Entity<AssetSettings>().Property(settings => settings.MaximumHumidity).IsRequired();
+        builder.Entity<AssetSettings>().Property(settings => settings.CalibrationFrequencyDays).IsRequired();
+        builder.Entity<AssetSettings>().Property(settings => settings.TemperatureUnit).IsRequired().HasMaxLength(16);
+        builder.Entity<AssetSettings>().Property(settings => settings.HumidityUnit).IsRequired().HasMaxLength(16);
+        builder.Entity<AssetSettings>().Property(settings => settings.WeightUnit).IsRequired().HasMaxLength(16);
+        builder.Entity<AssetSettings>().Property(settings => settings.ReadingFrequencySeconds).IsRequired();
+        builder.Entity<AssetSettings>().Property(settings => settings.AlertThresholdMinutes).IsRequired();
+        builder.Entity<AssetSettings>().Property(settings => settings.CreatedAt);
+        builder.Entity<AssetSettings>().Property(settings => settings.UpdatedAt);
+        builder.Entity<AssetSettings>()
+            .HasIndex(settings => new { settings.OrganizationId, settings.AssetId })
+            .IsUnique();
+        builder.Entity<AssetSettings>()
+            .HasOne(settings => settings.Organization)
+            .WithMany()
+            .HasForeignKey(settings => settings.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_asset_settings_organizations_organization_id");
+        builder.Entity<AssetSettings>()
+            .HasOne(settings => settings.Asset)
+            .WithMany()
+            .HasForeignKey(settings => settings.AssetId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_asset_settings_assets_asset_id");
+
         builder.Entity<IotDevice>().HasKey(device => device.Id);
         builder.Entity<IotDevice>().Property(device => device.Id).IsRequired().ValueGeneratedOnAdd();
         builder.Entity<IotDevice>().Property(device => device.Uuid).IsRequired().HasMaxLength(128);
         builder.Entity<IotDevice>().Property(device => device.Name).IsRequired().HasMaxLength(200);
+        builder.Entity<IotDevice>().Property(device => device.DeviceType).IsRequired().HasMaxLength(80);
+        builder.Entity<IotDevice>().Property(device => device.Model).IsRequired().HasMaxLength(120);
+        builder.Entity<IotDevice>().Property(device => device.MeasurementType).IsRequired().HasMaxLength(120);
+        builder.Entity<IotDevice>().Ignore(device => device.MeasurementParameters);
+        builder.Entity<IotDevice>().OwnsMany(device => device.MeasurementParameterEntries, parametersBuilder =>
+        {
+            parametersBuilder.ToTable("iot_device_measurement_parameters");
+            parametersBuilder.Property<int>("IotDeviceId").HasColumnName("iot_device_id").IsRequired();
+            parametersBuilder.Property(entry => entry.MeasurementParameter).HasColumnName("measurement_parameter")
+                .IsRequired().HasMaxLength(255);
+            parametersBuilder.HasKey("IotDeviceId", nameof(IotDeviceMeasurementParameter.MeasurementParameter));
+            parametersBuilder.WithOwner()
+                .HasForeignKey("IotDeviceId")
+                .HasConstraintName("f_k_iot_device_measurement_parameters_iot_device_id");
+        });
+        builder.Entity<IotDevice>().Property(device => device.ReadingFrequencySeconds).IsRequired();
         builder.Entity<IotDevice>().Property(device => device.Status).IsRequired().HasMaxLength(64);
+        builder.Entity<IotDevice>().Property(device => device.CalibrationStatus).IsRequired().HasMaxLength(64);
+        builder.Entity<IotDevice>().Property(device => device.LastCalibrationDate)
+            .HasConversion(
+                date => date.ToDateTime(TimeOnly.MinValue),
+                dateTime => DateOnly.FromDateTime(dateTime))
+            .HasColumnType("date")
+            .IsRequired();
+        builder.Entity<IotDevice>().Property(device => device.NextCalibrationDate)
+            .HasConversion(
+                date => date.ToDateTime(TimeOnly.MinValue),
+                dateTime => DateOnly.FromDateTime(dateTime))
+            .HasColumnType("date")
+            .IsRequired();
         builder.Entity<IotDevice>().Property(device => device.CreatedAt);
         builder.Entity<IotDevice>().Property(device => device.UpdatedAt);
         builder.Entity<IotDevice>()
@@ -214,18 +298,31 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
         builder.Entity<SensorReading>().HasKey(reading => reading.Id);
         builder.Entity<SensorReading>().Property(reading => reading.Id).IsRequired().ValueGeneratedOnAdd();
-        builder.Entity<SensorReading>().Property(reading => reading.Metric).IsRequired().HasMaxLength(80);
-        builder.Entity<SensorReading>().Property(reading => reading.Value).IsRequired().HasPrecision(12, 4);
-        builder.Entity<SensorReading>().Property(reading => reading.Unit).IsRequired().HasMaxLength(32);
+        builder.Entity<SensorReading>().Property(reading => reading.AssetId).IsRequired();
+        builder.Entity<SensorReading>().Property(reading => reading.GatewayId).IsRequired();
+        builder.Entity<SensorReading>().Property(reading => reading.LocationId).IsRequired();
+        builder.Entity<SensorReading>().Property(reading => reading.Temperature).HasPrecision(8, 2);
+        builder.Entity<SensorReading>().Property(reading => reading.Humidity).HasPrecision(8, 2);
+        builder.Entity<SensorReading>().Property(reading => reading.OutOfRange).IsRequired();
         builder.Entity<SensorReading>().Property(reading => reading.RecordedAt).IsRequired();
+        builder.Entity<SensorReading>().Property(reading => reading.MotionDetected);
+        builder.Entity<SensorReading>().Property(reading => reading.ImageCaptured);
+        builder.Entity<SensorReading>().Property(reading => reading.BatteryLevel);
+        builder.Entity<SensorReading>().Property(reading => reading.SignalStrength);
         builder.Entity<SensorReading>().Property(reading => reading.CreatedAt);
         builder.Entity<SensorReading>().Property(reading => reading.UpdatedAt);
         builder.Entity<SensorReading>()
             .HasIndex(reading => reading.OrganizationId);
         builder.Entity<SensorReading>()
+            .HasIndex(reading => reading.AssetId);
+        builder.Entity<SensorReading>()
             .HasIndex(reading => reading.IotDeviceId);
         builder.Entity<SensorReading>()
+            .HasIndex(reading => reading.GatewayId);
+        builder.Entity<SensorReading>()
             .HasIndex(reading => new { reading.OrganizationId, reading.RecordedAt });
+        builder.Entity<SensorReading>()
+            .HasIndex(reading => new { reading.OrganizationId, reading.AssetId, reading.RecordedAt });
         builder.Entity<SensorReading>()
             .HasOne(reading => reading.Organization)
             .WithMany()
@@ -233,11 +330,23 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("f_k_sensor_readings_organizations_organization_id");
         builder.Entity<SensorReading>()
+            .HasOne(reading => reading.Asset)
+            .WithMany()
+            .HasForeignKey(reading => reading.AssetId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_sensor_readings_assets_asset_id");
+        builder.Entity<SensorReading>()
             .HasOne(reading => reading.IotDevice)
             .WithMany()
             .HasForeignKey(reading => reading.IotDeviceId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("f_k_sensor_readings_iot_devices_iot_device_id");
+        builder.Entity<SensorReading>()
+            .HasOne(reading => reading.Gateway)
+            .WithMany()
+            .HasForeignKey(reading => reading.GatewayId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_sensor_readings_gateways_gateway_id");
         builder.Entity<Incident>().HasKey(incident => incident.Id);
         builder.Entity<Incident>().Property(incident => incident.Id).IsRequired().ValueGeneratedOnAdd();
         builder.Entity<Incident>().Property(incident => incident.DeviceId);
@@ -251,6 +360,12 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<Incident>().Property(incident => incident.DetectedAt).IsRequired();
         builder.Entity<Incident>().Property(incident => incident.AcknowledgedAt);
         builder.Entity<Incident>().Property(incident => incident.AcknowledgedBy).HasMaxLength(256);
+        builder.Entity<Incident>().Property(incident => incident.EscalatedAt);
+        builder.Entity<Incident>().Property(incident => incident.EscalatedBy).HasMaxLength(256);
+        builder.Entity<Incident>().Property(incident => incident.EscalationReason).HasMaxLength(1024);
+        builder.Entity<Incident>().Property(incident => incident.CorrectiveActionRegisteredAt);
+        builder.Entity<Incident>().Property(incident => incident.CorrectiveActionRegisteredBy).HasMaxLength(256);
+        builder.Entity<Incident>().Property(incident => incident.CorrectiveAction).HasMaxLength(1024);
         builder.Entity<Incident>().Property(incident => incident.ResolvedAt);
         builder.Entity<Incident>().Property(incident => incident.ResolvedBy).HasMaxLength(256);
         builder.Entity<Incident>().Property(incident => incident.ResolutionNotes).HasMaxLength(1024);
@@ -335,7 +450,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         
         builder.Entity<MaintenanceSchedule>().HasKey(s => s.Id);
         builder.Entity<MaintenanceSchedule>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
-        builder.Entity<MaintenanceSchedule>().Property(s => s.Uuid).IsRequired().HasMaxLength(32);
+        builder.Entity<MaintenanceSchedule>().Property(s => s.Uuid).IsRequired().HasMaxLength(255);
         builder.Entity<MaintenanceSchedule>().Property(s => s.ScheduledDate).IsRequired();
         builder.Entity<MaintenanceSchedule>().Property(s => s.FrequencyDays);
         builder.Entity<MaintenanceSchedule>().Property(s => s.ResponsibleUserId);
@@ -358,7 +473,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
         builder.Entity<TechnicalServiceRequest>().HasKey(r => r.Id);
         builder.Entity<TechnicalServiceRequest>().Property(r => r.Id).IsRequired().ValueGeneratedOnAdd();
-        builder.Entity<TechnicalServiceRequest>().Property(r => r.Code).IsRequired().HasMaxLength(16);
+        builder.Entity<TechnicalServiceRequest>().Property(r => r.Code).IsRequired().HasMaxLength(255);
         builder.Entity<TechnicalServiceRequest>().Property(r => r.AssetLocationId).IsRequired();
         builder.Entity<TechnicalServiceRequest>().Property(r => r.AssetName).HasMaxLength(200);
         builder.Entity<TechnicalServiceRequest>().Property(r => r.IncidentId);
@@ -386,34 +501,18 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("f_k_technical_service_requests_assets_asset_id");
 
-        //HU-50
-        builder.Entity<AssetSettings>().HasKey(s => s.Id);
-        builder.Entity<AssetSettings>().Property(s => s.Id).IsRequired().ValueGeneratedOnAdd();
-        builder.Entity<AssetSettings>().Property(s => s.OrganizationId).IsRequired();
-        builder.Entity<AssetSettings>().Property(s => s.AssetId);
-        builder.Entity<AssetSettings>().Property(s => s.TemperatureMin).IsRequired();
-        builder.Entity<AssetSettings>().Property(s => s.TemperatureMax).IsRequired();
-        builder.Entity<AssetSettings>().Property(s => s.HumidityMin).IsRequired();
-        builder.Entity<AssetSettings>().Property(s => s.HumidityMax).IsRequired();
-        builder.Entity<AssetSettings>().Property(s => s.ReadingFrequencySeconds).IsRequired();
-        builder.Entity<AssetSettings>().Property(s => s.AlertThresholdMinutes).IsRequired();
-        builder.Entity<AssetSettings>().Property(s => s.CreatedAt);
-        builder.Entity<AssetSettings>().Property(s => s.UpdatedAt);
-        builder.Entity<AssetSettings>()
-            .HasOne(s => s.Organization)
-            .WithMany()
-            .HasForeignKey(s => s.OrganizationId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .HasConstraintName("f_k_asset_settings_organizations_organization_id");
-        builder.Entity<AssetSettings>()
-            .HasOne(s => s.Asset)
-            .WithMany()
-            .HasForeignKey(s => s.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
-            .IsRequired(false)
-            .HasConstraintName("f_k_asset_settings_assets_asset_id");
-        
+        UseDateTimeOffsetPrecision(builder);
         builder.UseSnakeCaseNamingConvention();
+    }
+
+    private static void UseDateTimeOffsetPrecision(ModelBuilder builder)
+    {
+        foreach (var property in builder.Model.GetEntityTypes().SelectMany(entityType => entityType.GetProperties()))
+        {
+            if (property.ClrType == typeof(DateTimeOffset) ||
+                property.ClrType == typeof(DateTimeOffset?))
+                property.SetColumnType("datetime(6)");
+        }
     }
 
     private static object PermissionSeed(
@@ -430,4 +529,5 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             Action = action,
             Description = description
         };
+
 }

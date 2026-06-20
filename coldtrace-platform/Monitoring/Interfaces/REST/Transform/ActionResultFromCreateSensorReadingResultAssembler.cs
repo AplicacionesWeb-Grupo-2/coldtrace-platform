@@ -27,8 +27,19 @@ public static class ActionResultFromCreateSensorReadingResultAssembler
                 {
                     CreateSensorReadingError.OrganizationNotFound =>
                         controller.NotFound(localizer["OrganizationNotFound"].Value),
+                    CreateSensorReadingError.AssetNotFound =>
+                        controller.NotFound(localizer["AssetNotFound"].Value),
                     CreateSensorReadingError.IotDeviceNotFound =>
                         controller.NotFound(localizer["IotDeviceNotFound"].Value),
+                    CreateSensorReadingError.GatewayNotFound =>
+                        controller.NotFound(localizer["GatewayNotFound"].Value),
+                    CreateSensorReadingError.DeviceNotAssignedToAsset or
+                        CreateSensorReadingError.IncompatibleLocation or
+                        CreateSensorReadingError.DeviceOffline or
+                        CreateSensorReadingError.GatewayOffline or
+                        CreateSensorReadingError.AssetSettingsNotFound or
+                        CreateSensorReadingError.UnsupportedMeasurement =>
+                        controller.BadRequest(localizer["InvalidSensorReadingRequest"].Value),
                     CreateSensorReadingError.UnexpectedError =>
                         controller.Problem(
                             title: localizer["UnexpectedServerError"].Value,

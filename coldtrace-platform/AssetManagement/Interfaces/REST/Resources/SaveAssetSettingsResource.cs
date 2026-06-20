@@ -1,26 +1,43 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
 
 /// <summary>
-///     Request resource used to save asset settings.
+///     Request resource used to create or update asset settings.
 /// </summary>
-[SwaggerSchema(Description = "Request payload to save asset settings")]
+[SwaggerSchema(Description = "Request payload for creating or updating safety thresholds and operational settings")]
 public record SaveAssetSettingsResource(
-    [SwaggerParameter(Description = "Minimum safe temperature")]
-    double TemperatureMin,
+    [SwaggerParameter(Description = "Optional settings code")]
+    string? Uuid,
+    [SwaggerParameter(Description = "Asset types covered by these settings")]
+    IReadOnlyList<string>? AssetTypes,
+    [SwaggerParameter(Description = "IoT device types covered by these settings")]
+    IReadOnlyList<string>? IotDeviceTypes,
     [Required]
-    [SwaggerParameter(Description = "Maximum safe temperature")]
-    double TemperatureMax,
-    [SwaggerParameter(Description = "Minimum safe humidity percentage")]
-    double HumidityMin,
+    [SwaggerParameter(Description = "Lower safe temperature threshold")]
+    double? MinimumTemperature,
     [Required]
-    [SwaggerParameter(Description = "Maximum safe humidity percentage")]
-    double HumidityMax,
+    [SwaggerParameter(Description = "Upper safe temperature threshold")]
+    double? MaximumTemperature,
+    [SwaggerParameter(Description = "Lower safe humidity threshold")]
+    double? MinimumHumidity,
     [Required]
-    [SwaggerParameter(Description = "Reading frequency in seconds")]
-    int ReadingFrequencySeconds,
+    [SwaggerParameter(Description = "Upper safe humidity threshold")]
+    double? MaximumHumidity,
     [Required]
-    [SwaggerParameter(Description = "Alert threshold in minutes")]
-    int AlertThresholdMinutes);
+    [SwaggerParameter(Description = "Calibration frequency in days")]
+    int? CalibrationFrequencyDays,
+    [Required]
+    [SwaggerParameter(Description = "Temperature unit")]
+    string TemperatureUnit,
+    [Required]
+    [SwaggerParameter(Description = "Humidity unit")]
+    string HumidityUnit,
+    [Required]
+    [SwaggerParameter(Description = "Weight unit")]
+    string WeightUnit,
+    [SwaggerParameter(Description = "Telemetry reading frequency in seconds")]
+    int? ReadingFrequencySeconds,
+    [SwaggerParameter(Description = "Delay threshold before alert escalation in minutes")]
+    int? AlertThresholdMinutes);

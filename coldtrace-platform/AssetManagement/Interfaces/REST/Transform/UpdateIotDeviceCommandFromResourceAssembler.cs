@@ -21,6 +21,13 @@ public static class UpdateIotDeviceCommandFromResourceAssembler
             resource.GatewayId,
             resource.AssetId,
             resource.Uuid,
-            resource.Name,
-            resource.Status);
+            resource.DeviceType,
+            resource.Model,
+            resource.MeasurementType,
+            resource.MeasurementParameters,
+            resource.ReadingFrequencySeconds,
+            resource.Status,
+            resource.CalibrationStatus,
+            resource.LastCalibrationDate,
+            resource.NextCalibrationDate);
 }

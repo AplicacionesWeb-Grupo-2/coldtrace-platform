@@ -16,8 +16,15 @@ public static class IotDeviceResourceFromEntityAssembler
             entity.Id,
             entity.OrganizationId,
             entity.GatewayId,
-            entity.AssetId,
             entity.Uuid,
-            entity.Name,
-            entity.Status);
+            entity.DeviceType,
+            entity.Model,
+            entity.MeasurementType,
+            entity.MeasurementParameters,
+            entity.ReadingFrequencySeconds,
+            entity.AssetId,
+            entity.Status,
+            entity.CalibrationStatus,
+            entity.LastCalibrationDate,
+            entity.NextCalibrationDate);
 }

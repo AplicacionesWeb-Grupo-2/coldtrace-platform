@@ -13,13 +13,16 @@ public static class CreateSensorReadingCommandFromResourceAssembler
     /// </summary>
     public static CreateSensorReadingCommand ToCommandFromResource(
         CreateSensorReadingResource resource,
-        int organizationId,
-        int iotDeviceId) =>
+        int organizationId) =>
         new(
             organizationId,
-            iotDeviceId,
-            resource.Metric,
-            resource.Value,
-            resource.Unit,
-            resource.RecordedAt);
+            resource.AssetId,
+            resource.IotDeviceId,
+            resource.Temperature,
+            resource.Humidity,
+            resource.RecordedAt,
+            resource.MotionDetected,
+            resource.ImageCaptured,
+            resource.BatteryLevel,
+            resource.SignalStrength);
 }

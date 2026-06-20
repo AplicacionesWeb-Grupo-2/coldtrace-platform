@@ -1,4 +1,4 @@
-﻿using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 
 namespace ColdTrace.Platform.AssetManagement.Domain.Repositories;

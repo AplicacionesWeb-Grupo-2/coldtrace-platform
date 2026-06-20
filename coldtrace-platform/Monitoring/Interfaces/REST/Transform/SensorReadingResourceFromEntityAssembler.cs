@@ -15,9 +15,17 @@ public static class SensorReadingResourceFromEntityAssembler
         new(
             entity.Id,
             entity.OrganizationId,
+            entity.AssetId,
             entity.IotDeviceId,
-            entity.Metric,
-            entity.Value,
-            entity.Unit,
-            entity.RecordedAt);
+            entity.GatewayId,
+            entity.LocationId,
+            entity.Temperature,
+            entity.Humidity,
+            entity.OutOfRange,
+            entity.OutOfRange,
+            entity.RecordedAt,
+            entity.MotionDetected,
+            entity.ImageCaptured,
+            entity.BatteryLevel,
+            entity.SignalStrength);
 }

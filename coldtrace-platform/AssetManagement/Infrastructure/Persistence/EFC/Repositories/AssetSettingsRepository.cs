@@ -1,4 +1,4 @@
-﻿using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
@@ -9,7 +9,6 @@ namespace ColdTrace.Platform.AssetManagement.Infrastructure.Persistence.EFC.Repo
 /// <summary>
 ///     Entity Framework repository for asset settings persistence.
 /// </summary>
-/// <param name="context">The EF Core database context.</param>
 public class AssetSettingsRepository(AppDbContext context)
     : BaseRepository<AssetSettings>(context), IAssetSettingsRepository
 {
@@ -19,7 +18,9 @@ public class AssetSettingsRepository(AppDbContext context)
         CancellationToken cancellationToken = default)
     {
         return await Context.Set<AssetSettings>()
-            .Where(s => s.OrganizationId == organizationId)
+            .Where(settings => settings.OrganizationId == organizationId)
+            .OrderBy(settings => settings.AssetId.HasValue)
+            .ThenBy(settings => settings.AssetId)
             .ToListAsync(cancellationToken);
     }
 
@@ -31,7 +32,7 @@ public class AssetSettingsRepository(AppDbContext context)
     {
         return await Context.Set<AssetSettings>()
             .FirstOrDefaultAsync(
-                s => s.OrganizationId == organizationId && s.AssetId == assetId,
+                settings => settings.OrganizationId == organizationId && settings.AssetId == assetId,
                 cancellationToken);
     }
 
@@ -42,7 +43,7 @@ public class AssetSettingsRepository(AppDbContext context)
     {
         return await Context.Set<AssetSettings>()
             .FirstOrDefaultAsync(
-                s => s.OrganizationId == organizationId && s.AssetId == null,
+                settings => settings.OrganizationId == organizationId && settings.AssetId == null,
                 cancellationToken);
     }
 }

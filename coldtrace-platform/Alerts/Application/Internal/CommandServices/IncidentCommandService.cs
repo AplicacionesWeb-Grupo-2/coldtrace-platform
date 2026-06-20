@@ -211,6 +211,126 @@ public class IncidentCommandService(
         }
     }
 
+    /// <inheritdoc />
+    public async Task<Result<Incident, EscalateIncidentError>> Handle(
+        EscalateIncidentCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning("Organization not found for incident escalation: {OrganizationId}", command.OrganizationId);
+            return new Result<Incident, EscalateIncidentError>.Failure(EscalateIncidentError.OrganizationNotFound);
+        }
+
+        var incident = await incidentRepository.FindByIdAndOrganizationIdAsync(
+            command.IncidentId,
+            command.OrganizationId,
+            cancellationToken);
+        if (incident is null)
+        {
+            logger.LogWarning(
+                "Incident not found for escalation: {OrganizationId} {IncidentId}",
+                command.OrganizationId,
+                command.IncidentId);
+            return new Result<Incident, EscalateIncidentError>.Failure(EscalateIncidentError.IncidentNotFound);
+        }
+
+        if (incident.IsResolved())
+            return new Result<Incident, EscalateIncidentError>.Failure(EscalateIncidentError.AlreadyResolved);
+
+        if (incident.IsEscalated())
+            return new Result<Incident, EscalateIncidentError>.Failure(EscalateIncidentError.AlreadyEscalated);
+
+        try
+        {
+            incident.Escalate(command);
+            await unitOfWork.CompleteAsync(cancellationToken);
+
+            return new Result<Incident, EscalateIncidentError>.Success(incident);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogError(
+                ex,
+                "Database update failed escalating incident {IncidentId} for organization {OrganizationId}",
+                command.IncidentId,
+                command.OrganizationId);
+            return new Result<Incident, EscalateIncidentError>.Failure(EscalateIncidentError.UnexpectedError);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error escalating incident {IncidentId} for organization {OrganizationId}",
+                command.IncidentId,
+                command.OrganizationId);
+            return new Result<Incident, EscalateIncidentError>.Failure(EscalateIncidentError.UnexpectedError);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<Incident, RegisterIncidentCorrectiveActionError>> Handle(
+        RegisterIncidentCorrectiveActionCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for incident corrective action: {OrganizationId}",
+                command.OrganizationId);
+            return new Result<Incident, RegisterIncidentCorrectiveActionError>.Failure(
+                RegisterIncidentCorrectiveActionError.OrganizationNotFound);
+        }
+
+        var incident = await incidentRepository.FindByIdAndOrganizationIdAsync(
+            command.IncidentId,
+            command.OrganizationId,
+            cancellationToken);
+        if (incident is null)
+        {
+            logger.LogWarning(
+                "Incident not found for corrective action: {OrganizationId} {IncidentId}",
+                command.OrganizationId,
+                command.IncidentId);
+            return new Result<Incident, RegisterIncidentCorrectiveActionError>.Failure(
+                RegisterIncidentCorrectiveActionError.IncidentNotFound);
+        }
+
+        if (incident.IsResolved())
+            return new Result<Incident, RegisterIncidentCorrectiveActionError>.Failure(
+                RegisterIncidentCorrectiveActionError.AlreadyResolved);
+
+        try
+        {
+            incident.RegisterCorrectiveAction(command);
+            await unitOfWork.CompleteAsync(cancellationToken);
+
+            return new Result<Incident, RegisterIncidentCorrectiveActionError>.Success(incident);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogError(
+                ex,
+                "Database update failed registering corrective action for incident {IncidentId} in organization {OrganizationId}",
+                command.IncidentId,
+                command.OrganizationId);
+            return new Result<Incident, RegisterIncidentCorrectiveActionError>.Failure(
+                RegisterIncidentCorrectiveActionError.UnexpectedError);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error registering corrective action for incident {IncidentId} in organization {OrganizationId}",
+                command.IncidentId,
+                command.OrganizationId);
+            return new Result<Incident, RegisterIncidentCorrectiveActionError>.Failure(
+                RegisterIncidentCorrectiveActionError.UnexpectedError);
+        }
+    }
+
     private async Task EmitNotificationAsync(
         Incident incident,
         Notification notification,

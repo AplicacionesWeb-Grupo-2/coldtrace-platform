@@ -2,6 +2,7 @@ using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.Monitoring.Domain.Repositories;
 using ColdTrace.Platform.Reports.Application.Errors;
 using ColdTrace.Platform.Reports.Domain.Model.Aggregates;
 using ColdTrace.Platform.Reports.Domain.Model.Commands;
@@ -21,6 +22,7 @@ public class ReportCommandService(
     IOrganizationRepository organizationRepository,
     IAssetRepository assetRepository,
     IIncidentRepository incidentRepository,
+    ISensorReadingRepository sensorReadingRepository,
     IUnitOfWork unitOfWork,
     ILogger<ReportCommandService> logger)
     : IReportCommandService
@@ -44,20 +46,50 @@ public class ReportCommandService(
             var incidents = await incidentRepository.FindAllByOrganizationIdAsync(
                 command.OrganizationId,
                 cancellationToken);
+            var readings = (await sensorReadingRepository.FindAllByOrganizationIdAsync(
+                    command.OrganizationId,
+                    from: command.PeriodStart,
+                    to: command.PeriodEnd,
+                    cancellationToken: cancellationToken))
+                .ToList();
             var incidentsInPeriod = incidents
                 .Where(incident => incident.DetectedAt >= command.PeriodStart && incident.DetectedAt <= command.PeriodEnd)
                 .ToList();
+            var temperatureReadings = readings
+                .Where(reading => reading.Temperature.HasValue)
+                .Select(reading => reading.Temperature!.Value)
+                .ToList();
+            var humidityReadings = readings
+                .Where(reading => reading.Humidity.HasValue)
+                .Select(reading => reading.Humidity!.Value)
+                .ToList();
+            var outOfRangeReadingCount = readings.Count(reading => reading.OutOfRange);
+            double? compliancePercentage = readings.Count == 0
+                ? null
+                : Math.Round(
+                    (readings.Count - outOfRangeReadingCount) * 100.0 / readings.Count,
+                    1,
+                    MidpointRounding.AwayFromZero);
+            double? averageTemperature = temperatureReadings.Count == 0
+                ? null
+                : Math.Round(temperatureReadings.Average(), 1, MidpointRounding.AwayFromZero);
+            double? averageHumidity = humidityReadings.Count == 0
+                ? null
+                : Math.Round(humidityReadings.Average(), 1, MidpointRounding.AwayFromZero);
+            var assetCount = readings.Count == 0
+                ? assets.Count()
+                : readings.Select(reading => reading.AssetId).Distinct().Count();
 
             var report = new Report(
                 command,
-                assets.Count(),
-                readingCount: 0,
-                outOfRangeReadingCount: 0,
+                assetCount,
+                readings.Count,
+                outOfRangeReadingCount,
                 incidentsInPeriod.Count,
                 incidentsInPeriod.Count(IsOpenIncident),
-                averageTemperature: null,
-                averageHumidity: null,
-                compliancePercentage: null);
+                averageTemperature,
+                averageHumidity,
+                compliancePercentage);
 
             await reportRepository.AddAsync(report, cancellationToken);
             await unitOfWork.CompleteAsync(cancellationToken);

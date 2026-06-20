@@ -16,4 +16,11 @@ public interface ISensorReadingCommandService
     Task<Result<SensorReading, CreateSensorReadingError>> Handle(
         CreateSensorReadingCommand command,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Handles demo sensor reading generation.
+    /// </summary>
+    Task<Result<IEnumerable<SensorReading>, GenerateDemoSensorReadingsError>> Handle(
+        GenerateDemoSensorReadingsCommand command,
+        CancellationToken cancellationToken = default);
 }

@@ -6,6 +6,14 @@ namespace ColdTrace.Platform.Monitoring.Application.Errors;
 public enum CreateSensorReadingError
 {
     OrganizationNotFound,
+    AssetNotFound,
     IotDeviceNotFound,
+    GatewayNotFound,
+    DeviceNotAssignedToAsset,
+    IncompatibleLocation,
+    DeviceOffline,
+    GatewayOffline,
+    AssetSettingsNotFound,
+    UnsupportedMeasurement,
     UnexpectedError
 }

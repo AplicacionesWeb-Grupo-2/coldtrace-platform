@@ -1,10 +1,10 @@
-﻿using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
 
 namespace ColdTrace.Platform.AssetManagement.Interfaces.REST.Transform;
 
 /// <summary>
-///     Assembles asset settings resources from asset settings entities.
+///     Assembles an asset settings resource from a domain entity.
 /// </summary>
 public static class AssetSettingsResourceFromEntityAssembler
 {
@@ -13,10 +13,17 @@ public static class AssetSettingsResourceFromEntityAssembler
             entity.Id,
             entity.OrganizationId,
             entity.AssetId,
-            entity.TemperatureMin,
-            entity.TemperatureMax,
-            entity.HumidityMin,
-            entity.HumidityMax,
+            entity.Uuid,
+            entity.AssetTypes,
+            entity.IotDeviceTypes,
+            entity.MinimumTemperature,
+            entity.MaximumTemperature,
+            entity.MinimumHumidity,
+            entity.MaximumHumidity,
+            entity.CalibrationFrequencyDays,
+            entity.TemperatureUnit,
+            entity.HumidityUnit,
+            entity.WeightUnit,
             entity.ReadingFrequencySeconds,
             entity.AlertThresholdMinutes);
 }

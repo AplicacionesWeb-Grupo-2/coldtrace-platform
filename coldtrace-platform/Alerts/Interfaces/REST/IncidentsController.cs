@@ -157,6 +157,99 @@ public class IncidentsController(
     }
 
     /// <summary>
+    ///     Escalates an active incident.
+    /// </summary>
+    [HttpPatch("{incidentId:int}/escalation")]
+    [SwaggerOperation(
+        Summary = "Escalates an incident",
+        Description = "Registers escalation fields for an open or acknowledged incident",
+        OperationId = "EscalateIncident")]
+    [SwaggerResponse(200, "Incident escalated", typeof(IncidentResource))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
+    [SwaggerResponse(404, "Organization or incident not found", typeof(string))]
+    [SwaggerResponse(409, "Lifecycle transition is not allowed", typeof(string))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> EscalateIncident(
+        [FromRoute] int organizationId,
+        [FromRoute] int incidentId,
+        [FromBody] EscalateIncidentResource resource,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var command = EscalateIncidentCommandFromResourceAssembler
+                .ToCommandFromResource(resource, organizationId, incidentId);
+            var result = await incidentCommandService.Handle(command, cancellationToken);
+            return ActionResultFromEscalateIncidentResultAssembler
+                .ToActionResultFromEscalateIncidentResult(result, this, localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid escalation payload for incident {IncidentId} in organization {OrganizationId}",
+                incidentId,
+                organizationId);
+            return BadRequest(localizer["InvalidIncidentRequest"].Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error while escalating incident {IncidentId}", incidentId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorEscalatingIncident"].Value,
+                statusCode: 500);
+        }
+    }
+
+    /// <summary>
+    ///     Registers corrective action for an active incident.
+    /// </summary>
+    [HttpPatch("{incidentId:int}/corrective-action")]
+    [SwaggerOperation(
+        Summary = "Registers incident corrective action",
+        Description = "Registers corrective action fields for an open or acknowledged incident",
+        OperationId = "RegisterIncidentCorrectiveAction")]
+    [SwaggerResponse(200, "Corrective action registered", typeof(IncidentResource))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
+    [SwaggerResponse(404, "Organization or incident not found", typeof(string))]
+    [SwaggerResponse(409, "Lifecycle transition is not allowed", typeof(string))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> RegisterIncidentCorrectiveAction(
+        [FromRoute] int organizationId,
+        [FromRoute] int incidentId,
+        [FromBody] RegisterIncidentCorrectiveActionResource resource,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var command = RegisterIncidentCorrectiveActionCommandFromResourceAssembler
+                .ToCommandFromResource(resource, organizationId, incidentId);
+            var result = await incidentCommandService.Handle(command, cancellationToken);
+            return ActionResultFromRegisterIncidentCorrectiveActionResultAssembler
+                .ToActionResultFromRegisterIncidentCorrectiveActionResult(result, this, localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid corrective action payload for incident {IncidentId} in organization {OrganizationId}",
+                incidentId,
+                organizationId);
+            return BadRequest(localizer["InvalidIncidentRequest"].Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error while registering corrective action for incident {IncidentId}",
+                incidentId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorRegisteringIncidentCorrectiveAction"].Value,
+                statusCode: 500);
+        }
+    }
+
+    /// <summary>
     ///     Resolves an active incident.
     /// </summary>
     [HttpPost("{incidentId:int}/resolutions")]

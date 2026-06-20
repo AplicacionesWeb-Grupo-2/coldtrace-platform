@@ -70,6 +70,18 @@ public class Incident : IAuditableEntity
 
     public string? AcknowledgedBy { get; private set; }
 
+    public DateTimeOffset? EscalatedAt { get; private set; }
+
+    public string? EscalatedBy { get; private set; }
+
+    public string? EscalationReason { get; private set; }
+
+    public DateTimeOffset? CorrectiveActionRegisteredAt { get; private set; }
+
+    public string? CorrectiveActionRegisteredBy { get; private set; }
+
+    public string? CorrectiveAction { get; private set; }
+
     public DateTimeOffset? ResolvedAt { get; private set; }
 
     public string? ResolvedBy { get; private set; }
@@ -96,6 +108,8 @@ public class Incident : IAuditableEntity
 
     public bool IsResolved() => Status == StatusResolved;
 
+    public bool IsEscalated() => EscalatedAt is not null;
+
     /// <summary>
     ///     Acknowledges an open incident.
     /// </summary>
@@ -104,6 +118,26 @@ public class Incident : IAuditableEntity
         Status = StatusAcknowledged;
         AcknowledgedAt = DateTimeOffset.UtcNow;
         AcknowledgedBy = command.AcknowledgedBy;
+    }
+
+    /// <summary>
+    ///     Escalates an open or acknowledged incident.
+    /// </summary>
+    public void Escalate(EscalateIncidentCommand command)
+    {
+        EscalatedAt = DateTimeOffset.UtcNow;
+        EscalatedBy = command.EscalatedBy;
+        EscalationReason = command.EscalationReason;
+    }
+
+    /// <summary>
+    ///     Registers corrective action details on an active incident.
+    /// </summary>
+    public void RegisterCorrectiveAction(RegisterIncidentCorrectiveActionCommand command)
+    {
+        CorrectiveActionRegisteredAt = DateTimeOffset.UtcNow;
+        CorrectiveActionRegisteredBy = command.RegisteredBy;
+        CorrectiveAction = command.CorrectiveAction;
     }
 
     /// <summary>

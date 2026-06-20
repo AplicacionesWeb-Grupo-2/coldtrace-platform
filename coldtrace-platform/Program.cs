@@ -34,6 +34,8 @@ using ColdTrace.Platform.Shared.Interfaces.ASP.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Localization;
 using MySql.Data.MySqlClient;
 
@@ -117,13 +119,15 @@ builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IGatewayRepository, GatewayRepository>();
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+builder.Services.AddScoped<IAssetSettingsRepository, AssetSettingsRepository>();
 builder.Services.AddScoped<ILocationCommandService, LocationCommandService>();
 builder.Services.AddScoped<ILocationQueryService, LocationQueryService>();
 builder.Services.AddScoped<IGatewayCommandService, GatewayCommandService>();
 builder.Services.AddScoped<IGatewayQueryService, GatewayQueryService>();
 builder.Services.AddScoped<IAssetCommandService, AssetCommandService>();
 builder.Services.AddScoped<IAssetQueryService, AssetQueryService>(); //HU-48
-
+builder.Services.AddScoped<IAssetSettingsCommandService, AssetSettingsCommandService>();
+builder.Services.AddScoped<IAssetSettingsQueryService, AssetSettingsQueryService>();
 builder.Services.AddScoped<IIotDeviceRepository, IotDeviceRepository>();
 builder.Services.AddScoped<IIotDeviceCommandService, IotDeviceCommandService>();
 builder.Services.AddScoped<IIotDeviceQueryService, IotDeviceQueryService>();
@@ -141,11 +145,6 @@ builder.Services.AddScoped<IMaintenanceScheduleQueryService, MaintenanceSchedule
 builder.Services.AddScoped<ITechnicalServiceRequestRepository, TechnicalServiceRequestRepository>();
 builder.Services.AddScoped<ITechnicalServiceRequestCommandService, TechnicalServiceRequestCommandService>();
 builder.Services.AddScoped<ITechnicalServiceRequestQueryService, TechnicalServiceRequestQueryService>();
-
-builder.Services.AddScoped<IAssetSettingsRepository, AssetSettingsRepository>();
-builder.Services.AddScoped<IAssetSettingsCommandService, AssetSettingsCommandService>();
-builder.Services.AddScoped<IAssetSettingsQueryService, AssetSettingsQueryService>();//HU-50
-
 
 var app = builder.Build();
 
@@ -183,8 +182,52 @@ app.Run();
 static void ApplyPendingMigrations(DbContext context)
 {
     EnsureMySqlDatabaseExists(context);
+    EnsureMySqlMigrationsHistoryTableExists(context);
 
-    context.Database.Migrate();
+    var migrations = context.Database.GetMigrations().ToList();
+    var appliedMigrations = GetAppliedMigrationIds(context);
+    if (migrations.Count == 0 || migrations.All(appliedMigrations.Contains)) return;
+
+    if (appliedMigrations.Count == 0)
+        context.Database.Migrate();
+    else
+        ApplyPendingMigrationsWithScript(context, migrations, appliedMigrations);
+}
+
+static void ApplyPendingMigrationsWithScript(
+    DbContext context,
+    IReadOnlyList<string> migrations,
+    HashSet<string> appliedMigrations)
+{
+    var fromMigration = migrations.LastOrDefault(appliedMigrations.Contains) ?? Migration.InitialDatabase;
+    var script = context.GetService<IMigrator>()
+        .GenerateScript(fromMigration, toMigration: null, MigrationsSqlGenerationOptions.Default);
+    if (string.IsNullOrWhiteSpace(script)) return;
+
+    var connectionString = context.Database.GetConnectionString();
+    if (string.IsNullOrWhiteSpace(connectionString)) return;
+
+    using var connection = new MySqlConnection(connectionString);
+    connection.Open();
+    new MySqlScript(connection, script).Execute();
+}
+
+static HashSet<string> GetAppliedMigrationIds(DbContext context)
+{
+    var connectionString = context.Database.GetConnectionString();
+    if (string.IsNullOrWhiteSpace(connectionString)) return [];
+
+    using var connection = new MySqlConnection(connectionString);
+    connection.Open();
+
+    using var command = connection.CreateCommand();
+    command.CommandText = "SELECT `MigrationId` FROM `__EFMigrationsHistory`;";
+
+    using var reader = command.ExecuteReader();
+    var appliedMigrations = new HashSet<string>(StringComparer.Ordinal);
+    while (reader.Read()) appliedMigrations.Add(reader.GetString(0));
+
+    return appliedMigrations;
 }
 
 static void EnsureMySqlDatabaseExists(DbContext context)
@@ -199,5 +242,24 @@ static void EnsureMySqlDatabaseExists(DbContext context)
 
     using var command = connection.CreateCommand();
     command.CommandText = $"CREATE DATABASE IF NOT EXISTS `{database.Replace("`", "``")}`;";
+    command.ExecuteNonQuery();
+}
+
+static void EnsureMySqlMigrationsHistoryTableExists(DbContext context)
+{
+    var connectionString = context.Database.GetConnectionString();
+    if (string.IsNullOrWhiteSpace(connectionString)) return;
+
+    using var connection = new MySqlConnection(connectionString);
+    connection.Open();
+
+    using var command = connection.CreateCommand();
+    command.CommandText = """
+                          CREATE TABLE IF NOT EXISTS `__EFMigrationsHistory` (
+                              `MigrationId` varchar(150) NOT NULL,
+                              `ProductVersion` varchar(32) NOT NULL,
+                              PRIMARY KEY (`MigrationId`)
+                          ) CHARACTER SET=utf8mb4;
+                          """;
     command.ExecuteNonQuery();
 }

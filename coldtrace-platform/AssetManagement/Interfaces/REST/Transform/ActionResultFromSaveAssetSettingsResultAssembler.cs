@@ -1,4 +1,4 @@
-﻿using ColdTrace.Platform.AssetManagement.Application.Errors;
+using ColdTrace.Platform.AssetManagement.Application.Errors;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.Shared.Application.Patterns;
@@ -8,7 +8,7 @@ using Microsoft.Extensions.Localization;
 namespace ColdTrace.Platform.AssetManagement.Interfaces.REST.Transform;
 
 /// <summary>
-///     Assembles an HTTP action result from a save asset settings result.
+///     Converts asset settings save results to action results.
 /// </summary>
 public static class ActionResultFromSaveAssetSettingsResultAssembler
 {
@@ -20,28 +20,17 @@ public static class ActionResultFromSaveAssetSettingsResultAssembler
         {
             Result<AssetSettings, SaveAssetSettingsError>.Success success =>
                 controller.Ok(AssetSettingsResourceFromEntityAssembler.ToResourceFromEntity(success.Value)),
-
             Result<AssetSettings, SaveAssetSettingsError>.Failure failure =>
                 failure.Error switch
                 {
-                    SaveAssetSettingsError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
-                    SaveAssetSettingsError.AssetNotFound =>
-                        controller.NotFound(localizer["AssetNotFound"].Value),
-                    SaveAssetSettingsError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorSavingAssetSettings"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
+                    SaveAssetSettingsError.OrganizationNotFound => controller.NotFound(localizer["OrganizationNotFound"].Value),
+                    SaveAssetSettingsError.AssetNotFound => controller.NotFound(localizer["AssetNotFound"].Value),
+                    SaveAssetSettingsError.UnexpectedError => controller.Problem(
                         title: localizer["UnexpectedServerError"].Value,
                         detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        statusCode: 500),
+                    _ => controller.BadRequest(localizer["InvalidRequest"].Value)
                 },
-
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.Problem()
         };
 }

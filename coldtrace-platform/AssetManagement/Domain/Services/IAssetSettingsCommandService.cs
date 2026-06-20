@@ -1,4 +1,4 @@
-﻿using ColdTrace.Platform.AssetManagement.Application.Errors;
+using ColdTrace.Platform.AssetManagement.Application.Errors;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.Shared.Application.Patterns;
@@ -6,7 +6,7 @@ using ColdTrace.Platform.Shared.Application.Patterns;
 namespace ColdTrace.Platform.AssetManagement.Domain.Services;
 
 /// <summary>
-///     Asset settings command application service contract.
+///     Application service contract for asset settings commands.
 /// </summary>
 public interface IAssetSettingsCommandService
 {

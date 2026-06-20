@@ -1,89 +1,107 @@
-﻿using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
 namespace ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 
 /// <summary>
-///     AssetSettings aggregate for the asset management context.
+///     Asset settings aggregate for safety thresholds and telemetry defaults.
 /// </summary>
-/// <remarks>
-///     Represents safety ranges and operational thresholds tied to an organization
-///     and optionally to a specific asset. When AssetId is null, these are the
-///     organization-wide default settings.
-/// </remarks>
 public class AssetSettings : IAuditableEntity
 {
-    /// <summary>
-    ///     Protected parameterless constructor for EF Core.
-    /// </summary>
-    protected AssetSettings() { }
+    protected AssetSettings()
+    {
+        Uuid = string.Empty;
+        TemperatureUnit = string.Empty;
+        HumidityUnit = string.Empty;
+        WeightUnit = string.Empty;
+    }
 
     /// <summary>
     ///     Creates asset settings from a save command.
     /// </summary>
-    /// <param name="command">Command containing asset settings data.</param>
     public AssetSettings(SaveAssetSettingsCommand command)
     {
+        TemperatureUnit = string.Empty;
+        HumidityUnit = string.Empty;
+        WeightUnit = string.Empty;
         OrganizationId = command.OrganizationId;
         AssetId = command.AssetId;
-        TemperatureMin = command.TemperatureMin;
-        TemperatureMax = command.TemperatureMax;
-        HumidityMin = command.HumidityMin;
-        HumidityMax = command.HumidityMax;
-        ReadingFrequencySeconds = command.ReadingFrequencySeconds;
-        AlertThresholdMinutes = command.AlertThresholdMinutes;
+        Uuid = string.IsNullOrWhiteSpace(command.Uuid)
+            ? $"AST-SET-{Guid.NewGuid()}"
+            : command.Uuid.Trim();
+        Apply(command);
     }
 
-    /// <summary>Gets the server-generated identifier.</summary>
     public int Id { get; private set; }
 
-    /// <summary>Gets the owning organization identifier.</summary>
     public int OrganizationId { get; private set; }
 
-    /// <summary>Gets the optional asset identifier. Null means organization default settings.</summary>
     public int? AssetId { get; private set; }
 
-    /// <summary>Gets the owning organization.</summary>
-    public Organization Organization { get; private set; } = null!;
+    public string Uuid { get; private set; }
 
-    /// <summary>Gets the optional asset these settings apply to.</summary>
-    public Asset? Asset { get; private set; }
+    public List<AssetSettingsAssetType> AssetTypeEntries { get; private set; } = [];
 
-    /// <summary>Gets the minimum safe temperature.</summary>
-    public double TemperatureMin { get; private set; }
+    public List<AssetSettingsIotDeviceType> IotDeviceTypeEntries { get; private set; } = [];
 
-    /// <summary>Gets the maximum safe temperature.</summary>
-    public double TemperatureMax { get; private set; }
+    public IReadOnlyList<string> AssetTypes => AssetTypeEntries.Select(entry => entry.AssetType).ToList();
 
-    /// <summary>Gets the minimum safe humidity percentage.</summary>
-    public double HumidityMin { get; private set; }
+    public IReadOnlyList<string> IotDeviceTypes => IotDeviceTypeEntries.Select(entry => entry.IotDeviceType).ToList();
 
-    /// <summary>Gets the maximum safe humidity percentage.</summary>
-    public double HumidityMax { get; private set; }
+    public double MinimumTemperature { get; private set; }
 
-    /// <summary>Gets the reading frequency in seconds.</summary>
+    public double MaximumTemperature { get; private set; }
+
+    public double MinimumHumidity { get; private set; }
+
+    public double MaximumHumidity { get; private set; }
+
+    public int CalibrationFrequencyDays { get; private set; }
+
+    public string TemperatureUnit { get; private set; }
+
+    public string HumidityUnit { get; private set; }
+
+    public string WeightUnit { get; private set; }
+
     public int ReadingFrequencySeconds { get; private set; }
 
-    /// <summary>Gets the alert threshold in minutes.</summary>
     public int AlertThresholdMinutes { get; private set; }
 
-    /// <inheritdoc />
+    public Organization Organization { get; private set; } = null!;
+
+    public Asset? Asset { get; private set; }
+
     public DateTimeOffset? CreatedAt { get; set; }
 
-    /// <inheritdoc />
     public DateTimeOffset? UpdatedAt { get; set; }
 
     /// <summary>
-    ///     Updates asset settings data.
+    ///     Updates threshold and operational values from a save command.
     /// </summary>
-    /// <param name="command">Command containing updated data.</param>
     public void Update(SaveAssetSettingsCommand command)
     {
-        TemperatureMin = command.TemperatureMin;
-        TemperatureMax = command.TemperatureMax;
-        HumidityMin = command.HumidityMin;
-        HumidityMax = command.HumidityMax;
+        if (!string.IsNullOrWhiteSpace(command.Uuid)) Uuid = command.Uuid.Trim();
+        Apply(command);
+    }
+
+    private void Apply(SaveAssetSettingsCommand command)
+    {
+        AssetTypeEntries = command.AssetTypes
+            .Select(assetType => new AssetSettingsAssetType(assetType))
+            .ToList();
+        IotDeviceTypeEntries = command.IotDeviceTypes
+            .Select(iotDeviceType => new AssetSettingsIotDeviceType(iotDeviceType))
+            .ToList();
+        MinimumTemperature = command.MinimumTemperature;
+        MaximumTemperature = command.MaximumTemperature;
+        MinimumHumidity = command.MinimumHumidity;
+        MaximumHumidity = command.MaximumHumidity;
+        CalibrationFrequencyDays = command.CalibrationFrequencyDays;
+        TemperatureUnit = command.TemperatureUnit;
+        HumidityUnit = command.HumidityUnit;
+        WeightUnit = command.WeightUnit;
         ReadingFrequencySeconds = command.ReadingFrequencySeconds;
         AlertThresholdMinutes = command.AlertThresholdMinutes;
     }

@@ -1,7 +1,11 @@
 namespace ColdTrace.Platform.Monitoring.Domain.Model.Queries;
 
 /// <summary>
-///     Query for retrieving sensor readings by organization.
+///     Query for getting sensor readings by organization with optional filters.
 /// </summary>
-/// <param name="OrganizationId">Organization identifier.</param>
-public record GetSensorReadingsByOrganizationIdQuery(int OrganizationId);
+public record GetSensorReadingsByOrganizationIdQuery(
+    int OrganizationId,
+    int? AssetId,
+    int? IotDeviceId,
+    DateTimeOffset? From,
+    DateTimeOffset? To);

@@ -36,6 +36,10 @@ public class SensorReadingQueryService(
         {
             var readings = await sensorReadingRepository.FindAllByOrganizationIdAsync(
                 query.OrganizationId,
+                query.AssetId,
+                query.IotDeviceId,
+                query.From,
+                query.To,
                 cancellationToken);
             return new Result<IEnumerable<SensorReading>, GetSensorReadingsByOrganizationError>.Success(readings);
         }

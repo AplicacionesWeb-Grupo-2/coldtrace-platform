@@ -13,6 +13,10 @@ public interface ISensorReadingRepository : IBaseRepository<SensorReading>
     /// </summary>
     Task<IEnumerable<SensorReading>> FindAllByOrganizationIdAsync(
         int organizationId,
+        int? assetId = null,
+        int? iotDeviceId = null,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

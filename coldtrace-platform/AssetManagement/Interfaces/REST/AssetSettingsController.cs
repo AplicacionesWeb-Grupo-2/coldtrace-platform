@@ -1,6 +1,6 @@
-﻿using System.Net.Mime;
-using ColdTrace.Platform.AssetManagement.Domain.Services;
+using System.Net.Mime;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
+using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Transform;
 using ColdTrace.Platform.Resources;
@@ -14,6 +14,7 @@ namespace ColdTrace.Platform.AssetManagement.Interfaces.REST;
 ///     Asset settings controller.
 /// </summary>
 [ApiController]
+[Route("api/v1/organizations/{organizationId:int}")]
 [Produces(MediaTypeNames.Application.Json)]
 [Tags("Asset Settings")]
 public class AssetSettingsController(
@@ -23,34 +24,32 @@ public class AssetSettingsController(
     ILogger<AssetSettingsController> logger)
     : ControllerBase
 {
-    [HttpGet("api/v1/organizations/{organizationId:int}/asset-settings")]
+    [HttpGet("asset-settings")]
     [SwaggerOperation(
         Summary = "Gets asset settings by organization",
-        Description = "Gets all asset settings that belong to the provided organization",
+        Description = "Gets default and asset-specific settings that belong to the provided organization",
         OperationId = "GetAssetSettingsByOrganization")]
-    [SwaggerResponse(200, "Asset settings found", typeof(IEnumerable<AssetSettingsResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(200, "Settings found", typeof(IEnumerable<AssetSettingsResource>))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetAssetSettingsByOrganizationId(
         [FromRoute] int organizationId,
         CancellationToken cancellationToken = default)
     {
-        var result = await assetSettingsQueryService.Handle(
+        var settings = await assetSettingsQueryService.Handle(
             new GetAssetSettingsByOrganizationIdQuery(organizationId),
             cancellationToken);
-        return ActionResultFromGetAssetSettingsByOrganizationResultAssembler
-            .ToActionResultFromGetAssetSettingsByOrganizationResult(result, this, localizer);
+        return Ok(settings.Select(AssetSettingsResourceFromEntityAssembler.ToResourceFromEntity));
     }
 
-    [HttpGet("api/v1/organizations/{organizationId:int}/assets/{assetId:int}/settings")]
+    [HttpGet("assets/{assetId:int}/settings")]
     [SwaggerOperation(
-        Summary = "Gets effective asset settings for an asset",
-        Description = "Gets asset-specific settings or falls back to organization default",
-        OperationId = "GetEffectiveAssetSettingsByAsset")]
-    [SwaggerResponse(200, "Asset settings found", typeof(AssetSettingsResource))]
-    [SwaggerResponse(404, "Organization or asset not found", typeof(string))]
+        Summary = "Gets effective asset settings",
+        Description = "Gets asset-specific settings or organization default settings for one asset",
+        OperationId = "GetEffectiveAssetSettings")]
+    [SwaggerResponse(200, "Settings found", typeof(AssetSettingsResource))]
+    [SwaggerResponse(404, "Asset or settings not found", typeof(string))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
-    public async Task<ActionResult> GetEffectiveAssetSettingsByAssetId(
+    public async Task<ActionResult> GetEffectiveAssetSettings(
         [FromRoute] int organizationId,
         [FromRoute] int assetId,
         CancellationToken cancellationToken = default)
@@ -58,14 +57,31 @@ public class AssetSettingsController(
         var result = await assetSettingsQueryService.Handle(
             new GetEffectiveAssetSettingsByAssetIdQuery(organizationId, assetId),
             cancellationToken);
-        return ActionResultFromGetEffectiveAssetSettingsByAssetResultAssembler
-            .ToActionResultFromGetEffectiveAssetSettingsByAssetResult(result, this, localizer);
+        return ActionResultFromGetEffectiveAssetSettingsResultAssembler
+            .ToActionResultFromGetEffectiveAssetSettingsResult(result, this, localizer);
     }
 
-    [HttpPut("api/v1/organizations/{organizationId:int}/assets/{assetId:int}/settings")]
+    [HttpPut("asset-settings/default")]
+    [SwaggerOperation(
+        Summary = "Saves default asset settings",
+        Description = "Creates or updates default safety and telemetry settings for an organization",
+        OperationId = "SaveDefaultAssetSettings")]
+    [SwaggerResponse(200, "Default settings saved", typeof(AssetSettingsResource))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> SaveDefaultAssetSettings(
+        [FromRoute] int organizationId,
+        [FromBody] SaveAssetSettingsResource resource,
+        CancellationToken cancellationToken = default)
+    {
+        return await SaveAssetSettingsInternal(organizationId, null, resource, cancellationToken);
+    }
+
+    [HttpPut("assets/{assetId:int}/settings")]
     [SwaggerOperation(
         Summary = "Saves settings for an asset",
-        Description = "Creates or updates settings for a specific asset",
+        Description = "Creates or updates safety and telemetry settings for one organization asset",
         OperationId = "SaveAssetSettings")]
     [SwaggerResponse(200, "Asset settings saved", typeof(AssetSettingsResource))]
     [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
@@ -77,70 +93,37 @@ public class AssetSettingsController(
         [FromBody] SaveAssetSettingsResource resource,
         CancellationToken cancellationToken = default)
     {
-        try
-        {
-            var command = SaveAssetSettingsCommandFromResourceAssembler
-                .ToCommandFromResource(resource, organizationId, assetId);
-            var result = await assetSettingsCommandService.Handle(command, cancellationToken);
-            return ActionResultFromSaveAssetSettingsResultAssembler
-                .ToActionResultFromSaveAssetSettingsResult(result, this, localizer);
-        }
-        catch (ArgumentException ex)
-        {
-            logger.LogWarning(ex,
-                "Invalid asset settings request for organization {OrganizationId} asset {AssetId}",
-                organizationId, assetId);
-            return BadRequest(localizer["InvalidAssetSettingsRequest"].Value);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex,
-                "Unexpected error saving asset settings for organization {OrganizationId} asset {AssetId}",
-                organizationId, assetId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorSavingAssetSettings"].Value,
-                statusCode: 500);
-        }
+        return await SaveAssetSettingsInternal(organizationId, assetId, resource, cancellationToken);
     }
 
-    [HttpPut("api/v1/organizations/{organizationId:int}/asset-settings/default")]
-    [SwaggerOperation(
-        Summary = "Saves organization default asset settings",
-        Description = "Creates or updates the organization-wide default asset settings",
-        OperationId = "SaveDefaultAssetSettings")]
-    [SwaggerResponse(200, "Default asset settings saved", typeof(AssetSettingsResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
-    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
-    public async Task<ActionResult> SaveDefaultAssetSettings(
-        [FromRoute] int organizationId,
-        [FromBody] SaveAssetSettingsResource resource,
-        CancellationToken cancellationToken = default)
+    private async Task<ActionResult> SaveAssetSettingsInternal(
+        int organizationId,
+        int? assetId,
+        SaveAssetSettingsResource resource,
+        CancellationToken cancellationToken)
     {
         try
         {
-            var command = SaveAssetSettingsCommandFromResourceAssembler
-                .ToCommandFromResource(resource, organizationId);
+            var command = SaveAssetSettingsCommandFromResourceAssembler.ToCommandFromResource(
+                resource,
+                organizationId,
+                assetId);
             var result = await assetSettingsCommandService.Handle(command, cancellationToken);
             return ActionResultFromSaveAssetSettingsResultAssembler
                 .ToActionResultFromSaveAssetSettingsResult(result, this, localizer);
         }
         catch (ArgumentException ex)
         {
-            logger.LogWarning(ex,
-                "Invalid default asset settings request for organization {OrganizationId}",
-                organizationId);
-            return BadRequest(localizer["InvalidAssetSettingsRequest"].Value);
+            logger.LogWarning(ex, "Invalid asset settings request for organization {OrganizationId}", organizationId);
+            return BadRequest(localizer["InvalidRequest"].Value);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex,
-                "Unexpected error saving default asset settings for organization {OrganizationId}",
+            logger.LogError(ex, "Unexpected error saving asset settings for organization {OrganizationId}",
                 organizationId);
             return Problem(
                 title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorSavingAssetSettings"].Value,
+                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
                 statusCode: 500);
         }
     }

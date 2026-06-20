@@ -18,6 +18,14 @@ public interface IIncidentCommandService
         AcknowledgeIncidentCommand command,
         CancellationToken cancellationToken = default);
 
+    Task<Result<Incident, EscalateIncidentError>> Handle(
+        EscalateIncidentCommand command,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<Incident, RegisterIncidentCorrectiveActionError>> Handle(
+        RegisterIncidentCorrectiveActionCommand command,
+        CancellationToken cancellationToken = default);
+
     Task<Result<Incident, ResolveIncidentError>> Handle(
         ResolveIncidentCommand command,
         CancellationToken cancellationToken = default);

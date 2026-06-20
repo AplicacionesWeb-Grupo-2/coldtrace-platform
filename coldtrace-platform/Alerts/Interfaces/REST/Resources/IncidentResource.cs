@@ -35,6 +35,18 @@ public record IncidentResource(
     DateTimeOffset? AcknowledgedAt,
     [SwaggerParameter(Description = "Actor that acknowledged the incident")]
     string? AcknowledgedBy,
+    [SwaggerParameter(Description = "Escalation timestamp")]
+    DateTimeOffset? EscalatedAt,
+    [SwaggerParameter(Description = "Actor that escalated the incident")]
+    string? EscalatedBy,
+    [SwaggerParameter(Description = "Reason that justified escalation")]
+    string? EscalationReason,
+    [SwaggerParameter(Description = "Corrective action registration timestamp")]
+    DateTimeOffset? CorrectiveActionRegisteredAt,
+    [SwaggerParameter(Description = "Actor that registered the corrective action")]
+    string? CorrectiveActionRegisteredBy,
+    [SwaggerParameter(Description = "Corrective action details")]
+    string? CorrectiveAction,
     [SwaggerParameter(Description = "Resolution timestamp")]
     DateTimeOffset? ResolvedAt,
     [SwaggerParameter(Description = "Actor that resolved the incident")]

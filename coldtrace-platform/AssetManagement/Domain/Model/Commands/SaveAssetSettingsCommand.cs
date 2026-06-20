@@ -1,55 +1,79 @@
-﻿namespace ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
+namespace ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 
 /// <summary>
-///     Command for saving asset settings for an organization asset or as organization default.
+///     Command for creating or updating organization default or asset-specific settings.
 /// </summary>
 public record SaveAssetSettingsCommand
 {
-    /// <summary>
-    ///     Creates a command with validated asset settings data.
-    /// </summary>
     public SaveAssetSettingsCommand(
         int organizationId,
         int? assetId,
-        double temperatureMin,
-        double temperatureMax,
-        double humidityMin,
-        double humidityMax,
-        int readingFrequencySeconds,
-        int alertThresholdMinutes)
+        string? uuid,
+        IEnumerable<string>? assetTypes,
+        IEnumerable<string>? iotDeviceTypes,
+        double? minimumTemperature,
+        double? maximumTemperature,
+        double? minimumHumidity,
+        double? maximumHumidity,
+        int? calibrationFrequencyDays,
+        string? temperatureUnit,
+        string? humidityUnit,
+        string? weightUnit,
+        int? readingFrequencySeconds,
+        int? alertThresholdMinutes)
     {
         OrganizationId = RequirePositive(organizationId, nameof(organizationId));
-        AssetId = assetId.HasValue ? RequirePositive(assetId.Value, nameof(assetId)) : null;
-        TemperatureMin = temperatureMin;
-        TemperatureMax = RequireGreaterThan(temperatureMax, temperatureMin, nameof(temperatureMax));
-        HumidityMin = RequireInRange(humidityMin, 0, 100, nameof(humidityMin));
-        HumidityMax = RequireInRange(humidityMax, humidityMin, 100, nameof(humidityMax));
-        ReadingFrequencySeconds = RequirePositive(readingFrequencySeconds, nameof(readingFrequencySeconds));
-        AlertThresholdMinutes = RequirePositive(alertThresholdMinutes, nameof(alertThresholdMinutes));
+        AssetId = RequirePositiveOrNull(assetId, nameof(assetId));
+        Uuid = uuid?.Trim();
+        AssetTypes = NormalizeList(assetTypes);
+        IotDeviceTypes = NormalizeList(iotDeviceTypes);
+        MinimumTemperature = RequireNumber(minimumTemperature, nameof(minimumTemperature));
+        MaximumTemperature = RequireNumber(maximumTemperature, nameof(maximumTemperature));
+        if (MinimumTemperature >= MaximumTemperature) throw new ArgumentException("Temperature range is invalid.");
+        MinimumHumidity = minimumHumidity ?? 0;
+        MaximumHumidity = RequireNumber(maximumHumidity, nameof(maximumHumidity));
+        if (MinimumHumidity < 0 || MaximumHumidity > 100 || MinimumHumidity >= MaximumHumidity)
+            throw new ArgumentException("Humidity range is invalid.");
+        CalibrationFrequencyDays = RequirePositive(calibrationFrequencyDays, nameof(calibrationFrequencyDays));
+        TemperatureUnit = RequireNonBlank(temperatureUnit);
+        HumidityUnit = RequireNonBlank(humidityUnit);
+        WeightUnit = RequireNonBlank(weightUnit);
+        ReadingFrequencySeconds = readingFrequencySeconds is null
+            ? 300
+            : RequirePositive(readingFrequencySeconds, nameof(readingFrequencySeconds));
+        AlertThresholdMinutes = alertThresholdMinutes is null
+            ? 10
+            : RequirePositive(alertThresholdMinutes, nameof(alertThresholdMinutes));
     }
 
-    /// <summary>Gets the owning organization identifier.</summary>
     public int OrganizationId { get; init; }
 
-    /// <summary>Gets the optional asset identifier. Null means organization default settings.</summary>
     public int? AssetId { get; init; }
 
-    /// <summary>Gets the minimum safe temperature.</summary>
-    public double TemperatureMin { get; init; }
+    public string? Uuid { get; init; }
 
-    /// <summary>Gets the maximum safe temperature.</summary>
-    public double TemperatureMax { get; init; }
+    public IReadOnlyList<string> AssetTypes { get; init; }
 
-    /// <summary>Gets the minimum safe humidity percentage.</summary>
-    public double HumidityMin { get; init; }
+    public IReadOnlyList<string> IotDeviceTypes { get; init; }
 
-    /// <summary>Gets the maximum safe humidity percentage.</summary>
-    public double HumidityMax { get; init; }
+    public double MinimumTemperature { get; init; }
 
-    /// <summary>Gets the reading frequency in seconds.</summary>
+    public double MaximumTemperature { get; init; }
+
+    public double MinimumHumidity { get; init; }
+
+    public double MaximumHumidity { get; init; }
+
+    public int CalibrationFrequencyDays { get; init; }
+
+    public string TemperatureUnit { get; init; }
+
+    public string HumidityUnit { get; init; }
+
+    public string WeightUnit { get; init; }
+
     public int ReadingFrequencySeconds { get; init; }
 
-    /// <summary>Gets the alert threshold in minutes.</summary>
     public int AlertThresholdMinutes { get; init; }
 
     private static int RequirePositive(int value, string name)
@@ -58,15 +82,34 @@ public record SaveAssetSettingsCommand
         return value;
     }
 
-    private static double RequireGreaterThan(double value, double min, string name)
+    private static int RequirePositive(int? value, string name)
     {
-        if (value <= min) throw new ArgumentException($"{name} must be greater than {min}.");
+        if (value is null or <= 0) throw new ArgumentException($"{name} must be positive.");
+        return value.Value;
+    }
+
+    private static int? RequirePositiveOrNull(int? value, string name)
+    {
+        if (value is <= 0) throw new ArgumentException($"{name} must be positive when provided.");
         return value;
     }
 
-    private static double RequireInRange(double value, double min, double max, string name)
+    private static double RequireNumber(double? value, string name)
     {
-        if (value < min || value > max) throw new ArgumentException($"{name} must be between {min} and {max}.");
-        return value;
+        if (value is null || double.IsNaN(value.Value) || double.IsInfinity(value.Value))
+            throw new ArgumentException($"{name} is required.");
+        return value.Value;
     }
+
+    private static string RequireNonBlank(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Required value cannot be blank.");
+        return value.Trim();
+    }
+
+    private static IReadOnlyList<string> NormalizeList(IEnumerable<string>? values) =>
+        values?
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Select(value => value.Trim())
+            .ToList() ?? [];
 }

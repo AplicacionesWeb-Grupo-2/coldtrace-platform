@@ -1,58 +1,56 @@
 namespace ColdTrace.Platform.Monitoring.Domain.Model.Commands;
 
 /// <summary>
-///     Command for creating a sensor reading.
+///     Command for creating a sensor reading explicitly.
 /// </summary>
 public record CreateSensorReadingCommand
 {
-    /// <summary>
-    ///     Creates a validated sensor reading command.
-    /// </summary>
     public CreateSensorReadingCommand(
         int organizationId,
-        int iotDeviceId,
-        string metric,
-        decimal value,
-        string unit,
-        DateTimeOffset? recordedAt)
+        int? assetId,
+        int? iotDeviceId,
+        double? temperature,
+        double? humidity,
+        DateTimeOffset? recordedAt,
+        bool? motionDetected,
+        bool? imageCaptured,
+        int? batteryLevel,
+        int? signalStrength)
     {
         OrganizationId = RequirePositive(organizationId, nameof(organizationId));
+        AssetId = RequirePositive(assetId, nameof(assetId));
         IotDeviceId = RequirePositive(iotDeviceId, nameof(iotDeviceId));
-        Metric = RequireNonBlank(metric);
-        Value = value;
-        Unit = RequireNonBlank(unit);
+        Temperature = temperature;
+        Humidity = humidity;
         RecordedAt = recordedAt ?? DateTimeOffset.UtcNow;
+        MotionDetected = motionDetected;
+        ImageCaptured = imageCaptured;
+        BatteryLevel = RequirePercentageOrNull(batteryLevel, nameof(batteryLevel));
+        SignalStrength = RequirePercentageOrNull(signalStrength, nameof(signalStrength));
+        if (Temperature is null && Humidity is null && MotionDetected is null && ImageCaptured is null &&
+            BatteryLevel is null && SignalStrength is null)
+            throw new ArgumentException("At least one telemetry value is required.");
     }
 
-    /// <summary>
-    ///     Gets the owning organization identifier.
-    /// </summary>
     public int OrganizationId { get; init; }
 
-    /// <summary>
-    ///     Gets the originating IoT device identifier.
-    /// </summary>
+    public int AssetId { get; init; }
+
     public int IotDeviceId { get; init; }
 
-    /// <summary>
-    ///     Gets the metric name.
-    /// </summary>
-    public string Metric { get; init; }
+    public double? Temperature { get; init; }
 
-    /// <summary>
-    ///     Gets the measured value.
-    /// </summary>
-    public decimal Value { get; init; }
+    public double? Humidity { get; init; }
 
-    /// <summary>
-    ///     Gets the metric unit.
-    /// </summary>
-    public string Unit { get; init; }
-
-    /// <summary>
-    ///     Gets the timestamp when the reading was captured.
-    /// </summary>
     public DateTimeOffset RecordedAt { get; init; }
+
+    public bool? MotionDetected { get; init; }
+
+    public bool? ImageCaptured { get; init; }
+
+    public int? BatteryLevel { get; init; }
+
+    public int? SignalStrength { get; init; }
 
     private static int RequirePositive(int value, string name)
     {
@@ -60,9 +58,15 @@ public record CreateSensorReadingCommand
         return value;
     }
 
-    private static string RequireNonBlank(string? value)
+    private static int RequirePositive(int? value, string name)
     {
-        if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Required value cannot be blank.");
-        return value.Trim();
+        if (value is null or <= 0) throw new ArgumentException($"{name} must be positive.");
+        return value.Value;
+    }
+
+    private static int? RequirePercentageOrNull(int? value, string name)
+    {
+        if (value is < 0 or > 100) throw new ArgumentException($"{name} must be between 0 and 100.");
+        return value;
     }
 }

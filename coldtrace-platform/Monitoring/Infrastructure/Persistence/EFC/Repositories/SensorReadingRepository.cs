@@ -15,11 +15,21 @@ public class SensorReadingRepository(AppDbContext context) : BaseRepository<Sens
     /// <inheritdoc />
     public async Task<IEnumerable<SensorReading>> FindAllByOrganizationIdAsync(
         int organizationId,
+        int? assetId = null,
+        int? iotDeviceId = null,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null,
         CancellationToken cancellationToken = default)
     {
-        return await Context.Set<SensorReading>()
-            .Where(reading => reading.OrganizationId == organizationId)
-            .OrderByDescending(reading => reading.RecordedAt)
+        var query = Context.Set<SensorReading>()
+            .Where(reading => reading.OrganizationId == organizationId);
+
+        if (assetId is not null) query = query.Where(reading => reading.AssetId == assetId);
+        if (iotDeviceId is not null) query = query.Where(reading => reading.IotDeviceId == iotDeviceId);
+        if (from is not null) query = query.Where(reading => reading.RecordedAt >= from);
+        if (to is not null) query = query.Where(reading => reading.RecordedAt <= to);
+
+        return await query.OrderByDescending(reading => reading.RecordedAt)
             .ThenByDescending(reading => reading.Id)
             .ToListAsync(cancellationToken);
     }
