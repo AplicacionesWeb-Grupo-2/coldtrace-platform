@@ -41,9 +41,32 @@ using MySql.Data.MySqlClient;
 
 
 var builder = WebApplication.CreateBuilder(args);
+const string corsPolicyName = "ColdTraceCorsPolicy";
 
 // Configure Lower Case URLs
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+// Configure CORS for browser-based clients.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(corsPolicyName, policy =>
+    {
+        var allowedOrigins = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS")
+            ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (allowedOrigins is { Length: > 0 })
+        {
+            policy.WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+            return;
+        }
+
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 // Localization Configuration
 builder.Services.AddLocalization();
@@ -173,9 +196,17 @@ app.UseRequestLocalization(localizationOptions);
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
+app.UseCors(corsPolicyName);
+
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapMethods("/{*path}", ["OPTIONS"], () => Results.NoContent())
+    .RequireCors(corsPolicyName);
+
+app.MapControllers()
+    .RequireCors(corsPolicyName);
 
 app.Run();
 

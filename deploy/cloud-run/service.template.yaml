@@ -36,6 +36,8 @@ spec:
           value: ${DATABASE_NAME}
         - name: DATABASE_USER
           value: ${DATABASE_USER}
+        - name: CORS_ALLOWED_ORIGINS
+          value: '${CORS_ALLOWED_ORIGINS}'
         image: ${IMAGE_URI}
         ports:
         - containerPort: 8080
