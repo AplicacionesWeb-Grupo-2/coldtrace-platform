@@ -1,6 +1,230 @@
 @coldtrace_platform_HostAddress = http://localhost:5269
 
-GET {{coldtrace_platform_HostAddress}}/weatherforecast/
+GET {{coldtrace_platform_HostAddress}}/swagger/index.html
 Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/swagger/v1/swagger.json
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations
+Content-Type: application/json
+Accept: application/json
+
+{
+  "legalName": "ColdTrace Demo SAC",
+  "commercialName": "ColdTrace Demo",
+  "taxId": "20123456789",
+  "contactEmail": "admin@coldtrace.demo"
+}
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organization-sign-ups
+Content-Type: application/json
+Accept: application/json
+
+{
+  "legalName": "ColdTrace Sign Up SAC",
+  "commercialName": "ColdTrace Sign Up",
+  "taxId": "20987654321",
+  "contactEmail": "owner@signup.demo",
+  "firstName": "Mauricio",
+  "lastName": "Pajes",
+  "email": "mauricio@signup.demo"
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/roles
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/users
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/users
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "Andrea",
+  "lastName": "Torres",
+  "email": "andrea@signup.demo",
+  "roleId": 2
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations/1
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Main Cold Room",
+  "type": "cold-room",
+  "address": "Av. Industrial 123",
+  "description": "Primary refrigerated storage area",
+  "status": "active"
+}
+
+###
+
+PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Main Cold Room",
+  "type": "cold-room",
+  "address": "Av. Industrial 123",
+  "description": "Primary refrigerated storage area updated",
+  "status": "active"
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways/1
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways
+Content-Type: application/json
+Accept: application/json
+
+{
+  "locationId": 1,
+  "uuid": "GW-001",
+  "name": "Main Gateway",
+  "network": "cold-room-wifi",
+  "status": "active"
+}
+
+###
+
+PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "locationId": 1,
+  "uuid": "GW-001",
+  "name": "Main Gateway",
+  "network": "cold-room-wifi-backup",
+  "status": "active"
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/assets
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/assets
+Content-Type: application/json
+Accept: application/json
+
+{
+  "locationId": 1,
+  "uuid": "ASSET-001",
+  "type": "cold-room",
+  "name": "Main Asset",
+  "capacity": 12.5,
+  "description": "Asset used to validate IoT device assignment",
+  "status": "active"
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices
+Content-Type: application/json
+Accept: application/json
+
+{
+  "gatewayId": 1,
+  "assetId": 1,
+  "uuid": "DEV-001",
+  "name": "Main Sensor",
+  "status": "active"
+}
+
+###
+
+PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "gatewayId": 1,
+  "assetId": 1,
+  "uuid": "DEV-001",
+  "name": "Main Sensor",
+  "status": "active"
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/sensor-readings
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/sensor-readings/1
+Accept: application/json
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1/sensor-readings
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1/sensor-readings
+Content-Type: application/json
+Accept: application/json
+
+{
+  "metric": "temperature",
+  "value": 4.25,
+  "unit": "C"
+}
 
 ###
