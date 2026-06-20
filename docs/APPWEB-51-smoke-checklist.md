@@ -6,7 +6,7 @@ Ticket: T-44 - ASP.NET Core API Foundation
 
 - MySQL is running locally.
 - Rider is using the .NET 10 SDK from `~/.dotnet/dotnet`.
-- The local schema exists:
+- The API creates the configured MySQL database if it does not exist. Creating the schema manually is optional:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS coldtrace_platform;
@@ -22,6 +22,7 @@ ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-p
 
 - EF Core migrations are versioned under
   `coldtrace-platform/Shared/Infrastructure/Persistence/EFC/Migrations`.
+- Startup ensures `__EFMigrationsHistory` exists and applies pending migrations.
 - The sensitive data logging warning is expected in `Development`; it should not
   be enabled for production credentials.
 
@@ -29,7 +30,7 @@ ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-p
 
 1. Restore dependencies from Rider or the .NET SDK configured for `net10.0`.
 2. Run the API using the `http` or `https` launch profile.
-3. Confirm the app starts and applies pending EF Core migrations without errors.
+3. Confirm the app starts, creates the database if needed, and applies pending EF Core migrations without errors.
 4. Open `/swagger/index.html`.
 5. Open `/swagger/v1/swagger.json`.
 6. Confirm future bounded contexts can be added under:
@@ -45,4 +46,4 @@ ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-p
 - JWT or session generation.
 - Authorization enforcement.
 - Production deployment.
-- Automated tests.
+- Full automated test suite.

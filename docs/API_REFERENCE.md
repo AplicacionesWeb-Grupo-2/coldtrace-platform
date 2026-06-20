@@ -1,0 +1,182 @@
+# ColdTrace Platform API Reference
+
+Base URL for local development:
+
+```text
+http://localhost:5271
+```
+
+Swagger UI:
+
+```text
+/swagger/index.html
+```
+
+All request and response bodies use JSON. Most operational endpoints are scoped by organization:
+
+```text
+/api/v1/organizations/{organizationId}
+```
+
+## Identity Access
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/organizations` | List organizations. |
+| `POST` | `/api/v1/organizations` | Create an organization. |
+| `POST` | `/api/v1/organization-sign-ups` | Create an organization and its first user. |
+| `GET` | `/api/v1/roles` | List seeded roles and permissions. |
+| `GET` | `/api/v1/organizations/{organizationId}/users` | List users for one organization. |
+| `POST` | `/api/v1/organizations/{organizationId}/users` | Create an organization user. |
+| `PATCH` | `/api/v1/organizations/{organizationId}/users/{userId}/role` | Assign or replace a user's role. |
+
+Important request fields:
+
+- `POST /organization-sign-ups`: `legalName`, `commercialName`, `taxId`, `contactEmail`, `firstName`, `lastName`, `email`.
+- `POST /organizations/{organizationId}/users`: `firstName`, `lastName`, `email`, `roleId`.
+- `PATCH /users/{userId}/role`: `roleId`.
+
+## Asset Management
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/organizations/{organizationId}/locations` | List locations. |
+| `GET` | `/api/v1/organizations/{organizationId}/locations/{locationId}` | Get one location. |
+| `POST` | `/api/v1/organizations/{organizationId}/locations` | Create a location. |
+| `PUT` | `/api/v1/organizations/{organizationId}/locations/{locationId}` | Update a location. |
+| `GET` | `/api/v1/organizations/{organizationId}/gateways` | List gateways. |
+| `GET` | `/api/v1/organizations/{organizationId}/gateways/{gatewayId}` | Get one gateway. |
+| `POST` | `/api/v1/organizations/{organizationId}/gateways` | Create a gateway. |
+| `PUT` | `/api/v1/organizations/{organizationId}/gateways/{gatewayId}` | Update a gateway. |
+| `GET` | `/api/v1/organizations/{organizationId}/assets` | List assets. |
+| `GET` | `/api/v1/organizations/{organizationId}/assets/{assetId}` | Get one asset. |
+| `POST` | `/api/v1/organizations/{organizationId}/assets` | Create an asset. |
+| `PUT` | `/api/v1/organizations/{organizationId}/assets/{assetId}` | Update an asset. |
+| `GET` | `/api/v1/organizations/{organizationId}/asset-settings` | List default and asset-specific settings. |
+| `GET` | `/api/v1/organizations/{organizationId}/assets/{assetId}/settings` | Get effective settings for one asset. |
+| `PUT` | `/api/v1/organizations/{organizationId}/asset-settings/default` | Create or update organization default settings. |
+| `PUT` | `/api/v1/organizations/{organizationId}/assets/{assetId}/settings` | Create or update settings for one asset. |
+| `GET` | `/api/v1/organizations/{organizationId}/iot-devices` | List IoT devices. |
+| `GET` | `/api/v1/organizations/{organizationId}/iot-devices/{iotDeviceId}` | Get one IoT device. |
+| `POST` | `/api/v1/organizations/{organizationId}/iot-devices` | Create an IoT device. |
+| `PUT` | `/api/v1/organizations/{organizationId}/iot-devices/{iotDeviceId}` | Update an IoT device. |
+
+Important request fields:
+
+- Locations: `name`, `type`, `address`, `description`, `status`.
+- Gateways: `locationId`, `uuid`, `name`, `network`, `status`.
+- Assets: `locationId`, `uuid`, `type`, `name`, `capacity`, `description`, `status`.
+- Asset settings: `uuid`, `assetTypes`, `iotDeviceTypes`, `minimumTemperature`, `maximumTemperature`, `minimumHumidity`, `maximumHumidity`, `calibrationFrequencyDays`, `temperatureUnit`, `humidityUnit`, `weightUnit`, `readingFrequencySeconds`, `alertThresholdMinutes`.
+- IoT devices: `gatewayId`, `uuid`, `deviceType`, `model`, `measurementType`, `measurementParameters`, `readingFrequencySeconds`, `assetId`, `status`, `calibrationStatus`, `lastCalibrationDate`, `nextCalibrationDate`.
+
+Validation rules enforced by the API include organization ownership, unique UUIDs per organization for gateways/assets/devices, and gateway/asset location compatibility for assigned IoT devices.
+
+## Monitoring
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/organizations/{organizationId}/sensor-readings` | List readings with optional query filters. |
+| `GET` | `/api/v1/organizations/{organizationId}/sensor-readings/{sensorReadingId}` | Get one reading. |
+| `POST` | `/api/v1/organizations/{organizationId}/sensor-readings` | Persist telemetry and evaluate thresholds. |
+| `POST` | `/api/v1/organizations/{organizationId}/sensor-readings/demo-generations` | Generate demo readings for eligible devices. |
+
+Supported query filters for `GET /sensor-readings`:
+
+```text
+assetId
+iotDeviceId
+from
+to
+```
+
+Create reading request fields:
+
+```text
+assetId
+iotDeviceId
+temperature
+humidity
+recordedAt
+motionDetected
+imageCaptured
+batteryLevel
+signalStrength
+```
+
+The response includes `gatewayId`, `locationId`, `outOfRange`, and `isOutOfRange` so frontend views can avoid recalculating ownership and compliance state.
+
+## Alerts
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/organizations/{organizationId}/incidents` | List incidents. |
+| `GET` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}` | Get one incident. |
+| `POST` | `/api/v1/organizations/{organizationId}/incidents` | Register an incident. |
+| `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/acknowledgements` | Acknowledge an incident. |
+| `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation` | Register escalation details. |
+| `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action` | Register corrective action details. |
+| `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/resolutions` | Resolve an incident. |
+| `GET` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/notifications` | List notifications for one incident. |
+| `GET` | `/api/v1/organizations/{organizationId}/notifications` | List organization notifications. |
+
+Incident lifecycle endpoints return `409 Conflict` when a transition is not allowed.
+
+Important request fields:
+
+- Create incident: `assetId`, `deviceId`, `readingId`, `assetName`, `deviceName`, `type`, `severity`, `value`.
+- Acknowledge: `acknowledgedBy`.
+- Escalation: `escalatedBy`, `escalationReason`.
+- Corrective action: `correctiveAction`, `registeredBy`.
+- Resolution: `resolvedBy`, `resolutionNotes`.
+
+## Maintenance Management
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/organizations/{organizationId}/maintenance-schedules` | List maintenance schedules. |
+| `GET` | `/api/v1/organizations/{organizationId}/maintenance-schedules/{maintenanceScheduleId}` | Get one maintenance schedule. |
+| `POST` | `/api/v1/organizations/{organizationId}/maintenance-schedules` | Create a maintenance schedule. |
+| `PATCH` | `/api/v1/organizations/{organizationId}/maintenance-schedules/{maintenanceScheduleId}` | Update schedule lifecycle status. |
+| `GET` | `/api/v1/organizations/{organizationId}/technical-service-requests` | List technical service requests. |
+| `GET` | `/api/v1/organizations/{organizationId}/technical-service-requests/{technicalServiceRequestId}` | Get one technical service request. |
+| `POST` | `/api/v1/organizations/{organizationId}/technical-service-requests` | Create a technical service request. |
+| `PATCH` | `/api/v1/organizations/{organizationId}/technical-service-requests/{technicalServiceRequestId}` | Update request lifecycle status. |
+
+Important request fields:
+
+- Maintenance schedule: `assetId`, `scheduledDate`, `frequencyDays`, `responsibleUserId`, `observations`, `status`.
+- Maintenance status update: `status`.
+- Technical service request: `assetId`, `incidentId`, `issueDescription`, `priority`, `requestedBy`.
+- Technical service status update: `status`, `closureSummary`, `evidence`, `closedBy`.
+
+## Reports
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/organizations/{organizationId}/reports` | List generated reports. |
+| `POST` | `/api/v1/organizations/{organizationId}/reports` | Generate an operational report. |
+| `GET` | `/api/v1/organizations/{organizationId}/reports/{reportId}` | Get one generated report. |
+
+Report generation request fields:
+
+```text
+type
+title
+periodStart
+periodEnd
+```
+
+The generated report includes asset, reading, incident, average temperature, average humidity, and compliance summary fields.
+
+## Error Responses
+
+Expected validation and business-rule responses:
+
+| Status | Meaning |
+| --- | --- |
+| `400` | Invalid request payload or unsupported input. |
+| `404` | Organization or scoped resource was not found. |
+| `409` | Duplicate resource or invalid lifecycle transition. |
+| `500` | Unexpected server error returned as RFC 7807 `ProblemDetails`. |
+
+The API currently exposes Swagger and does not enforce JWT/session authorization.
