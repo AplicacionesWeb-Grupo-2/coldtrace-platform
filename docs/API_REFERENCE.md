@@ -168,6 +168,28 @@ periodEnd
 
 The generated report includes asset, reading, incident, average temperature, average humidity, and compliance summary fields.
 
+## AI Assistance
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/ai-assistance/provider-status` | Get non-secret AI assistance provider configuration and structured output contract status. |
+
+The AI status response includes:
+
+```text
+provider
+model
+enabled
+configured
+hasEndpoint
+hasApiKey
+hasChatClient
+timeoutSeconds
+structuredOutputContracts
+```
+
+Supported provider values are `disabled`, `ollama`, and `openai`.
+
 ## Error Responses
 
 Expected validation and business-rule responses:
