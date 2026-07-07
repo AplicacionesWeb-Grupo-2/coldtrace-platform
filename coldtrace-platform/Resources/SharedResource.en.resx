@@ -249,6 +249,9 @@
     <data name="UnexpectedErrorRejectingAiResolutionPlan" xml:space="preserve">
         <value>An unexpected error occurred while rejecting the AI resolution plan.</value>
     </data>
+    <data name="UnexpectedErrorGettingAiResolutionPlans" xml:space="preserve">
+        <value>An unexpected error occurred while getting AI resolution plans.</value>
+    </data>
     <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
         <value>An unexpected error occurred while getting incidents.</value>
     </data>

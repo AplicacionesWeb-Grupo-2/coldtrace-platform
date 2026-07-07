@@ -135,6 +135,7 @@ builder.Services.AddScoped<IAiResolutionPlanRepository, AiResolutionPlanReposito
 builder.Services.AddScoped<IIncidentCommandService, IncidentCommandService>();
 builder.Services.AddScoped<IAiResolutionPlanCommandService, AiResolutionPlanCommandService>();
 builder.Services.AddScoped<IIncidentQueryService, IncidentQueryService>();
+builder.Services.AddScoped<IAiResolutionPlanQueryService, AiResolutionPlanQueryService>();
 builder.Services.AddScoped<INotificationQueryService, NotificationQueryService>();
 
 // Reports Bounded Context Injection Configuration

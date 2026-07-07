@@ -20,6 +20,7 @@ namespace ColdTrace.Platform.Alerts.Interfaces.REST;
 public class IncidentsController(
     IIncidentCommandService incidentCommandService,
     IAiResolutionPlanCommandService aiResolutionPlanCommandService,
+    IAiResolutionPlanQueryService aiResolutionPlanQueryService,
     IIncidentQueryService incidentQueryService,
     INotificationQueryService notificationQueryService,
     IStringLocalizer<SharedResource> localizer,
@@ -120,6 +121,29 @@ public class IncidentsController(
                 detail: localizer["UnexpectedErrorGeneratingAiResolutionPlan"].Value,
                 statusCode: 500);
         }
+    }
+
+    /// <summary>
+    ///     Gets AI resolution plan history for an incident.
+    /// </summary>
+    [HttpGet("{incidentId:int}/ai-resolution-plans")]
+    [SwaggerOperation(
+        Summary = "Gets incident AI resolution plan history",
+        Description = "Gets generated, approved, and rejected AI resolution plans scoped to the provided incident",
+        OperationId = "GetAiResolutionPlansByIncident")]
+    [SwaggerResponse(200, "AI resolution plan history found", typeof(IEnumerable<AiResolutionPlanResource>))]
+    [SwaggerResponse(404, "Organization or incident not found", typeof(string))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> GetAiResolutionPlansByIncidentId(
+        [FromRoute] int organizationId,
+        [FromRoute] int incidentId,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await aiResolutionPlanQueryService.Handle(
+            new GetAiResolutionPlansByIncidentIdAndOrganizationIdQuery(organizationId, incidentId),
+            cancellationToken);
+        return ActionResultFromGetAiResolutionPlansByIncidentResultAssembler
+            .ToActionResultFromGetAiResolutionPlansByIncidentResult(result, this, localizer);
     }
 
     /// <summary>

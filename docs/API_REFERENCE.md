@@ -115,6 +115,7 @@ The response includes `gatewayId`, `locationId`, `outOfRange`, and `isOutOfRange
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/acknowledgements` | Acknowledge an incident. |
 | `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation` | Register escalation details. |
 | `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action` | Register corrective action details. |
+| `GET` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` | List generated, approved, and rejected AI resolution plans for one incident. |
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` | Generate and persist a pending AI resolution plan. |
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals` | Approve a pending AI resolution plan and resolve the incident. |
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/rejections` | Reject a pending AI resolution plan without changing incident state. |
@@ -124,6 +125,7 @@ The response includes `gatewayId`, `locationId`, `outOfRange`, and `isOutOfRange
 
 Incident lifecycle endpoints return `409 Conflict` when a transition is not allowed.
 AI resolution plan generation also returns `409 Conflict` for resolved incidents or incidents with incomplete referenced context, `502 Bad Gateway` for invalid structured provider output, `503 Service Unavailable` when AI is disabled/unconfigured/unavailable, and `504 Gateway Timeout` when the provider times out.
+AI resolution plan history returns the same resource shape as generation/approval/rejection, ordered from newest to oldest and scoped by organization plus incident.
 AI resolution plan approval returns `404 Not Found` when the organization, incident, or plan is missing, and `409 Conflict` when the plan was already approved/rejected or the incident can no longer be resolved.
 AI resolution plan rejection returns `404 Not Found` when the organization, incident, or plan is missing, and `409 Conflict` when the plan was already approved or rejected.
 
