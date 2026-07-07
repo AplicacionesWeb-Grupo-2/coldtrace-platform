@@ -11,6 +11,7 @@ using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Billing.Application.ACL;
 using ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Checkout;
+using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Webhook;
 using ColdTrace.Platform.Billing.Application.Internal.QueryServices;
 using ColdTrace.Platform.Billing.Application.Internal.Services;
 using ColdTrace.Platform.Billing.Domain.Model.Commands;
@@ -137,13 +138,16 @@ builder.Services.AddOptions<BillingOptions>()
     .Bind(builder.Configuration.GetSection(BillingOptions.SectionName))
     .PostConfigure(options => options.ExpandEnvironmentVariables());
 builder.Services.AddScoped<IOrganizationSubscriptionRepository, OrganizationSubscriptionRepository>();
+builder.Services.AddScoped<IBillingWebhookEventRepository, BillingWebhookEventRepository>();
 builder.Services.AddScoped<ISubscriptionPlanQueryService, SubscriptionPlanQueryService>();
 builder.Services.AddScoped<OrganizationSubscriptionUsageService>();
 builder.Services.AddScoped<EntitlementPolicyService>();
 builder.Services.AddScoped<ICheckoutSessionProviderService, StripeCheckoutSessionProviderService>();
+builder.Services.AddScoped<IBillingWebhookProviderService, StripeBillingWebhookProviderService>();
 builder.Services.AddScoped<IOrganizationSubscriptionCommandService, OrganizationSubscriptionCommandService>();
 builder.Services.AddScoped<IOrganizationSubscriptionQueryService, OrganizationSubscriptionQueryService>();
 builder.Services.AddScoped<IBillingCheckoutSessionCommandService, BillingCheckoutSessionCommandService>();
+builder.Services.AddScoped<IBillingWebhookCommandService, BillingWebhookCommandService>();
 builder.Services.AddScoped<ISubscriptionBillingContextFacade, SubscriptionBillingContextFacade>();
 
 // AI Assistance Bounded Context Injection Configuration

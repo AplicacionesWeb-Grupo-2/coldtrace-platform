@@ -1,6 +1,7 @@
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.Billing.Domain.Model.Aggregates;
+using ColdTrace.Platform.Billing.Domain.Model.Entities;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
@@ -143,6 +144,30 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(subscription => subscription.OrganizationId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("f_k_organization_subscriptions_organizations_organization_id");
+
+        builder.Entity<BillingWebhookEvent>().HasKey(webhookEvent => webhookEvent.Id);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.Id).IsRequired()
+            .ValueGeneratedOnAdd();
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.Provider).IsRequired()
+            .HasMaxLength(30);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.EventId).IsRequired()
+            .HasMaxLength(120);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.EventType).IsRequired()
+            .HasMaxLength(120);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.Status).IsRequired()
+            .HasMaxLength(30);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.OrganizationId);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.ProviderCustomerId)
+            .HasMaxLength(255);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.ProviderSubscriptionId)
+            .HasMaxLength(255);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.ProcessedAt).IsRequired();
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.Metadata)
+            .HasMaxLength(2000);
+        builder.Entity<BillingWebhookEvent>()
+            .HasIndex(webhookEvent => new { webhookEvent.Provider, webhookEvent.EventId })
+            .IsUnique()
+            .HasDatabaseName("uk_billing_webhook_events_provider_event");
 
         builder.Entity<Location>().HasKey(location => location.Id);
         builder.Entity<Location>().Property(location => location.Id).IsRequired().ValueGeneratedOnAdd();
