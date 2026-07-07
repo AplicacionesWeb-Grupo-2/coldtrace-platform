@@ -228,8 +228,20 @@
     <data name="AiResolutionPlanInvalidStructuredOutput" xml:space="preserve">
         <value>El proveedor de IA devolvio una estructura invalida para el plan de resolucion.</value>
     </data>
+    <data name="InvalidAiResolutionPlanApprovalRequest" xml:space="preserve">
+        <value>La solicitud de aprobacion del plan de resolucion con IA no es valida.</value>
+    </data>
+    <data name="AiResolutionPlanNotFound" xml:space="preserve">
+        <value>No se encontro el plan de resolucion con IA.</value>
+    </data>
+    <data name="AiResolutionPlanAlreadyDecided" xml:space="preserve">
+        <value>El plan de resolucion con IA ya fue aprobado o rechazado.</value>
+    </data>
     <data name="UnexpectedErrorGeneratingAiResolutionPlan" xml:space="preserve">
         <value>Ocurrio un error inesperado al generar el plan de resolucion con IA.</value>
+    </data>
+    <data name="UnexpectedErrorApprovingAiResolutionPlan" xml:space="preserve">
+        <value>Ocurrio un error inesperado al aprobar el plan de resolucion con IA.</value>
     </data>
     <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener incidentes.</value>

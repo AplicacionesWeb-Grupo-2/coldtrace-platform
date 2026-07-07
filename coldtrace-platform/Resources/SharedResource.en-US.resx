@@ -228,8 +228,20 @@
     <data name="AiResolutionPlanInvalidStructuredOutput" xml:space="preserve">
         <value>AI provider returned an invalid resolution plan structure.</value>
     </data>
+    <data name="InvalidAiResolutionPlanApprovalRequest" xml:space="preserve">
+        <value>The AI resolution plan approval request is invalid.</value>
+    </data>
+    <data name="AiResolutionPlanNotFound" xml:space="preserve">
+        <value>The AI resolution plan was not found.</value>
+    </data>
+    <data name="AiResolutionPlanAlreadyDecided" xml:space="preserve">
+        <value>The AI resolution plan has already been approved or rejected.</value>
+    </data>
     <data name="UnexpectedErrorGeneratingAiResolutionPlan" xml:space="preserve">
         <value>An unexpected error occurred while generating the AI resolution plan.</value>
+    </data>
+    <data name="UnexpectedErrorApprovingAiResolutionPlan" xml:space="preserve">
+        <value>An unexpected error occurred while approving the AI resolution plan.</value>
     </data>
     <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
         <value>An unexpected error occurred while getting incidents.</value>

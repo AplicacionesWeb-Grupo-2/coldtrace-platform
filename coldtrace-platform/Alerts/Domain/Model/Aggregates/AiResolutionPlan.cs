@@ -119,4 +119,15 @@ public class AiResolutionPlan : IAuditableEntity
     public DateTimeOffset? CreatedAt { get; set; }
 
     public DateTimeOffset? UpdatedAt { get; set; }
+
+    public bool IsPending() => Status == StatusPending;
+
+    public void Approve(ApproveAiResolutionPlanCommand command)
+    {
+        Status = StatusApproved;
+        ApprovedAt = DateTimeOffset.UtcNow;
+        ApprovedBy = command.ApprovedBy;
+        FinalCorrectiveAction = command.FinalCorrectiveAction;
+        FinalResolutionNotes = command.FinalResolutionNotes;
+    }
 }

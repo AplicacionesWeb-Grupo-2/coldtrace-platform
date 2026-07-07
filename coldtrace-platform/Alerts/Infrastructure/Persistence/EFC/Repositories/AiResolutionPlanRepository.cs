@@ -12,6 +12,21 @@ namespace ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
 public class AiResolutionPlanRepository(AppDbContext context)
     : BaseRepository<AiResolutionPlan>(context), IAiResolutionPlanRepository
 {
+    public async Task<AiResolutionPlan?> FindByIdAndIncidentIdAndOrganizationIdAsync(
+        int planId,
+        int incidentId,
+        int organizationId,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<AiResolutionPlan>()
+            .FirstOrDefaultAsync(
+                plan =>
+                    plan.Id == planId &&
+                    plan.IncidentId == incidentId &&
+                    plan.OrganizationId == organizationId,
+                cancellationToken);
+    }
+
     public async Task<IEnumerable<AiResolutionPlan>> FindAllByIncidentIdAndOrganizationIdAsync(
         int incidentId,
         int organizationId,

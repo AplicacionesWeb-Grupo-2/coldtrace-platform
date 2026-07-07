@@ -123,6 +123,59 @@ public class IncidentsController(
     }
 
     /// <summary>
+    ///     Approves an AI resolution plan and resolves its incident.
+    /// </summary>
+    [HttpPost("{incidentId:int}/ai-resolution-plans/{planId:int}/approvals")]
+    [SwaggerOperation(
+        Summary = "Approves an incident AI resolution plan",
+        Description = "Approves a pending AI plan, stores final operator notes and resolves the incident through backend lifecycle rules",
+        OperationId = "ApproveAiResolutionPlan")]
+    [SwaggerResponse(200, "AI resolution plan approved and incident resolved", typeof(AiResolutionPlanResource))]
+    [SwaggerResponse(400, "Missing or invalid approval request", typeof(string))]
+    [SwaggerResponse(404, "Organization, incident, or AI plan not found", typeof(string))]
+    [SwaggerResponse(409, "Plan already decided or incident already resolved", typeof(string))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> ApproveAiResolutionPlan(
+        [FromRoute] int organizationId,
+        [FromRoute] int incidentId,
+        [FromRoute] int planId,
+        [FromBody] ApproveAiResolutionPlanResource? resource,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (resource is null) throw new ArgumentException("Approval request body is required.");
+
+            var command = ApproveAiResolutionPlanCommandFromResourceAssembler
+                .ToCommandFromResource(resource, organizationId, incidentId, planId);
+            var result = await aiResolutionPlanCommandService.Handle(command, cancellationToken);
+            return ActionResultFromApproveAiResolutionPlanResultAssembler
+                .ToActionResultFromApproveAiResolutionPlanResult(result, this, localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid AI resolution plan approval request for incident {IncidentId} in organization {OrganizationId}",
+                incidentId,
+                organizationId);
+            return BadRequest(localizer["InvalidAiResolutionPlanApprovalRequest"].Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error while approving AI resolution plan {PlanId} for incident {IncidentId}",
+                planId,
+                incidentId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorApprovingAiResolutionPlan"].Value,
+                statusCode: 500);
+        }
+    }
+
+    /// <summary>
     ///     Creates an incident.
     /// </summary>
     [HttpPost]

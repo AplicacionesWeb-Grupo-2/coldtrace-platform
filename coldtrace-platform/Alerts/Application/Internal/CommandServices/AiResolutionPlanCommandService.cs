@@ -29,6 +29,7 @@ namespace ColdTrace.Platform.Alerts.Application.Internal.CommandServices;
 public class AiResolutionPlanCommandService(
     IAiResolutionPlanRepository aiResolutionPlanRepository,
     IIncidentRepository incidentRepository,
+    INotificationRepository notificationRepository,
     IOrganizationRepository organizationRepository,
     IAssetRepository assetRepository,
     IIotDeviceRepository iotDeviceRepository,
@@ -47,6 +48,109 @@ public class AiResolutionPlanCommandService(
     private const int TechnicalServiceRequestContextLimit = 5;
 
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
+
+    public async Task<Result<AiResolutionPlan, ApproveAiResolutionPlanError>> Handle(
+        ApproveAiResolutionPlanCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for AI resolution plan approval: {OrganizationId}",
+                command.OrganizationId);
+            return ApprovalFailure(ApproveAiResolutionPlanError.OrganizationNotFound);
+        }
+
+        var incident = await incidentRepository.FindByIdAndOrganizationIdAsync(
+            command.IncidentId,
+            command.OrganizationId,
+            cancellationToken);
+        if (incident is null)
+        {
+            logger.LogWarning(
+                "Incident not found for AI resolution plan approval: {OrganizationId} {IncidentId}",
+                command.OrganizationId,
+                command.IncidentId);
+            return ApprovalFailure(ApproveAiResolutionPlanError.IncidentNotFound);
+        }
+
+        var plan = await aiResolutionPlanRepository.FindByIdAndIncidentIdAndOrganizationIdAsync(
+            command.PlanId,
+            command.IncidentId,
+            command.OrganizationId,
+            cancellationToken);
+        if (plan is null)
+        {
+            logger.LogWarning(
+                "AI resolution plan not found for approval: {OrganizationId} {IncidentId} {PlanId}",
+                command.OrganizationId,
+                command.IncidentId,
+                command.PlanId);
+            return ApprovalFailure(ApproveAiResolutionPlanError.PlanNotFound);
+        }
+
+        if (!plan.IsPending())
+        {
+            logger.LogWarning(
+                "AI resolution plan already decided: {OrganizationId} {IncidentId} {PlanId}",
+                command.OrganizationId,
+                command.IncidentId,
+                command.PlanId);
+            return ApprovalFailure(ApproveAiResolutionPlanError.PlanAlreadyDecided);
+        }
+
+        if (incident.IsResolved())
+            return ApprovalFailure(ApproveAiResolutionPlanError.IncidentAlreadyResolved);
+
+        if (!incident.IsOpen() && !incident.IsAcknowledged())
+            return ApprovalFailure(ApproveAiResolutionPlanError.InvalidIncidentLifecycleTransition);
+
+        try
+        {
+            incident.RegisterCorrectiveAction(
+                new RegisterIncidentCorrectiveActionCommand(
+                    command.OrganizationId,
+                    command.IncidentId,
+                    command.FinalCorrectiveAction,
+                    command.ApprovedBy));
+            incident.Resolve(
+                new ResolveIncidentCommand(
+                    command.OrganizationId,
+                    command.IncidentId,
+                    command.ApprovedBy,
+                    command.FinalResolutionNotes));
+            plan.Approve(command);
+
+            var notification = Notification.IncidentResolved(incident);
+            await notificationRepository.AddAsync(notification, cancellationToken);
+            incident.RecordNotification(notification.Status);
+
+            incidentRepository.Update(incident);
+            aiResolutionPlanRepository.Update(plan);
+            await unitOfWork.CompleteAsync(cancellationToken);
+
+            return new Result<AiResolutionPlan, ApproveAiResolutionPlanError>.Success(plan);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogError(
+                ex,
+                "Database update failed approving AI resolution plan {PlanId} for incident {IncidentId}",
+                command.PlanId,
+                command.IncidentId);
+            return ApprovalFailure(ApproveAiResolutionPlanError.UnexpectedError);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error approving AI resolution plan {PlanId} for incident {IncidentId}",
+                command.PlanId,
+                command.IncidentId);
+            return ApprovalFailure(ApproveAiResolutionPlanError.UnexpectedError);
+        }
+    }
 
     public async Task<Result<AiResolutionPlan, GenerateAiResolutionPlanError>> Handle(
         GenerateAiResolutionPlanCommand command,
@@ -318,6 +422,10 @@ public class AiResolutionPlanCommandService(
     private static Result<AiResolutionPlan, GenerateAiResolutionPlanError> Failure(
         GenerateAiResolutionPlanError error) =>
         new Result<AiResolutionPlan, GenerateAiResolutionPlanError>.Failure(error);
+
+    private static Result<AiResolutionPlan, ApproveAiResolutionPlanError> ApprovalFailure(
+        ApproveAiResolutionPlanError error) =>
+        new Result<AiResolutionPlan, ApproveAiResolutionPlanError>.Failure(error);
 
     private static IncidentSnapshot ToIncidentSnapshot(Incident incident) =>
         new(
