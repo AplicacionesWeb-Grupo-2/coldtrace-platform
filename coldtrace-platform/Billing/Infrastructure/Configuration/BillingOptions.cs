@@ -9,12 +9,19 @@ public sealed class BillingOptions
 
     public BillingPlanCatalogOptions PlanCatalog { get; set; } = new();
 
+    public BillingStripeOptions Stripe { get; set; } = new();
+
     public void ExpandEnvironmentVariables()
     {
         PlanCatalog.OperationsStripePriceId = NormalizeOptionalValue(
             ExpandValue(PlanCatalog.OperationsStripePriceId));
         PlanCatalog.ComplianceAiStripePriceId = NormalizeOptionalValue(
             ExpandValue(PlanCatalog.ComplianceAiStripePriceId));
+        Stripe.SecretKey = NormalizeOptionalValue(ExpandValue(Stripe.SecretKey));
+        Stripe.WebhookSigningSecret = NormalizeOptionalValue(ExpandValue(Stripe.WebhookSigningSecret));
+        Stripe.CheckoutSuccessUrl = NormalizeOptionalValue(ExpandValue(Stripe.CheckoutSuccessUrl));
+        Stripe.CheckoutCancelUrl = NormalizeOptionalValue(ExpandValue(Stripe.CheckoutCancelUrl));
+        Stripe.CustomerPortalReturnUrl = NormalizeOptionalValue(ExpandValue(Stripe.CustomerPortalReturnUrl));
     }
 
     private static string? ExpandValue(string? value) =>

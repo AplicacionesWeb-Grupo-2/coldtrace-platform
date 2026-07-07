@@ -10,6 +10,7 @@ using ColdTrace.Platform.Alerts.Domain.Services;
 using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Billing.Application.ACL;
 using ColdTrace.Platform.Billing.Application.Internal.CommandServices;
+using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Checkout;
 using ColdTrace.Platform.Billing.Application.Internal.QueryServices;
 using ColdTrace.Platform.Billing.Application.Internal.Services;
 using ColdTrace.Platform.Billing.Domain.Model.Commands;
@@ -17,6 +18,7 @@ using ColdTrace.Platform.Billing.Domain.Repositories;
 using ColdTrace.Platform.Billing.Domain.Services;
 using ColdTrace.Platform.Billing.Infrastructure.Configuration;
 using ColdTrace.Platform.Billing.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Billing.Infrastructure.Stripe;
 using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.AssetManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
@@ -138,8 +140,10 @@ builder.Services.AddScoped<IOrganizationSubscriptionRepository, OrganizationSubs
 builder.Services.AddScoped<ISubscriptionPlanQueryService, SubscriptionPlanQueryService>();
 builder.Services.AddScoped<OrganizationSubscriptionUsageService>();
 builder.Services.AddScoped<EntitlementPolicyService>();
+builder.Services.AddScoped<ICheckoutSessionProviderService, StripeCheckoutSessionProviderService>();
 builder.Services.AddScoped<IOrganizationSubscriptionCommandService, OrganizationSubscriptionCommandService>();
 builder.Services.AddScoped<IOrganizationSubscriptionQueryService, OrganizationSubscriptionQueryService>();
+builder.Services.AddScoped<IBillingCheckoutSessionCommandService, BillingCheckoutSessionCommandService>();
 builder.Services.AddScoped<ISubscriptionBillingContextFacade, SubscriptionBillingContextFacade>();
 
 // AI Assistance Bounded Context Injection Configuration

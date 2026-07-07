@@ -288,4 +288,28 @@
     <data name="BillingOrganizationSubscriptionPlanNotFound" xml:space="preserve">
         <value>Subscription plan was not found.</value>
     </data>
+    <data name="BillingCheckoutSessionInvalidRequest" xml:space="preserve">
+        <value>The checkout session request is invalid.</value>
+    </data>
+    <data name="BillingCheckoutSessionOrganizationNotFound" xml:space="preserve">
+        <value>Organization was not found.</value>
+    </data>
+    <data name="BillingCheckoutSessionOrganizationSubscriptionNotFound" xml:space="preserve">
+        <value>Organization subscription was not found.</value>
+    </data>
+    <data name="BillingCheckoutSessionTargetPlanNotFound" xml:space="preserve">
+        <value>Target plan was not found.</value>
+    </data>
+    <data name="BillingCheckoutSessionFreePlanNotAllowed" xml:space="preserve">
+        <value>The selected plan is free and does not require checkout.</value>
+    </data>
+    <data name="BillingCheckoutSessionPlanProviderPriceNotConfigured" xml:space="preserve">
+        <value>The selected plan does not have a Stripe price configured.</value>
+    </data>
+    <data name="BillingCheckoutSessionProviderNotConfigured" xml:space="preserve">
+        <value>Stripe checkout is not configured.</value>
+    </data>
+    <data name="BillingCheckoutSessionProviderUnavailable" xml:space="preserve">
+        <value>Stripe checkout is currently unavailable.</value>
+    </data>
 </root>
