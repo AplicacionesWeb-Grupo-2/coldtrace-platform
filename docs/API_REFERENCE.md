@@ -219,6 +219,7 @@ Important request fields:
 | `GET` | `/api/v1/organizations/{organizationId}/reports` | List generated reports. |
 | `POST` | `/api/v1/organizations/{organizationId}/reports` | Generate an operational report. |
 | `GET` | `/api/v1/organizations/{organizationId}/reports/{reportId}` | Get one generated report. |
+| `POST` | `/api/v1/organizations/{organizationId}/reports/{reportId}/ai-summary` | Generate an advisory AI compliance summary for one report. |
 
 Report generation request fields:
 
@@ -230,6 +231,27 @@ periodEnd
 ```
 
 The generated report includes asset, reading, incident, average temperature, average humidity, and compliance summary fields.
+
+Report AI summary generation has no request body. The response mirrors the Spring Boot contract:
+
+```text
+organizationId
+reportId
+reportUuid
+reportType
+reportTitle
+summaryGeneratedAt
+sourceReport
+executiveSummary
+findings[{ area, status, evidence, recommendation }]
+evidenceGaps
+recommendedActions
+uncertaintyNotes
+modelProvider
+modelName
+```
+
+Report AI summary generation returns `404 Not Found` when the organization or report is missing, `502 Bad Gateway` for invalid structured provider output, `503 Service Unavailable` when AI is disabled/unconfigured/unavailable, and `504 Gateway Timeout` when the provider times out.
 
 ## AI Assistance
 

@@ -267,6 +267,15 @@
     <data name="UnexpectedErrorGeneratingReport" xml:space="preserve">
         <value>Ocurrio un error inesperado al generar el reporte.</value>
     </data>
+    <data name="ReportAiSummaryContextUnavailable" xml:space="preserve">
+        <value>El contexto del reporte esta incompleto o no esta disponible para generar el resumen con IA.</value>
+    </data>
+    <data name="ReportAiSummaryInvalidStructuredOutput" xml:space="preserve">
+        <value>El proveedor de IA devolvio una estructura invalida para el resumen del reporte.</value>
+    </data>
+    <data name="UnexpectedErrorGeneratingReportAiSummary" xml:space="preserve">
+        <value>Ocurrio un error inesperado al generar el resumen del reporte con IA.</value>
+    </data>
     <data name="UnexpectedErrorGettingReports" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener reportes.</value>
     </data>

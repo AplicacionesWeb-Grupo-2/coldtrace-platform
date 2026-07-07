@@ -267,6 +267,15 @@
     <data name="UnexpectedErrorGeneratingReport" xml:space="preserve">
         <value>An unexpected error occurred while generating the report.</value>
     </data>
+    <data name="ReportAiSummaryContextUnavailable" xml:space="preserve">
+        <value>Report context is incomplete or unavailable for AI summary generation.</value>
+    </data>
+    <data name="ReportAiSummaryInvalidStructuredOutput" xml:space="preserve">
+        <value>AI provider returned an invalid report summary structure.</value>
+    </data>
+    <data name="UnexpectedErrorGeneratingReportAiSummary" xml:space="preserve">
+        <value>An unexpected error occurred while generating the AI report summary.</value>
+    </data>
     <data name="UnexpectedErrorGettingReports" xml:space="preserve">
         <value>An unexpected error occurred while getting reports.</value>
     </data>

@@ -141,6 +141,7 @@ builder.Services.AddScoped<INotificationQueryService, NotificationQueryService>(
 // Reports Bounded Context Injection Configuration
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IReportCommandService, ReportCommandService>();
+builder.Services.AddScoped<IReportAiSummaryCommandService, ReportAiSummaryCommandService>();
 builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
 
 // Identity Access Bounded Context Injection Configuration

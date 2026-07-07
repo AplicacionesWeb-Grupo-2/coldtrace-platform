@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.Reports.Domain.Model.Commands;
 using ColdTrace.Platform.Reports.Domain.Model.Queries;
 using ColdTrace.Platform.Reports.Domain.Services;
 using ColdTrace.Platform.Reports.Interfaces.REST.Resources;
@@ -19,6 +20,7 @@ namespace ColdTrace.Platform.Reports.Interfaces.REST;
 [Tags("Reports")]
 public class ReportsController(
     IReportCommandService reportCommandService,
+    IReportAiSummaryCommandService reportAiSummaryCommandService,
     IReportQueryService reportQueryService,
     IStringLocalizer<SharedResource> localizer,
     ILogger<ReportsController> logger)
@@ -108,5 +110,56 @@ public class ReportsController(
             cancellationToken);
         return ActionResultFromGetReportByIdResultAssembler
             .ToActionResultFromGetReportByIdResult(result, this, localizer);
+    }
+
+    /// <summary>
+    ///     Generates an advisory AI summary for one existing report.
+    /// </summary>
+    [HttpPost("{reportId:int}/ai-summary")]
+    [SwaggerOperation(
+        Summary = "Generates a report AI summary",
+        Description = "Loads persisted report metrics and related evidence, then returns a structured advisory AI summary without mutating the source report",
+        OperationId = "GenerateReportAiSummary")]
+    [SwaggerResponse(200, "AI report summary generated", typeof(ReportAiSummaryResource))]
+    [SwaggerResponse(400, "Missing or invalid identifier", typeof(string))]
+    [SwaggerResponse(404, "Organization or report not found", typeof(string))]
+    [SwaggerResponse(500, "Report context could not be prepared", typeof(ProblemDetails))]
+    [SwaggerResponse(502, "AI provider returned invalid structured output", typeof(ProblemDetails))]
+    [SwaggerResponse(503, "AI provider is unavailable or disabled", typeof(ProblemDetails))]
+    [SwaggerResponse(504, "AI provider timed out", typeof(ProblemDetails))]
+    public async Task<ActionResult> GenerateReportAiSummary(
+        [FromRoute] int organizationId,
+        [FromRoute] int reportId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await reportAiSummaryCommandService.Handle(
+                new GenerateReportAiSummaryCommand(organizationId, reportId),
+                cancellationToken);
+            return ActionResultFromGenerateReportAiSummaryResultAssembler
+                .ToActionResultFromGenerateReportAiSummaryResult(result, this, localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid report AI summary route for organization {OrganizationId} and report {ReportId}",
+                organizationId,
+                reportId);
+            return BadRequest(localizer["InvalidReportRequest"].Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error while generating AI report summary for organization {OrganizationId} and report {ReportId}",
+                organizationId,
+                reportId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorGeneratingReportAiSummary"].Value,
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
     }
 }
