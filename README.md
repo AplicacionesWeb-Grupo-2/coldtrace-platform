@@ -24,7 +24,7 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 | Alerts | Incidents, acknowledgements, escalation, corrective action, resolutions, notifications |
 | Maintenance Management | Maintenance schedules and technical service requests |
 | Reports | Operational report generation and report lookup |
-| AI Assistance | Provider configuration, structured output contracts, and AI diagnostics |
+| AI Assistance | Provider configuration, structured output contracts for dashboard interpretation, report AI summaries, incident AI resolution plans, and AI diagnostics |
 
 ## Repository Layout
 
