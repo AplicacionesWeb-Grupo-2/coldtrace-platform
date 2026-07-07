@@ -17,4 +17,8 @@ public interface IAiResolutionPlanCommandService
     Task<Result<AiResolutionPlan, ApproveAiResolutionPlanError>> Handle(
         ApproveAiResolutionPlanCommand command,
         CancellationToken cancellationToken = default);
+
+    Task<Result<AiResolutionPlan, RejectAiResolutionPlanError>> Handle(
+        RejectAiResolutionPlanCommand command,
+        CancellationToken cancellationToken = default);
 }

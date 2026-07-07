@@ -231,6 +231,9 @@
     <data name="InvalidAiResolutionPlanApprovalRequest" xml:space="preserve">
         <value>The AI resolution plan approval request is invalid.</value>
     </data>
+    <data name="InvalidAiResolutionPlanRejectionRequest" xml:space="preserve">
+        <value>The AI resolution plan rejection request is invalid.</value>
+    </data>
     <data name="AiResolutionPlanNotFound" xml:space="preserve">
         <value>The AI resolution plan was not found.</value>
     </data>
@@ -242,6 +245,9 @@
     </data>
     <data name="UnexpectedErrorApprovingAiResolutionPlan" xml:space="preserve">
         <value>An unexpected error occurred while approving the AI resolution plan.</value>
+    </data>
+    <data name="UnexpectedErrorRejectingAiResolutionPlan" xml:space="preserve">
+        <value>An unexpected error occurred while rejecting the AI resolution plan.</value>
     </data>
     <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
         <value>An unexpected error occurred while getting incidents.</value>

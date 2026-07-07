@@ -176,6 +176,59 @@ public class IncidentsController(
     }
 
     /// <summary>
+    ///     Rejects an AI resolution plan without changing incident status.
+    /// </summary>
+    [HttpPost("{incidentId:int}/ai-resolution-plans/{planId:int}/rejections")]
+    [SwaggerOperation(
+        Summary = "Rejects an incident AI resolution plan",
+        Description = "Rejects a pending AI plan, stores operator audit metadata and leaves the incident lifecycle unchanged",
+        OperationId = "RejectAiResolutionPlan")]
+    [SwaggerResponse(200, "AI resolution plan rejected", typeof(AiResolutionPlanResource))]
+    [SwaggerResponse(400, "Missing or invalid rejection request", typeof(string))]
+    [SwaggerResponse(404, "Organization, incident, or AI plan not found", typeof(string))]
+    [SwaggerResponse(409, "Plan already approved or rejected", typeof(string))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> RejectAiResolutionPlan(
+        [FromRoute] int organizationId,
+        [FromRoute] int incidentId,
+        [FromRoute] int planId,
+        [FromBody] RejectAiResolutionPlanResource? resource,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (resource is null) throw new ArgumentException("Rejection request body is required.");
+
+            var command = RejectAiResolutionPlanCommandFromResourceAssembler
+                .ToCommandFromResource(resource, organizationId, incidentId, planId);
+            var result = await aiResolutionPlanCommandService.Handle(command, cancellationToken);
+            return ActionResultFromRejectAiResolutionPlanResultAssembler
+                .ToActionResultFromRejectAiResolutionPlanResult(result, this, localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid AI resolution plan rejection request for incident {IncidentId} in organization {OrganizationId}",
+                incidentId,
+                organizationId);
+            return BadRequest(localizer["InvalidAiResolutionPlanRejectionRequest"].Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error while rejecting AI resolution plan {PlanId} for incident {IncidentId}",
+                planId,
+                incidentId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorRejectingAiResolutionPlan"].Value,
+                statusCode: 500);
+        }
+    }
+
+    /// <summary>
     ///     Creates an incident.
     /// </summary>
     [HttpPost]
