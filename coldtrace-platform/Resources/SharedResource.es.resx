@@ -312,6 +312,24 @@
     <data name="BillingCheckoutSessionProviderUnavailable" xml:space="preserve">
         <value>Stripe Checkout no esta disponible en este momento.</value>
     </data>
+    <data name="BillingPortalSessionInvalidRequest" xml:space="preserve">
+        <value>La solicitud de Customer Portal no es valida.</value>
+    </data>
+    <data name="BillingPortalSessionOrganizationNotFound" xml:space="preserve">
+        <value>La organizacion no fue encontrada.</value>
+    </data>
+    <data name="BillingPortalSessionOrganizationSubscriptionNotFound" xml:space="preserve">
+        <value>La suscripcion de la organizacion no fue encontrada.</value>
+    </data>
+    <data name="BillingPortalSessionProviderCustomerNotFound" xml:space="preserve">
+        <value>La organizacion aun no tiene un cliente de Stripe.</value>
+    </data>
+    <data name="BillingPortalSessionProviderNotConfigured" xml:space="preserve">
+        <value>Stripe Customer Portal no esta configurado.</value>
+    </data>
+    <data name="BillingPortalSessionProviderUnavailable" xml:space="preserve">
+        <value>Stripe Customer Portal no esta disponible en este momento.</value>
+    </data>
     <data name="BillingWebhookProviderNotConfigured" xml:space="preserve">
         <value>El secreto de firma del webhook de Stripe no esta configurado.</value>
     </data>
