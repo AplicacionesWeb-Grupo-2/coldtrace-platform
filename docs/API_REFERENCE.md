@@ -192,6 +192,32 @@ AI resolution plan rejection accepts:
 
 The rejection response uses the same `AiResolutionPlanResource` shape with `status` set to `rejected`, rejection metadata populated, and the incident lifecycle unchanged.
 
+## Billing
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/subscription-plans` | List visible subscription plans and pricing catalog. |
+
+The subscription plan catalog response mirrors the Spring Boot contract:
+
+```text
+id
+code
+displayName
+description
+monthlyPriceCents
+currency
+stripePriceId
+recommended
+recommendedLabel
+visible
+usageLimits { maxLocations, maxAssets, maxIotDevices, maxUsers, historyRetentionDays }
+featureFlags { allowsExports, allowsMaintenance, allowsAiGuidance, allowsAiReportSummary }
+includedFeatures
+```
+
+The public catalog currently returns `base`, `operations`, and `compliance-ai` using backend-owned values. Stripe price identifiers are read from `STRIPE_OPERATIONS_PRICE_ID` and `STRIPE_COMPLIANCE_AI_PRICE_ID` when configured.
+
 ## Maintenance Management
 
 | Method | Path | Description |

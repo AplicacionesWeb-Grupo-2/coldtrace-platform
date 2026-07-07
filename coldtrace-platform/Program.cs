@@ -8,6 +8,9 @@ using ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.Alerts.Domain.Services;
 using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Billing.Application.Internal.QueryServices;
+using ColdTrace.Platform.Billing.Domain.Services;
+using ColdTrace.Platform.Billing.Infrastructure.Configuration;
 using ColdTrace.Platform.AssetManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
@@ -119,6 +122,12 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 
 // Shared Bounded Context Injection Configuration
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Billing Bounded Context Injection Configuration
+builder.Services.AddOptions<BillingOptions>()
+    .Bind(builder.Configuration.GetSection(BillingOptions.SectionName))
+    .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddScoped<ISubscriptionPlanQueryService, SubscriptionPlanQueryService>();
 
 // AI Assistance Bounded Context Injection Configuration
 builder.Services.AddOptions<AiOptions>()
