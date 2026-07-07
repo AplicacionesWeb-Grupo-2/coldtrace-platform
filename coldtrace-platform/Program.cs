@@ -239,7 +239,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 // Localization Configuration
-string[] supportedCultures = ["en", "en-US", "es", "es-PE"];
+string[] supportedCultures = ["en", "es"];
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
     .AddSupportedCultures(supportedCultures)
