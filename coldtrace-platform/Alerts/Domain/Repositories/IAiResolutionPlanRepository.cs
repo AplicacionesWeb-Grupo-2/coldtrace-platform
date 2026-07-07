@@ -8,6 +8,12 @@ namespace ColdTrace.Platform.Alerts.Domain.Repositories;
 /// </summary>
 public interface IAiResolutionPlanRepository : IBaseRepository<AiResolutionPlan>
 {
+    Task<AiResolutionPlan?> FindByIdAndIncidentIdAndOrganizationIdAsync(
+        int planId,
+        int incidentId,
+        int organizationId,
+        CancellationToken cancellationToken = default);
+
     Task<IEnumerable<AiResolutionPlan>> FindAllByIncidentIdAndOrganizationIdAsync(
         int incidentId,
         int organizationId,

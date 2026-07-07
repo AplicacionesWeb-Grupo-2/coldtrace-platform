@@ -116,12 +116,14 @@ The response includes `gatewayId`, `locationId`, `outOfRange`, and `isOutOfRange
 | `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation` | Register escalation details. |
 | `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action` | Register corrective action details. |
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` | Generate and persist a pending AI resolution plan. |
+| `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals` | Approve a pending AI resolution plan and resolve the incident. |
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/resolutions` | Resolve an incident. |
 | `GET` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/notifications` | List notifications for one incident. |
 | `GET` | `/api/v1/organizations/{organizationId}/notifications` | List organization notifications. |
 
 Incident lifecycle endpoints return `409 Conflict` when a transition is not allowed.
 AI resolution plan generation also returns `409 Conflict` for resolved incidents or incidents with incomplete referenced context, `502 Bad Gateway` for invalid structured provider output, `503 Service Unavailable` when AI is disabled/unconfigured/unavailable, and `504 Gateway Timeout` when the provider times out.
+AI resolution plan approval returns `404 Not Found` when the organization, incident, or plan is missing, and `409 Conflict` when the plan was already approved/rejected or the incident can no longer be resolved.
 
 Important request fields:
 
@@ -130,6 +132,7 @@ Important request fields:
 - Escalation: `escalatedBy`, `escalationReason`.
 - Corrective action: `correctiveAction`, `registeredBy`.
 - Resolution: `resolvedBy`, `resolutionNotes`.
+- AI plan approval: `approvedBy`, `finalCorrectiveAction`, `finalResolutionNotes`.
 
 AI resolution plan generation has no request body. The response mirrors the Spring Boot contract:
 
@@ -160,6 +163,18 @@ rejectionReason
 finalCorrectiveAction
 finalResolutionNotes
 ```
+
+AI resolution plan approval accepts:
+
+```json
+{
+  "approvedBy": "operations.manager@coldtrace.test",
+  "finalCorrectiveAction": "Moved inventory to backup freezer and recalibrated the affected sensor",
+  "finalResolutionNotes": "Temperature returned to safe range after transfer and recalibration."
+}
+```
+
+The approval response uses the same `AiResolutionPlanResource` shape with `status` set to `approved`, approval metadata populated, and the final corrective action and resolution notes persisted. The incident is resolved through backend lifecycle rules during the same command.
 
 ## Maintenance Management
 
