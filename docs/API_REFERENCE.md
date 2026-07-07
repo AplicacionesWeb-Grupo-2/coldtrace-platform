@@ -198,6 +198,7 @@ The rejection response uses the same `AiResolutionPlanResource` shape with `stat
 | --- | --- | --- |
 | `GET` | `/api/v1/subscription-plans` | List visible subscription plans and pricing catalog. |
 | `GET` | `/api/v1/organizations/{organizationId}/subscription` | Get an organization's active subscription, usage and entitlements. |
+| `POST` | `/api/v1/organizations/{organizationId}/billing/checkout-sessions` | Create a Stripe Checkout session for a paid plan upgrade. |
 
 The subscription plan catalog response mirrors the Spring Boot contract:
 
@@ -233,6 +234,25 @@ metadata
 plan { ...subscription plan resource }
 usage { locations, assets, iotDevices, users }
 entitlements [{ key, category, enabled, limit, used, remaining, lockedReason }]
+```
+
+Create a checkout session with:
+
+```json
+{
+  "targetPlanCode": "operations"
+}
+```
+
+The checkout response returns only safe redirect metadata:
+
+```json
+{
+  "provider": "STRIPE",
+  "sessionId": "cs_test_...",
+  "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_...",
+  "targetPlanCode": "operations"
+}
 ```
 
 The public catalog currently returns `base`, `operations`, and `compliance-ai` using backend-owned values. Stripe price identifiers are read from `STRIPE_OPERATIONS_PRICE_ID` and `STRIPE_COMPLIANCE_AI_PRICE_ID` when configured.
