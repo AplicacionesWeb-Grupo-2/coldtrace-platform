@@ -7,5 +7,8 @@ public enum AiGenerationError
 {
     ProviderDisabled,
     ProviderNotConfigured,
+    ProviderUnavailable,
+    ProviderTimeout,
+    InvalidStructuredOutput,
     UnexpectedError
 }

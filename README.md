@@ -21,7 +21,7 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 | Identity Access | Organizations, organization sign-up, users, roles, permissions |
 | Asset Management | Locations, gateways, assets, asset settings, IoT devices |
 | Monitoring | Sensor readings, range evaluation, demo telemetry generation |
-| Alerts | Incidents, acknowledgements, escalation, corrective action, resolutions, notifications |
+| Alerts | Incidents, acknowledgements, escalation, corrective action, AI resolution plans, resolutions, notifications |
 | Maintenance Management | Maintenance schedules and technical service requests |
 | Reports | Operational report generation and report lookup |
 | AI Assistance | Provider configuration, structured output contracts for dashboard interpretation, report AI summaries, incident AI resolution plans, and AI diagnostics |
@@ -148,9 +148,13 @@ Deployment is automated through:
 scripts/deploy-cloud-run.sh
 ```
 
-The current schema contains 18 domain tables plus EF Core's `__EFMigrationsHistory` table:
+The current schema contains 22 domain tables plus EF Core's `__EFMigrationsHistory` table:
 
 ```text
+ai_resolution_plan_required_evidences
+ai_resolution_plan_steps
+ai_resolution_plan_uncertainty_notes
+ai_resolution_plans
 asset_settings
 asset_settings_asset_types
 asset_settings_iot_device_types
@@ -181,7 +185,7 @@ All organization-owned operational resources are scoped under `/api/v1/organizat
 | Roles and users | `/api/v1/roles`, `/api/v1/organizations/{organizationId}/users` |
 | Assets | `/api/v1/organizations/{organizationId}/locations`, `/gateways`, `/assets`, `/iot-devices`, `/asset-settings` |
 | Monitoring | `/api/v1/organizations/{organizationId}/sensor-readings` |
-| Alerts | `/api/v1/organizations/{organizationId}/incidents`, `/notifications` |
+| Alerts | `/api/v1/organizations/{organizationId}/incidents`, `/incidents/{incidentId}/ai-resolution-plans`, `/notifications` |
 | Maintenance | `/api/v1/organizations/{organizationId}/maintenance-schedules`, `/technical-service-requests` |
 | Reports | `/api/v1/organizations/{organizationId}/reports` |
 | AI Assistance | `/api/v1/ai-assistance/provider-status` |

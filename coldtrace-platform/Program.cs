@@ -126,12 +126,14 @@ builder.Services.AddOptions<AiOptions>()
     .PostConfigure(options => options.ExpandEnvironmentVariables());
 builder.Services.AddScoped<IAiChatClientAdapter, ServiceProviderAiChatClientAdapter>();
 builder.Services.AddScoped<IAiProviderStatusQueryService, AiProviderStatusQueryService>();
-builder.Services.AddScoped<IAiStructuredOutputService, DisabledAiStructuredOutputService>();
+builder.Services.AddScoped<IAiStructuredOutputService, MicrosoftExtensionsAiStructuredOutputService>();
 
 // Alerts Bounded Context Injection Configuration
 builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IAiResolutionPlanRepository, AiResolutionPlanRepository>();
 builder.Services.AddScoped<IIncidentCommandService, IncidentCommandService>();
+builder.Services.AddScoped<IAiResolutionPlanCommandService, AiResolutionPlanCommandService>();
 builder.Services.AddScoped<IIncidentQueryService, IncidentQueryService>();
 builder.Services.AddScoped<INotificationQueryService, NotificationQueryService>();
 

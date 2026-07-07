@@ -393,6 +393,84 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("f_k_incidents_assets_asset_id");
 
+        builder.Entity<AiResolutionPlan>().HasKey(plan => plan.Id);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.Status).IsRequired().HasMaxLength(32);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.Summary).IsRequired().HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ProbableCause).IsRequired().HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().OwnsMany(plan => plan.RecommendedSteps, stepsBuilder =>
+        {
+            stepsBuilder.ToTable("ai_resolution_plan_steps");
+            stepsBuilder.Property<int>("AiResolutionPlanId").HasColumnName("ai_resolution_plan_id").IsRequired();
+            stepsBuilder.Property(step => step.Sequence).HasColumnName("sequence").IsRequired().ValueGeneratedNever();
+            stepsBuilder.Property(step => step.Action).HasColumnName("action").IsRequired().HasMaxLength(1024);
+            stepsBuilder.Property(step => step.Rationale).HasColumnName("rationale").IsRequired().HasMaxLength(1024);
+            stepsBuilder.Property(step => step.ExpectedOutcome).HasColumnName("expected_outcome").IsRequired()
+                .HasMaxLength(1024);
+            stepsBuilder.HasKey("AiResolutionPlanId", nameof(AiResolutionPlanStep.Sequence));
+            stepsBuilder.WithOwner()
+                .HasForeignKey("AiResolutionPlanId")
+                .HasConstraintName("f_k_ai_resolution_plan_steps_ai_resolution_plan_id");
+        });
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.CorrectiveActionDraft).IsRequired()
+            .HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ResolutionNotesDraft).IsRequired()
+            .HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.EscalationRecommended).IsRequired();
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.EscalationUrgency).IsRequired().HasMaxLength(32);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.EscalationReason).IsRequired().HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().OwnsMany(plan => plan.RequiredEvidenceItems, evidenceBuilder =>
+        {
+            evidenceBuilder.ToTable("ai_resolution_plan_required_evidence");
+            evidenceBuilder.Property<int>("Id").HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
+            evidenceBuilder.Property<int>("AiResolutionPlanId").HasColumnName("ai_resolution_plan_id").IsRequired();
+            evidenceBuilder.Property(item => item.Value).HasColumnName("value").IsRequired().HasMaxLength(512);
+            evidenceBuilder.HasKey("Id");
+            evidenceBuilder.WithOwner()
+                .HasForeignKey("AiResolutionPlanId")
+                .HasConstraintName("f_k_ai_resolution_plan_required_evidence_ai_resolution_plan_id");
+        });
+        builder.Entity<AiResolutionPlan>().OwnsMany(plan => plan.UncertaintyNoteItems, notesBuilder =>
+        {
+            notesBuilder.ToTable("ai_resolution_plan_uncertainty_notes");
+            notesBuilder.Property<int>("Id").HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
+            notesBuilder.Property<int>("AiResolutionPlanId").HasColumnName("ai_resolution_plan_id").IsRequired();
+            notesBuilder.Property(item => item.Value).HasColumnName("value").IsRequired().HasMaxLength(512);
+            notesBuilder.HasKey("Id");
+            notesBuilder.WithOwner()
+                .HasForeignKey("AiResolutionPlanId")
+                .HasConstraintName("f_k_ai_resolution_plan_uncertainty_notes_ai_resolution_plan_id");
+        });
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ModelProvider).IsRequired().HasMaxLength(64);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ModelName).IsRequired().HasMaxLength(128);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ProviderMetadata).HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.GeneratedAt).IsRequired();
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ApprovedAt);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ApprovedBy).HasMaxLength(256);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.RejectedAt);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.RejectedBy).HasMaxLength(256);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.RejectionReason).HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.FinalCorrectiveAction).HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.FinalResolutionNotes).HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.CreatedAt);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.UpdatedAt);
+        builder.Entity<AiResolutionPlan>()
+            .HasIndex(plan => new { plan.OrganizationId, plan.IncidentId, plan.GeneratedAt });
+        builder.Entity<AiResolutionPlan>()
+            .HasIndex(plan => new { plan.OrganizationId, plan.Status });
+        builder.Entity<AiResolutionPlan>()
+            .HasOne(plan => plan.Organization)
+            .WithMany()
+            .HasForeignKey(plan => plan.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_ai_resolution_plans_organizations_organization_id");
+        builder.Entity<AiResolutionPlan>()
+            .HasOne(plan => plan.Incident)
+            .WithMany()
+            .HasForeignKey(plan => plan.IncidentId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_ai_resolution_plans_incidents_incident_id");
+
         builder.Entity<Notification>().HasKey(notification => notification.Id);
         builder.Entity<Notification>().Property(notification => notification.Id).IsRequired().ValueGeneratedOnAdd();
         builder.Entity<Notification>().Property(notification => notification.Channel).IsRequired().HasMaxLength(32);
