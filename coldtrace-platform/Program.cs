@@ -8,9 +8,16 @@ using ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.Alerts.Domain.Services;
 using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Billing.Application.ACL;
+using ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 using ColdTrace.Platform.Billing.Application.Internal.QueryServices;
+using ColdTrace.Platform.Billing.Application.Internal.Services;
+using ColdTrace.Platform.Billing.Domain.Model.Commands;
+using ColdTrace.Platform.Billing.Domain.Repositories;
 using ColdTrace.Platform.Billing.Domain.Services;
 using ColdTrace.Platform.Billing.Infrastructure.Configuration;
+using ColdTrace.Platform.Billing.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.AssetManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
@@ -127,7 +134,13 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddOptions<BillingOptions>()
     .Bind(builder.Configuration.GetSection(BillingOptions.SectionName))
     .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddScoped<IOrganizationSubscriptionRepository, OrganizationSubscriptionRepository>();
 builder.Services.AddScoped<ISubscriptionPlanQueryService, SubscriptionPlanQueryService>();
+builder.Services.AddScoped<OrganizationSubscriptionUsageService>();
+builder.Services.AddScoped<EntitlementPolicyService>();
+builder.Services.AddScoped<IOrganizationSubscriptionCommandService, OrganizationSubscriptionCommandService>();
+builder.Services.AddScoped<IOrganizationSubscriptionQueryService, OrganizationSubscriptionQueryService>();
+builder.Services.AddScoped<ISubscriptionBillingContextFacade, SubscriptionBillingContextFacade>();
 
 // AI Assistance Bounded Context Injection Configuration
 builder.Services.AddOptions<AiOptions>()
@@ -203,6 +216,9 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AppDbContext>();
     ApplyPendingMigrations(context);
+    var organizationSubscriptionCommandService =
+        services.GetRequiredService<IOrganizationSubscriptionCommandService>();
+    await organizationSubscriptionCommandService.Handle(new SeedBaseOrganizationSubscriptionsCommand());
 }
 
 app.UseExceptionHandler();

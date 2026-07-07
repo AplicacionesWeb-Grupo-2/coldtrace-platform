@@ -1,5 +1,6 @@
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.Billing.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
@@ -107,6 +108,41 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .WithMany()
             .HasForeignKey(user => user.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<OrganizationSubscription>().HasKey(subscription => subscription.Id);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Id).IsRequired()
+            .ValueGeneratedOnAdd();
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.PlanCode).IsRequired()
+            .HasMaxLength(40);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Status).IsRequired()
+            .HasMaxLength(30);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Provider).IsRequired()
+            .HasMaxLength(30);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.ProviderCustomerId)
+            .HasMaxLength(255);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.ProviderSubscriptionId)
+            .HasMaxLength(255);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.CurrentPeriodStart);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.CurrentPeriodEnd);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.CancelAtPeriodEnd)
+            .IsRequired();
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Metadata)
+            .HasMaxLength(2000);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.CreatedAt);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.UpdatedAt);
+        builder.Entity<OrganizationSubscription>()
+            .HasIndex(subscription => subscription.OrganizationId)
+            .IsUnique();
+        builder.Entity<OrganizationSubscription>()
+            .HasIndex(subscription => subscription.ProviderCustomerId);
+        builder.Entity<OrganizationSubscription>()
+            .HasIndex(subscription => subscription.ProviderSubscriptionId);
+        builder.Entity<OrganizationSubscription>()
+            .HasOne(subscription => subscription.Organization)
+            .WithMany()
+            .HasForeignKey(subscription => subscription.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_organization_subscriptions_organizations_organization_id");
 
         builder.Entity<Location>().HasKey(location => location.Id);
         builder.Entity<Location>().Property(location => location.Id).IsRequired().ValueGeneratedOnAdd();

@@ -279,4 +279,13 @@
     <data name="UnexpectedErrorGettingReports" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener reportes.</value>
     </data>
+    <data name="BillingOrganizationSubscriptionOrganizationNotFound" xml:space="preserve">
+        <value>La organizacion no fue encontrada.</value>
+    </data>
+    <data name="BillingOrganizationSubscriptionNotFound" xml:space="preserve">
+        <value>La suscripcion de la organizacion no fue encontrada.</value>
+    </data>
+    <data name="BillingOrganizationSubscriptionPlanNotFound" xml:space="preserve">
+        <value>El plan de suscripcion no fue encontrado.</value>
+    </data>
 </root>
