@@ -130,4 +130,12 @@ public class AiResolutionPlan : IAuditableEntity
         FinalCorrectiveAction = command.FinalCorrectiveAction;
         FinalResolutionNotes = command.FinalResolutionNotes;
     }
+
+    public void Reject(RejectAiResolutionPlanCommand command)
+    {
+        Status = StatusRejected;
+        RejectedAt = DateTimeOffset.UtcNow;
+        RejectedBy = command.RejectedBy;
+        RejectionReason = command.RejectionReason;
+    }
 }

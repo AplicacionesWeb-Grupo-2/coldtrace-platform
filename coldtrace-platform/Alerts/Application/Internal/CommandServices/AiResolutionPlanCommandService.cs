@@ -49,6 +49,85 @@ public class AiResolutionPlanCommandService(
 
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web);
 
+    public async Task<Result<AiResolutionPlan, RejectAiResolutionPlanError>> Handle(
+        RejectAiResolutionPlanCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for AI resolution plan rejection: {OrganizationId}",
+                command.OrganizationId);
+            return RejectionFailure(RejectAiResolutionPlanError.OrganizationNotFound);
+        }
+
+        var incident = await incidentRepository.FindByIdAndOrganizationIdAsync(
+            command.IncidentId,
+            command.OrganizationId,
+            cancellationToken);
+        if (incident is null)
+        {
+            logger.LogWarning(
+                "Incident not found for AI resolution plan rejection: {OrganizationId} {IncidentId}",
+                command.OrganizationId,
+                command.IncidentId);
+            return RejectionFailure(RejectAiResolutionPlanError.IncidentNotFound);
+        }
+
+        var plan = await aiResolutionPlanRepository.FindByIdAndIncidentIdAndOrganizationIdAsync(
+            command.PlanId,
+            command.IncidentId,
+            command.OrganizationId,
+            cancellationToken);
+        if (plan is null)
+        {
+            logger.LogWarning(
+                "AI resolution plan not found for rejection: {OrganizationId} {IncidentId} {PlanId}",
+                command.OrganizationId,
+                command.IncidentId,
+                command.PlanId);
+            return RejectionFailure(RejectAiResolutionPlanError.PlanNotFound);
+        }
+
+        if (!plan.IsPending())
+        {
+            logger.LogWarning(
+                "AI resolution plan already decided before rejection: {OrganizationId} {IncidentId} {PlanId}",
+                command.OrganizationId,
+                command.IncidentId,
+                command.PlanId);
+            return RejectionFailure(RejectAiResolutionPlanError.PlanAlreadyDecided);
+        }
+
+        try
+        {
+            plan.Reject(command);
+            aiResolutionPlanRepository.Update(plan);
+            await unitOfWork.CompleteAsync(cancellationToken);
+
+            return new Result<AiResolutionPlan, RejectAiResolutionPlanError>.Success(plan);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogError(
+                ex,
+                "Database update failed rejecting AI resolution plan {PlanId} for incident {IncidentId}",
+                command.PlanId,
+                command.IncidentId);
+            return RejectionFailure(RejectAiResolutionPlanError.UnexpectedError);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error rejecting AI resolution plan {PlanId} for incident {IncidentId}",
+                command.PlanId,
+                command.IncidentId);
+            return RejectionFailure(RejectAiResolutionPlanError.UnexpectedError);
+        }
+    }
+
     public async Task<Result<AiResolutionPlan, ApproveAiResolutionPlanError>> Handle(
         ApproveAiResolutionPlanCommand command,
         CancellationToken cancellationToken = default)
@@ -426,6 +505,10 @@ public class AiResolutionPlanCommandService(
     private static Result<AiResolutionPlan, ApproveAiResolutionPlanError> ApprovalFailure(
         ApproveAiResolutionPlanError error) =>
         new Result<AiResolutionPlan, ApproveAiResolutionPlanError>.Failure(error);
+
+    private static Result<AiResolutionPlan, RejectAiResolutionPlanError> RejectionFailure(
+        RejectAiResolutionPlanError error) =>
+        new Result<AiResolutionPlan, RejectAiResolutionPlanError>.Failure(error);
 
     private static IncidentSnapshot ToIncidentSnapshot(Incident incident) =>
         new(

@@ -185,7 +185,7 @@ All organization-owned operational resources are scoped under `/api/v1/organizat
 | Roles and users | `/api/v1/roles`, `/api/v1/organizations/{organizationId}/users` |
 | Assets | `/api/v1/organizations/{organizationId}/locations`, `/gateways`, `/assets`, `/iot-devices`, `/asset-settings` |
 | Monitoring | `/api/v1/organizations/{organizationId}/sensor-readings` |
-| Alerts | `/api/v1/organizations/{organizationId}/incidents`, `/incidents/{incidentId}/ai-resolution-plans`, `/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals`, `/notifications` |
+| Alerts | `/api/v1/organizations/{organizationId}/incidents`, `/incidents/{incidentId}/ai-resolution-plans`, `/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals`, `/incidents/{incidentId}/ai-resolution-plans/{planId}/rejections`, `/notifications` |
 | Maintenance | `/api/v1/organizations/{organizationId}/maintenance-schedules`, `/technical-service-requests` |
 | Reports | `/api/v1/organizations/{organizationId}/reports` |
 | AI Assistance | `/api/v1/ai-assistance/provider-status` |
