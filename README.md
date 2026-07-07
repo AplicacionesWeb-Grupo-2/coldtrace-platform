@@ -11,7 +11,7 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 - Entity Framework Core 10
 - MySQL through `MySql.EntityFrameworkCore`
 - Swagger/OpenAPI through Swashbuckle annotations
-- Resource-based localization for `en`, `en-US`, `es`, and `es-PE`
+- Resource-based localization for `en` and `es`
 - Microsoft.Extensions.AI abstractions for provider-neutral AI features
 
 ## Backend Scope
