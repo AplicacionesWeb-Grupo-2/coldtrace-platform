@@ -312,6 +312,24 @@
     <data name="BillingCheckoutSessionProviderUnavailable" xml:space="preserve">
         <value>Stripe checkout is currently unavailable.</value>
     </data>
+    <data name="BillingPortalSessionInvalidRequest" xml:space="preserve">
+        <value>The customer portal session request is invalid.</value>
+    </data>
+    <data name="BillingPortalSessionOrganizationNotFound" xml:space="preserve">
+        <value>Organization was not found.</value>
+    </data>
+    <data name="BillingPortalSessionOrganizationSubscriptionNotFound" xml:space="preserve">
+        <value>Organization subscription was not found.</value>
+    </data>
+    <data name="BillingPortalSessionProviderCustomerNotFound" xml:space="preserve">
+        <value>Organization does not have a Stripe customer yet.</value>
+    </data>
+    <data name="BillingPortalSessionProviderNotConfigured" xml:space="preserve">
+        <value>Stripe Customer Portal is not configured.</value>
+    </data>
+    <data name="BillingPortalSessionProviderUnavailable" xml:space="preserve">
+        <value>Stripe Customer Portal is currently unavailable.</value>
+    </data>
     <data name="BillingWebhookProviderNotConfigured" xml:space="preserve">
         <value>Stripe webhook signing secret is not configured.</value>
     </data>

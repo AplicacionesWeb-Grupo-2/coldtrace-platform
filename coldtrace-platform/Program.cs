@@ -11,6 +11,7 @@ using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Billing.Application.ACL;
 using ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Checkout;
+using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Portal;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Webhook;
 using ColdTrace.Platform.Billing.Application.Internal.QueryServices;
 using ColdTrace.Platform.Billing.Application.Internal.Services;
@@ -143,10 +144,12 @@ builder.Services.AddScoped<ISubscriptionPlanQueryService, SubscriptionPlanQueryS
 builder.Services.AddScoped<OrganizationSubscriptionUsageService>();
 builder.Services.AddScoped<EntitlementPolicyService>();
 builder.Services.AddScoped<ICheckoutSessionProviderService, StripeCheckoutSessionProviderService>();
+builder.Services.AddScoped<IPortalSessionProviderService, StripePortalSessionProviderService>();
 builder.Services.AddScoped<IBillingWebhookProviderService, StripeBillingWebhookProviderService>();
 builder.Services.AddScoped<IOrganizationSubscriptionCommandService, OrganizationSubscriptionCommandService>();
 builder.Services.AddScoped<IOrganizationSubscriptionQueryService, OrganizationSubscriptionQueryService>();
 builder.Services.AddScoped<IBillingCheckoutSessionCommandService, BillingCheckoutSessionCommandService>();
+builder.Services.AddScoped<IBillingPortalSessionCommandService, BillingPortalSessionCommandService>();
 builder.Services.AddScoped<IBillingWebhookCommandService, BillingWebhookCommandService>();
 builder.Services.AddScoped<ISubscriptionBillingContextFacade, SubscriptionBillingContextFacade>();
 
