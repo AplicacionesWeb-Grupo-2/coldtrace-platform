@@ -108,4 +108,46 @@ public class OrganizationSubscription : IAuditableEntity
     /// </summary>
     /// <returns>True when plan limits and feature flags are available.</returns>
     public bool AllowsPlanEntitlements() => SubscriptionStatuses.AllowsPlanEntitlements(Status);
+
+    /// <summary>
+    ///     Synchronizes this subscription from a verified external provider event.
+    /// </summary>
+    public void SynchronizeProviderState(
+        string planCode,
+        string? status,
+        string? provider,
+        string? providerCustomerId,
+        string? providerSubscriptionId,
+        DateTimeOffset? currentPeriodStart,
+        DateTimeOffset? currentPeriodEnd,
+        bool? cancelAtPeriodEnd,
+        string? metadata)
+    {
+        PlanCode = NormalizePlanCode(planCode);
+        Status = NormalizeStatus(status);
+        Provider = NormalizeProvider(provider);
+        ProviderCustomerId = NormalizeOptionalText(providerCustomerId);
+        ProviderSubscriptionId = NormalizeOptionalText(providerSubscriptionId);
+        CurrentPeriodStart = currentPeriodStart;
+        CurrentPeriodEnd = currentPeriodEnd;
+        CancelAtPeriodEnd = cancelAtPeriodEnd is true;
+        Metadata = NormalizeOptionalText(metadata);
+    }
+
+    private static string NormalizePlanCode(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("Plan code is required.", nameof(value));
+
+        return value.Trim().ToLowerInvariant();
+    }
+
+    private static string NormalizeStatus(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? SubscriptionStatuses.Free : value.Trim().ToUpperInvariant();
+
+    private static string NormalizeProvider(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? BillingProviders.None : value.Trim().ToUpperInvariant();
+
+    private static string? NormalizeOptionalText(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }

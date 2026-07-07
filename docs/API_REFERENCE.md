@@ -199,6 +199,7 @@ The rejection response uses the same `AiResolutionPlanResource` shape with `stat
 | `GET` | `/api/v1/subscription-plans` | List visible subscription plans and pricing catalog. |
 | `GET` | `/api/v1/organizations/{organizationId}/subscription` | Get an organization's active subscription, usage and entitlements. |
 | `POST` | `/api/v1/organizations/{organizationId}/billing/checkout-sessions` | Create a Stripe Checkout session for a paid plan upgrade. |
+| `POST` | `/api/v1/billing/stripe/webhooks` | Process a signed Stripe billing webhook and synchronize local subscription state. |
 
 The subscription plan catalog response mirrors the Spring Boot contract:
 
@@ -252,6 +253,21 @@ The checkout response returns only safe redirect metadata:
   "sessionId": "cs_test_...",
   "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_...",
   "targetPlanCode": "operations"
+}
+```
+
+The Stripe webhook endpoint requires the `Stripe-Signature` header and returns the processing outcome:
+
+```json
+{
+  "provider": "STRIPE",
+  "eventId": "evt_...",
+  "eventType": "checkout.session.completed",
+  "processingStatus": "PROCESSED",
+  "duplicate": false,
+  "organizationId": 1,
+  "planCode": "operations",
+  "subscriptionStatus": "ACTIVE"
 }
 ```
 

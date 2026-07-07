@@ -312,4 +312,19 @@
     <data name="BillingCheckoutSessionProviderUnavailable" xml:space="preserve">
         <value>Stripe Checkout no esta disponible en este momento.</value>
     </data>
+    <data name="BillingWebhookProviderNotConfigured" xml:space="preserve">
+        <value>El secreto de firma del webhook de Stripe no esta configurado.</value>
+    </data>
+    <data name="BillingWebhookSignatureMissing" xml:space="preserve">
+        <value>El encabezado Stripe-Signature es obligatorio.</value>
+    </data>
+    <data name="BillingWebhookSignatureInvalid" xml:space="preserve">
+        <value>La firma del webhook de Stripe no es valida.</value>
+    </data>
+    <data name="BillingWebhookPayloadInvalid" xml:space="preserve">
+        <value>El payload del webhook de Stripe no es valido.</value>
+    </data>
+    <data name="BillingWebhookProcessingFailed" xml:space="preserve">
+        <value>El webhook de Stripe no pudo procesarse.</value>
+    </data>
 </root>
