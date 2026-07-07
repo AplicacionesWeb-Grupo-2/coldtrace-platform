@@ -12,6 +12,7 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 - MySQL through `MySql.EntityFrameworkCore`
 - Swagger/OpenAPI through Swashbuckle annotations
 - Resource-based localization for `en`, `en-US`, `es`, and `es-PE`
+- Microsoft.Extensions.AI abstractions for provider-neutral AI features
 
 ## Backend Scope
 
@@ -23,6 +24,7 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 | Alerts | Incidents, acknowledgements, escalation, corrective action, resolutions, notifications |
 | Maintenance Management | Maintenance schedules and technical service requests |
 | Reports | Operational report generation and report lookup |
+| AI Assistance | Provider configuration, structured output contracts for dashboard interpretation, report AI summaries, incident AI resolution plans, and AI diagnostics |
 
 ## Repository Layout
 
@@ -34,6 +36,7 @@ coldtrace-platform/
   MaintenanceManagement/
   Monitoring/
   Reports/
+  AiAssistance/
   Resources/
   Shared/
 docs/
@@ -121,6 +124,12 @@ DATABASE_SCHEMA=coldtrace_platform
 DATABASE_USER=coldtrace_app
 DATABASE_PASSWORD=<from Secret Manager>
 CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app,http://localhost:5173
+AI_ASSISTANCE_ENABLED=false
+AI_MODEL_PROVIDER=disabled
+AI_MODEL_NAME=
+OLLAMA_BASE_URL=http://localhost:11434
+OPENAI_API_KEY=<from Secret Manager when enabled>
+AI_REQUEST_TIMEOUT=30s
 ```
 
 `CORS_ALLOWED_ORIGINS` is a comma-separated allowlist for browser clients. Keep the stable Vercel production domain in the list and add temporary deployment URLs only when they must be tested directly.
@@ -175,6 +184,7 @@ All organization-owned operational resources are scoped under `/api/v1/organizat
 | Alerts | `/api/v1/organizations/{organizationId}/incidents`, `/notifications` |
 | Maintenance | `/api/v1/organizations/{organizationId}/maintenance-schedules`, `/technical-service-requests` |
 | Reports | `/api/v1/organizations/{organizationId}/reports` |
+| AI Assistance | `/api/v1/ai-assistance/provider-status` |
 
 See [docs/API_REFERENCE.md](docs/API_REFERENCE.md) for the current route and payload reference.
 

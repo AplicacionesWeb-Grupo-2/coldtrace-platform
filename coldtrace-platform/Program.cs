@@ -1,3 +1,8 @@
+using ColdTrace.Platform.AiAssistance.Application.Internal.CommandServices;
+using ColdTrace.Platform.AiAssistance.Application.Internal.QueryServices;
+using ColdTrace.Platform.AiAssistance.Domain.Services;
+using ColdTrace.Platform.AiAssistance.Infrastructure.Configuration;
+using ColdTrace.Platform.AiAssistance.Infrastructure.Providers;
 using ColdTrace.Platform.Alerts.Application.Internal.CommandServices;
 using ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
@@ -114,6 +119,14 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 
 // Shared Bounded Context Injection Configuration
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// AI Assistance Bounded Context Injection Configuration
+builder.Services.AddOptions<AiOptions>()
+    .Bind(builder.Configuration.GetSection(AiOptions.SectionName))
+    .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddScoped<IAiChatClientAdapter, ServiceProviderAiChatClientAdapter>();
+builder.Services.AddScoped<IAiProviderStatusQueryService, AiProviderStatusQueryService>();
+builder.Services.AddScoped<IAiStructuredOutputService, DisabledAiStructuredOutputService>();
 
 // Alerts Bounded Context Injection Configuration
 builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
