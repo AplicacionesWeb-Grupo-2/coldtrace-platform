@@ -198,6 +198,39 @@
     <data name="UnexpectedErrorResolvingIncident" xml:space="preserve">
         <value>An unexpected error occurred while resolving the incident.</value>
     </data>
+    <data name="IncidentCannotReceiveAiResolutionPlan" xml:space="preserve">
+        <value>Incident cannot receive AI resolution plans in its current status.</value>
+    </data>
+    <data name="IncidentAiContextUnavailable" xml:space="preserve">
+        <value>Incident context is incomplete or unavailable for AI resolution plan generation.</value>
+    </data>
+    <data name="AiProviderUnavailable" xml:space="preserve">
+        <value>AI provider is unavailable.</value>
+    </data>
+    <data name="AiProviderDisabled" xml:space="preserve">
+        <value>AI assistance is disabled.</value>
+    </data>
+    <data name="AiProviderNotConfigured" xml:space="preserve">
+        <value>AI provider is not configured.</value>
+    </data>
+    <data name="AiProviderRequestFailed" xml:space="preserve">
+        <value>AI provider request failed.</value>
+    </data>
+    <data name="AiProviderTimeout" xml:space="preserve">
+        <value>AI provider timed out.</value>
+    </data>
+    <data name="AiProviderTimedOut" xml:space="preserve">
+        <value>AI provider did not respond before the configured timeout.</value>
+    </data>
+    <data name="InvalidAiStructuredOutput" xml:space="preserve">
+        <value>Invalid AI structured output.</value>
+    </data>
+    <data name="AiResolutionPlanInvalidStructuredOutput" xml:space="preserve">
+        <value>AI provider returned an invalid resolution plan structure.</value>
+    </data>
+    <data name="UnexpectedErrorGeneratingAiResolutionPlan" xml:space="preserve">
+        <value>An unexpected error occurred while generating the AI resolution plan.</value>
+    </data>
     <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
         <value>An unexpected error occurred while getting incidents.</value>
     </data>

@@ -198,6 +198,39 @@
     <data name="UnexpectedErrorResolvingIncident" xml:space="preserve">
         <value>Ocurrio un error inesperado al resolver el incidente.</value>
     </data>
+    <data name="IncidentCannotReceiveAiResolutionPlan" xml:space="preserve">
+        <value>El incidente no puede recibir planes de resolucion con IA en su estado actual.</value>
+    </data>
+    <data name="IncidentAiContextUnavailable" xml:space="preserve">
+        <value>El contexto del incidente esta incompleto o no esta disponible para generar el plan de resolucion con IA.</value>
+    </data>
+    <data name="AiProviderUnavailable" xml:space="preserve">
+        <value>El proveedor de IA no esta disponible.</value>
+    </data>
+    <data name="AiProviderDisabled" xml:space="preserve">
+        <value>La asistencia de IA esta deshabilitada.</value>
+    </data>
+    <data name="AiProviderNotConfigured" xml:space="preserve">
+        <value>El proveedor de IA no esta configurado.</value>
+    </data>
+    <data name="AiProviderRequestFailed" xml:space="preserve">
+        <value>La solicitud al proveedor de IA fallo.</value>
+    </data>
+    <data name="AiProviderTimeout" xml:space="preserve">
+        <value>El proveedor de IA excedio el tiempo de espera.</value>
+    </data>
+    <data name="AiProviderTimedOut" xml:space="preserve">
+        <value>El proveedor de IA no respondio antes del tiempo configurado.</value>
+    </data>
+    <data name="InvalidAiStructuredOutput" xml:space="preserve">
+        <value>Salida estructurada de IA invalida.</value>
+    </data>
+    <data name="AiResolutionPlanInvalidStructuredOutput" xml:space="preserve">
+        <value>El proveedor de IA devolvio una estructura invalida para el plan de resolucion.</value>
+    </data>
+    <data name="UnexpectedErrorGeneratingAiResolutionPlan" xml:space="preserve">
+        <value>Ocurrio un error inesperado al generar el plan de resolucion con IA.</value>
+    </data>
     <data name="UnexpectedErrorGettingIncidents" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener incidentes.</value>
     </data>

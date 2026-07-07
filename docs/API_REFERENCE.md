@@ -115,11 +115,13 @@ The response includes `gatewayId`, `locationId`, `outOfRange`, and `isOutOfRange
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/acknowledgements` | Acknowledge an incident. |
 | `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation` | Register escalation details. |
 | `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action` | Register corrective action details. |
+| `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` | Generate and persist a pending AI resolution plan. |
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/resolutions` | Resolve an incident. |
 | `GET` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/notifications` | List notifications for one incident. |
 | `GET` | `/api/v1/organizations/{organizationId}/notifications` | List organization notifications. |
 
 Incident lifecycle endpoints return `409 Conflict` when a transition is not allowed.
+AI resolution plan generation also returns `409 Conflict` for resolved incidents or incidents with incomplete referenced context, `502 Bad Gateway` for invalid structured provider output, `503 Service Unavailable` when AI is disabled/unconfigured/unavailable, and `504 Gateway Timeout` when the provider times out.
 
 Important request fields:
 
@@ -128,6 +130,36 @@ Important request fields:
 - Escalation: `escalatedBy`, `escalationReason`.
 - Corrective action: `correctiveAction`, `registeredBy`.
 - Resolution: `resolvedBy`, `resolutionNotes`.
+
+AI resolution plan generation has no request body. The response mirrors the Spring Boot contract:
+
+```text
+id
+organizationId
+incidentId
+status
+summary
+probableCause
+recommendedSteps[{ sequence, action, rationale, expectedOutcome }]
+correctiveActionDraft
+resolutionNotesDraft
+escalationRecommended
+escalationUrgency
+escalationReason
+requiredEvidence
+uncertaintyNotes
+modelProvider
+modelName
+providerMetadata
+generatedAt
+approvedAt
+approvedBy
+rejectedAt
+rejectedBy
+rejectionReason
+finalCorrectiveAction
+finalResolutionNotes
+```
 
 ## Maintenance Management
 
@@ -190,10 +222,9 @@ structuredOutputContracts
 
 Supported provider values are `disabled`, `ollama`, and `openai`.
 
-The structured output contracts prepared by this context are aligned with the
-future product endpoints for dashboard AI interpretation, report AI summaries,
-and incident AI resolution plans. Those endpoint routes remain owned by their
-respective bounded contexts when implemented.
+The structured output contracts prepared by this context are consumed by product
+endpoints owned by their respective bounded contexts. Incident AI resolution
+plans are exposed from Alerts.
 
 ## Error Responses
 
@@ -204,6 +235,9 @@ Expected validation and business-rule responses:
 | `400` | Invalid request payload or unsupported input. |
 | `404` | Organization or scoped resource was not found. |
 | `409` | Duplicate resource or invalid lifecycle transition. |
+| `502` | Upstream AI provider returned invalid structured output. |
+| `503` | AI provider is disabled, unavailable, or not configured. |
+| `504` | AI provider exceeded the configured timeout. |
 | `500` | Unexpected server error returned as RFC 7807 `ProblemDetails`. |
 
 The API currently exposes Swagger and does not enforce JWT/session authorization.

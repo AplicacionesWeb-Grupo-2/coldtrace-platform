@@ -19,6 +19,7 @@ namespace ColdTrace.Platform.Alerts.Interfaces.REST;
 [Tags("Incidents")]
 public class IncidentsController(
     IIncidentCommandService incidentCommandService,
+    IAiResolutionPlanCommandService aiResolutionPlanCommandService,
     IIncidentQueryService incidentQueryService,
     INotificationQueryService notificationQueryService,
     IStringLocalizer<SharedResource> localizer,
@@ -68,6 +69,57 @@ public class IncidentsController(
             cancellationToken);
         return ActionResultFromGetIncidentByIdResultAssembler
             .ToActionResultFromGetIncidentByIdResult(result, this, localizer);
+    }
+
+    /// <summary>
+    ///     Generates an AI resolution plan for an active incident.
+    /// </summary>
+    [HttpPost("{incidentId:int}/ai-resolution-plans")]
+    [SwaggerOperation(
+        Summary = "Generates an AI incident resolution plan",
+        Description = "Generates and persists a pending AI resolution plan from real incident context",
+        OperationId = "GenerateAiResolutionPlan")]
+    [SwaggerResponse(201, "AI resolution plan generated", typeof(AiResolutionPlanResource))]
+    [SwaggerResponse(400, "The route values are invalid", typeof(string))]
+    [SwaggerResponse(404, "Organization or incident not found", typeof(string))]
+    [SwaggerResponse(409, "Incident cannot receive AI resolution plans", typeof(string))]
+    [SwaggerResponse(502, "AI provider returned invalid structured output", typeof(ProblemDetails))]
+    [SwaggerResponse(503, "AI provider is disabled, unavailable, or not configured", typeof(ProblemDetails))]
+    [SwaggerResponse(504, "AI provider timed out", typeof(ProblemDetails))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> GenerateAiResolutionPlan(
+        [FromRoute] int organizationId,
+        [FromRoute] int incidentId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var command = GenerateAiResolutionPlanCommandFromRouteAssembler
+                .ToCommandFromRoute(organizationId, incidentId);
+            var result = await aiResolutionPlanCommandService.Handle(command, cancellationToken);
+            return ActionResultFromGenerateAiResolutionPlanResultAssembler
+                .ToActionResultFromGenerateAiResolutionPlanResult(result, this, localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid AI resolution plan route values for incident {IncidentId} in organization {OrganizationId}",
+                incidentId,
+                organizationId);
+            return BadRequest(localizer["InvalidIncidentRequest"].Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error while generating AI resolution plan for incident {IncidentId}",
+                incidentId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorGeneratingAiResolutionPlan"].Value,
+                statusCode: 500);
+        }
     }
 
     /// <summary>
