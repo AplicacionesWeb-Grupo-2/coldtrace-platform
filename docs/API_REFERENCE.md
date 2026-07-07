@@ -190,6 +190,11 @@ structuredOutputContracts
 
 Supported provider values are `disabled`, `ollama`, and `openai`.
 
+The structured output contracts prepared by this context are aligned with the
+future product endpoints for dashboard AI interpretation, report AI summaries,
+and incident AI resolution plans. Those endpoint routes remain owned by their
+respective bounded contexts when implemented.
+
 ## Error Responses
 
 Expected validation and business-rule responses:

@@ -1,12 +1,20 @@
 namespace ColdTrace.Platform.AiAssistance.Application.StructuredOutputs;
 
 /// <summary>
-///     Structured AI output contract for compliance report summaries.
+///     Structured AI output contract aligned with the report AI summary API resource.
 /// </summary>
 public record ComplianceSummaryOutput(
-    string ComplianceStatus,
-    string Summary,
-    IReadOnlyCollection<string> KeyRisks,
-    IReadOnlyCollection<string> CriticalAssets,
-    IReadOnlyCollection<string> CorrectiveActions,
-    IReadOnlyCollection<string> NextSteps);
+    string ExecutiveSummary,
+    IReadOnlyCollection<ComplianceFindingOutput> Findings,
+    IReadOnlyCollection<string> EvidenceGaps,
+    IReadOnlyCollection<string> RecommendedActions,
+    IReadOnlyCollection<string> UncertaintyNotes);
+
+/// <summary>
+///     Structured AI output contract for one compliance or operational finding.
+/// </summary>
+public record ComplianceFindingOutput(
+    string Area,
+    string Status,
+    string Evidence,
+    string Recommendation);
