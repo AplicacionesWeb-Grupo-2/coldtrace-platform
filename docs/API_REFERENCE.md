@@ -197,6 +197,7 @@ The rejection response uses the same `AiResolutionPlanResource` shape with `stat
 | Method | Path | Description |
 | --- | --- | --- |
 | `GET` | `/api/v1/subscription-plans` | List visible subscription plans and pricing catalog. |
+| `GET` | `/api/v1/organizations/{organizationId}/subscription` | Get an organization's active subscription, usage and entitlements. |
 
 The subscription plan catalog response mirrors the Spring Boot contract:
 
@@ -214,6 +215,24 @@ visible
 usageLimits { maxLocations, maxAssets, maxIotDevices, maxUsers, historyRetentionDays }
 featureFlags { allowsExports, allowsMaintenance, allowsAiGuidance, allowsAiReportSummary }
 includedFeatures
+```
+
+The organization subscription response mirrors the Spring Boot contract:
+
+```text
+id
+organizationId
+status
+provider
+providerCustomerId
+providerSubscriptionId
+currentPeriodStart
+currentPeriodEnd
+cancelAtPeriodEnd
+metadata
+plan { ...subscription plan resource }
+usage { locations, assets, iotDevices, users }
+entitlements [{ key, category, enabled, limit, used, remaining, lockedReason }]
 ```
 
 The public catalog currently returns `base`, `operations`, and `compliance-ai` using backend-owned values. Stripe price identifiers are read from `STRIPE_OPERATIONS_PRICE_ID` and `STRIPE_COMPLIANCE_AI_PRICE_ID` when configured.

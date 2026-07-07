@@ -1,3 +1,4 @@
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Application.Errors;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
@@ -17,6 +18,7 @@ namespace ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices
 /// <param name="logger">Logger for diagnostics.</param>
 public class OrganizationCommandService(
     IOrganizationRepository organizationRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<OrganizationCommandService> logger)
     : IOrganizationCommandService
@@ -45,6 +47,9 @@ public class OrganizationCommandService(
             var organization = new Organization(command);
             await organizationRepository.AddAsync(organization, cancellationToken);
             await unitOfWork.CompleteAsync(cancellationToken);
+            await subscriptionBillingContextFacade.InitializeBaseSubscriptionForOrganizationAsync(
+                organization.Id,
+                cancellationToken);
             return new Result<Organization, CreateOrganizationError>.Success(organization);
         }
         catch (DbUpdateException ex)

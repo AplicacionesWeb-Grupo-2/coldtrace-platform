@@ -53,37 +53,38 @@ ASPNETCORE_ENVIRONMENT=Development \
 2. Confirm `/swagger/v1/swagger.json` returns `200`.
 3. List subscription plans with `GET /api/v1/subscription-plans` and expect `base`, `operations`, and `compliance-ai`.
 4. Create an organization and first user with `POST /api/v1/organization-sign-ups`.
-5. List roles with `GET /api/v1/roles`.
-6. Create an organization-scoped user with `POST /api/v1/organizations/{organizationId}/users`.
-7. Assign or replace the user's role with `PATCH /api/v1/organizations/{organizationId}/users/{userId}/role`.
-8. Create at least one location with `POST /api/v1/organizations/{organizationId}/locations`.
-9. Create at least one gateway with `POST /api/v1/organizations/{organizationId}/gateways`.
-10. Create at least one asset with `POST /api/v1/organizations/{organizationId}/assets`.
-11. Save default asset settings with `PUT /api/v1/organizations/{organizationId}/asset-settings/default`.
-12. Save asset-specific settings with `PUT /api/v1/organizations/{organizationId}/assets/{assetId}/settings`.
-13. Create an assigned IoT device with `POST /api/v1/organizations/{organizationId}/iot-devices`.
-14. Create telemetry with `POST /api/v1/organizations/{organizationId}/sensor-readings`.
-15. Query telemetry with `GET /api/v1/organizations/{organizationId}/sensor-readings?assetId={assetId}&iotDeviceId={iotDeviceId}`.
-16. Generate demo telemetry with `POST /api/v1/organizations/{organizationId}/sensor-readings/demo-generations`.
-17. Register an incident with `POST /api/v1/organizations/{organizationId}/incidents`.
-18. Acknowledge the incident with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/acknowledgements`.
-19. Escalate it with `PATCH /api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation`.
-20. Register corrective action with `PATCH /api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action`.
-21. With AI disabled or unconfigured, request `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` and expect `503` without creating a plan.
-22. List plan history with `GET /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` and expect `200` with an array, even when no plans exist.
-23. When AI is enabled and a pending plan exists, approve it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals` and expect `200` with `status: "approved"`, `approvedBy`, `finalCorrectiveAction`, and `finalResolutionNotes`.
-24. For a separate pending plan, reject it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/rejections` and expect `200` with `status: "rejected"`, `rejectedBy`, and `rejectionReason` while the incident remains open or acknowledged.
-25. Resolve it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/resolutions` when not using the AI approval path.
-26. Request `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` again and expect `409` because resolved incidents cannot receive new AI plans.
-27. Check incident notifications with `GET /api/v1/organizations/{organizationId}/incidents/{incidentId}/notifications`.
-28. Create a maintenance schedule with `POST /api/v1/organizations/{organizationId}/maintenance-schedules`.
-29. Update the maintenance schedule status with `PATCH /api/v1/organizations/{organizationId}/maintenance-schedules/{maintenanceScheduleId}`.
-30. Create a technical service request with `POST /api/v1/organizations/{organizationId}/technical-service-requests`.
-31. Update the technical service request status with `PATCH /api/v1/organizations/{organizationId}/technical-service-requests/{technicalServiceRequestId}`.
-32. Generate an operational report with `POST /api/v1/organizations/{organizationId}/reports`.
-33. Confirm the report can be listed and read with `GET /api/v1/organizations/{organizationId}/reports` and `GET /api/v1/organizations/{organizationId}/reports/{reportId}`.
-34. With AI disabled or unconfigured, request `POST /api/v1/organizations/{organizationId}/reports/{reportId}/ai-summary` and expect `503`.
-35. When AI is enabled, request the same report AI summary endpoint and expect `200` with `sourceReport`, `executiveSummary`, `findings`, `evidenceGaps`, `recommendedActions`, `uncertaintyNotes`, `modelProvider`, and `modelName`.
+5. Get the new organization's subscription with `GET /api/v1/organizations/{organizationId}/subscription` and expect `plan.code` `base`, `status` `FREE`, `provider` `NONE`, usage counters, and `LIMIT`/`FEATURE` entitlements.
+6. List roles with `GET /api/v1/roles`.
+7. Create an organization-scoped user with `POST /api/v1/organizations/{organizationId}/users`.
+8. Assign or replace the user's role with `PATCH /api/v1/organizations/{organizationId}/users/{userId}/role`.
+9. Create at least one location with `POST /api/v1/organizations/{organizationId}/locations`.
+10. Create at least one gateway with `POST /api/v1/organizations/{organizationId}/gateways`.
+11. Create at least one asset with `POST /api/v1/organizations/{organizationId}/assets`.
+12. Save default asset settings with `PUT /api/v1/organizations/{organizationId}/asset-settings/default`.
+13. Save asset-specific settings with `PUT /api/v1/organizations/{organizationId}/assets/{assetId}/settings`.
+14. Create an assigned IoT device with `POST /api/v1/organizations/{organizationId}/iot-devices`.
+15. Create telemetry with `POST /api/v1/organizations/{organizationId}/sensor-readings`.
+16. Query telemetry with `GET /api/v1/organizations/{organizationId}/sensor-readings?assetId={assetId}&iotDeviceId={iotDeviceId}`.
+17. Generate demo telemetry with `POST /api/v1/organizations/{organizationId}/sensor-readings/demo-generations`.
+18. Register an incident with `POST /api/v1/organizations/{organizationId}/incidents`.
+19. Acknowledge the incident with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/acknowledgements`.
+20. Escalate it with `PATCH /api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation`.
+21. Register corrective action with `PATCH /api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action`.
+22. With AI disabled or unconfigured, request `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` and expect `503` without creating a plan.
+23. List plan history with `GET /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` and expect `200` with an array, even when no plans exist.
+24. When AI is enabled and a pending plan exists, approve it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals` and expect `200` with `status: "approved"`, `approvedBy`, `finalCorrectiveAction`, and `finalResolutionNotes`.
+25. For a separate pending plan, reject it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/rejections` and expect `200` with `status: "rejected"`, `rejectedBy`, and `rejectionReason` while the incident remains open or acknowledged.
+26. Resolve it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/resolutions` when not using the AI approval path.
+27. Request `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` again and expect `409` because resolved incidents cannot receive new AI plans.
+28. Check incident notifications with `GET /api/v1/organizations/{organizationId}/incidents/{incidentId}/notifications`.
+29. Create a maintenance schedule with `POST /api/v1/organizations/{organizationId}/maintenance-schedules`.
+30. Update the maintenance schedule status with `PATCH /api/v1/organizations/{organizationId}/maintenance-schedules/{maintenanceScheduleId}`.
+31. Create a technical service request with `POST /api/v1/organizations/{organizationId}/technical-service-requests`.
+32. Update the technical service request status with `PATCH /api/v1/organizations/{organizationId}/technical-service-requests/{technicalServiceRequestId}`.
+33. Generate an operational report with `POST /api/v1/organizations/{organizationId}/reports`.
+34. Confirm the report can be listed and read with `GET /api/v1/organizations/{organizationId}/reports` and `GET /api/v1/organizations/{organizationId}/reports/{reportId}`.
+35. With AI disabled or unconfigured, request `POST /api/v1/organizations/{organizationId}/reports/{reportId}/ai-summary` and expect `503`.
+36. When AI is enabled, request the same report AI summary endpoint and expect `200` with `sourceReport`, `executiveSummary`, `findings`, `evidenceGaps`, `recommendedActions`, `uncertaintyNotes`, `modelProvider`, and `modelName`.
 
 ## Expected Status Codes
 
