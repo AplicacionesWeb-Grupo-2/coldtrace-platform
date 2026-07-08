@@ -69,6 +69,9 @@
     <data name="UnexpectedErrorCreatingUser" xml:space="preserve">
         <value>An unexpected error occurred while creating the user.</value>
     </data>
+    <data name="UserPlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow creating another user</value>
+    </data>
     <data name="UnexpectedErrorAssigningUserRole" xml:space="preserve">
         <value>An unexpected error occurred while assigning the user role.</value>
     </data>
@@ -86,6 +89,9 @@
     </data>
     <data name="UnexpectedErrorCreatingLocation" xml:space="preserve">
         <value>An unexpected error occurred while creating the location.</value>
+    </data>
+    <data name="LocationPlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow creating another location</value>
     </data>
     <data name="UnexpectedErrorUpdatingLocation" xml:space="preserve">
         <value>An unexpected error occurred while updating the location.</value>
@@ -123,6 +129,9 @@
     <data name="UnexpectedErrorCreatingAsset" xml:space="preserve">
         <value>An unexpected error occurred while creating the asset.</value>
     </data>
+    <data name="AssetPlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow creating another asset</value>
+    </data>
     <data name="UnexpectedErrorUpdatingAsset" xml:space="preserve">
         <value>An unexpected error occurred while updating the asset.</value>
     </data>
@@ -143,6 +152,9 @@
     </data>
     <data name="UnexpectedErrorCreatingIotDevice" xml:space="preserve">
         <value>An unexpected error occurred while creating the IoT device.</value>
+    </data>
+    <data name="IotDevicePlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow creating another IoT device</value>
     </data>
     <data name="UnexpectedErrorUpdatingIotDevice" xml:space="preserve">
         <value>An unexpected error occurred while updating the IoT device.</value>
@@ -243,6 +255,9 @@
     <data name="UnexpectedErrorGeneratingAiResolutionPlan" xml:space="preserve">
         <value>An unexpected error occurred while generating the AI resolution plan.</value>
     </data>
+    <data name="AiResolutionPlanPlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow AI incident guidance</value>
+    </data>
     <data name="UnexpectedErrorApprovingAiResolutionPlan" xml:space="preserve">
         <value>An unexpected error occurred while approving the AI resolution plan.</value>
     </data>
@@ -267,6 +282,9 @@
     <data name="UnexpectedErrorGeneratingReport" xml:space="preserve">
         <value>An unexpected error occurred while generating the report.</value>
     </data>
+    <data name="ReportPlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow generating reports</value>
+    </data>
     <data name="ReportAiSummaryContextUnavailable" xml:space="preserve">
         <value>Report context is incomplete or unavailable for AI summary generation.</value>
     </data>
@@ -275,6 +293,9 @@
     </data>
     <data name="UnexpectedErrorGeneratingReportAiSummary" xml:space="preserve">
         <value>An unexpected error occurred while generating the AI report summary.</value>
+    </data>
+    <data name="ReportAiSummaryPlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow AI report summaries</value>
     </data>
     <data name="UnexpectedErrorGettingReports" xml:space="preserve">
         <value>An unexpected error occurred while getting reports.</value>
@@ -344,5 +365,11 @@
     </data>
     <data name="BillingWebhookProcessingFailed" xml:space="preserve">
         <value>Stripe webhook could not be processed.</value>
+    </data>
+    <data name="MaintenanceSchedulePlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow maintenance scheduling</value>
+    </data>
+    <data name="TechnicalServiceRequestPlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow technical service requests</value>
     </data>
 </root>

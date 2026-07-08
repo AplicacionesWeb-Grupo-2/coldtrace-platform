@@ -3,6 +3,7 @@ using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Commands;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.Shared.Application.Patterns;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ public class UserCommandService(
     IUserRepository userRepository,
     IOrganizationRepository organizationRepository,
     IRoleRepository roleRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<UserCommandService> logger)
     : IUserCommandService
@@ -44,6 +46,12 @@ public class UserCommandService(
             logger.LogWarning("Role not found for user creation: {RoleId}", command.RoleId);
             return new Result<User, CreateUserError>.Failure(CreateUserError.RoleNotFound);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementUsers,
+            "UserPlanLimitExceeded",
+            cancellationToken);
 
         try
         {

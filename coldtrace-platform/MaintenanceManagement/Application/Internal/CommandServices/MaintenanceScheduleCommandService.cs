@@ -1,4 +1,5 @@
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.MaintenanceManagement.Application.Errors;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
@@ -17,6 +18,7 @@ public class MaintenanceScheduleCommandService(
     IMaintenanceScheduleRepository maintenanceScheduleRepository,
     IOrganizationRepository organizationRepository,
     IAssetRepository assetRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<MaintenanceScheduleCommandService> logger)
     : IMaintenanceScheduleCommandService
@@ -55,6 +57,12 @@ public class MaintenanceScheduleCommandService(
             return new Result<MaintenanceSchedule, CreateMaintenanceScheduleError>.Failure(
                 CreateMaintenanceScheduleError.DuplicateActiveSchedule);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementMaintenance,
+            "MaintenanceSchedulePlanLimitExceeded",
+            cancellationToken);
 
         try
         {

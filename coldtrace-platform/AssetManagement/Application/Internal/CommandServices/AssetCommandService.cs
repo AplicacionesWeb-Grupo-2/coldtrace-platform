@@ -3,6 +3,7 @@ using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.Shared.Application.Patterns;
 using ColdTrace.Platform.Shared.Domain.Repositories;
@@ -17,6 +18,7 @@ public class AssetCommandService(
     IAssetRepository assetRepository,
     ILocationRepository locationRepository,
     IOrganizationRepository organizationRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<AssetCommandService> logger)
     : IAssetCommandService
@@ -59,6 +61,12 @@ public class AssetCommandService(
                 command.Uuid);
             return new Result<Asset, CreateAssetError>.Failure(CreateAssetError.DuplicateUuid);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementAssets,
+            "AssetPlanLimitExceeded",
+            cancellationToken);
 
         try
         {

@@ -3,6 +3,7 @@ using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.Shared.Application.Patterns;
 using ColdTrace.Platform.Shared.Domain.Repositories;
@@ -16,6 +17,7 @@ namespace ColdTrace.Platform.AssetManagement.Application.Internal.CommandService
 public class LocationCommandService(
     ILocationRepository locationRepository,
     IOrganizationRepository organizationRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<LocationCommandService> logger)
     : ILocationCommandService
@@ -45,6 +47,12 @@ public class LocationCommandService(
                 command.Name);
             return new Result<Location, CreateLocationError>.Failure(CreateLocationError.DuplicateName);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementLocations,
+            "LocationPlanLimitExceeded",
+            cancellationToken);
 
         try
         {

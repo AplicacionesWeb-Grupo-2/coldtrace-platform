@@ -3,6 +3,7 @@ using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.Shared.Application.Patterns;
 using ColdTrace.Platform.Shared.Domain.Repositories;
@@ -18,6 +19,7 @@ public class IotDeviceCommandService(
     IAssetRepository assetRepository,
     IGatewayRepository gatewayRepository,
     IOrganizationRepository organizationRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<IotDeviceCommandService> logger)
     : IIotDeviceCommandService
@@ -85,6 +87,12 @@ public class IotDeviceCommandService(
                 command.Uuid);
             return new Result<IotDevice, CreateIotDeviceError>.Failure(CreateIotDeviceError.DuplicateUuid);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementIotDevices,
+            "IotDevicePlanLimitExceeded",
+            cancellationToken);
 
         try
         {

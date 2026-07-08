@@ -1,6 +1,7 @@
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.Monitoring.Domain.Repositories;
 using ColdTrace.Platform.Reports.Application.Errors;
@@ -23,6 +24,7 @@ public class ReportCommandService(
     IAssetRepository assetRepository,
     IIncidentRepository incidentRepository,
     ISensorReadingRepository sensorReadingRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<ReportCommandService> logger)
     : IReportCommandService
@@ -39,6 +41,12 @@ public class ReportCommandService(
                 command.OrganizationId);
             return new Result<Report, GenerateReportError>.Failure(GenerateReportError.OrganizationNotFound);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementReportHistory,
+            "ReportPlanLimitExceeded",
+            cancellationToken);
 
         try
         {
