@@ -69,6 +69,9 @@
     <data name="UnexpectedErrorCreatingUser" xml:space="preserve">
         <value>Ocurrio un error inesperado al crear el usuario.</value>
     </data>
+    <data name="UserPlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite crear otro usuario</value>
+    </data>
     <data name="UnexpectedErrorAssigningUserRole" xml:space="preserve">
         <value>Ocurrio un error inesperado al asignar el rol del usuario.</value>
     </data>
@@ -86,6 +89,9 @@
     </data>
     <data name="UnexpectedErrorCreatingLocation" xml:space="preserve">
         <value>Ocurrio un error inesperado al crear la ubicacion.</value>
+    </data>
+    <data name="LocationPlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite crear otra ubicacion</value>
     </data>
     <data name="UnexpectedErrorUpdatingLocation" xml:space="preserve">
         <value>Ocurrio un error inesperado al actualizar la ubicacion.</value>
@@ -123,6 +129,9 @@
     <data name="UnexpectedErrorCreatingAsset" xml:space="preserve">
         <value>Ocurrio un error inesperado al crear el activo.</value>
     </data>
+    <data name="AssetPlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite crear otro activo</value>
+    </data>
     <data name="UnexpectedErrorUpdatingAsset" xml:space="preserve">
         <value>Ocurrio un error inesperado al actualizar el activo.</value>
     </data>
@@ -143,6 +152,9 @@
     </data>
     <data name="UnexpectedErrorCreatingIotDevice" xml:space="preserve">
         <value>Ocurrio un error inesperado al crear el dispositivo IoT.</value>
+    </data>
+    <data name="IotDevicePlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite crear otro dispositivo IoT</value>
     </data>
     <data name="UnexpectedErrorUpdatingIotDevice" xml:space="preserve">
         <value>Ocurrio un error inesperado al actualizar el dispositivo IoT.</value>
@@ -243,6 +255,9 @@
     <data name="UnexpectedErrorGeneratingAiResolutionPlan" xml:space="preserve">
         <value>Ocurrio un error inesperado al generar el plan de resolucion con IA.</value>
     </data>
+    <data name="AiResolutionPlanPlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite guia de incidentes con AI</value>
+    </data>
     <data name="UnexpectedErrorApprovingAiResolutionPlan" xml:space="preserve">
         <value>Ocurrio un error inesperado al aprobar el plan de resolucion con IA.</value>
     </data>
@@ -267,6 +282,9 @@
     <data name="UnexpectedErrorGeneratingReport" xml:space="preserve">
         <value>Ocurrio un error inesperado al generar el reporte.</value>
     </data>
+    <data name="ReportPlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite generar reportes</value>
+    </data>
     <data name="ReportAiSummaryContextUnavailable" xml:space="preserve">
         <value>El contexto del reporte esta incompleto o no esta disponible para generar el resumen con IA.</value>
     </data>
@@ -275,6 +293,9 @@
     </data>
     <data name="UnexpectedErrorGeneratingReportAiSummary" xml:space="preserve">
         <value>Ocurrio un error inesperado al generar el resumen del reporte con IA.</value>
+    </data>
+    <data name="ReportAiSummaryPlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite resumenes de reportes con AI</value>
     </data>
     <data name="UnexpectedErrorGettingReports" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener reportes.</value>
@@ -344,5 +365,11 @@
     </data>
     <data name="BillingWebhookProcessingFailed" xml:space="preserve">
         <value>El webhook de Stripe no pudo procesarse.</value>
+    </data>
+    <data name="MaintenanceSchedulePlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite programar mantenimiento</value>
+    </data>
+    <data name="TechnicalServiceRequestPlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite solicitudes de servicio tecnico</value>
     </data>
 </root>

@@ -239,6 +239,24 @@ usage { locations, assets, iotDevices, users }
 entitlements [{ key, category, enabled, limit, used, remaining, lockedReason }]
 ```
 
+Restricted writes and paid AI operations use those backend-computed entitlements before persistence. When the current plan does not allow the operation, the API returns `409 Conflict` with `ProblemDetails` and the Spring Boot-compatible extension fields:
+
+```text
+organizationId
+planCode
+subscriptionStatus
+entitlementKey
+entitlementCategory
+entitlementEnabled
+limit
+used
+remaining
+lockedReason
+requiredPlanCode
+```
+
+Protected operations currently include creating locations, assets, IoT devices, users, reports, maintenance schedules, technical service requests, AI incident resolution plans, and AI report summaries.
+
 Create a checkout session with:
 
 ```json

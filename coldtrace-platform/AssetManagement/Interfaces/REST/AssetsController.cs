@@ -3,6 +3,7 @@ using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Transform;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -89,6 +90,10 @@ public class AssetsController(
         {
             logger.LogWarning(ex, "Invalid asset creation request for organization {OrganizationId}", organizationId);
             return BadRequest(localizer["InvalidAssetRequest"].Value);
+        }
+        catch (PlanLimitExceededException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

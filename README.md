@@ -190,6 +190,24 @@ All organization-owned operational resources are scoped under `/api/v1/organizat
 | Reports | `/api/v1/organizations/{organizationId}/reports` |
 | AI Assistance | `/api/v1/ai-assistance/provider-status` |
 
+Plan-limited writes and paid AI operations are enforced server-side before persistence. When the current subscription plan does not allow the operation, the API returns `409 Conflict` with RFC 7807 `ProblemDetails` and the same entitlement metadata exposed by the Spring Boot implementation:
+
+```text
+organizationId
+planCode
+subscriptionStatus
+entitlementKey
+entitlementCategory
+entitlementEnabled
+limit
+used
+remaining
+lockedReason
+requiredPlanCode
+```
+
+Current backend checks cover organization-scoped creation of locations, assets, IoT devices, users, reports, maintenance schedules, technical service requests, AI incident guidance, and AI report summaries.
+
 See [docs/API_REFERENCE.md](docs/API_REFERENCE.md) for the current route and payload reference.
 
 ## Validation

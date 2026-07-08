@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.Reports.Domain.Model.Commands;
 using ColdTrace.Platform.Reports.Domain.Model.Queries;
 using ColdTrace.Platform.Reports.Domain.Services;
@@ -78,6 +79,10 @@ public class ReportsController(
                 organizationId);
             return BadRequest(localizer["InvalidReportRequest"].Value);
         }
+        catch (PlanLimitExceededException)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error while generating report for organization {OrganizationId}",
@@ -148,6 +153,10 @@ public class ReportsController(
                 organizationId,
                 reportId);
             return BadRequest(localizer["InvalidReportRequest"].Value);
+        }
+        catch (PlanLimitExceededException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

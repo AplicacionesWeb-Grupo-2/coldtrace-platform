@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Queries;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
 using ColdTrace.Platform.MaintenanceManagement.Interfaces.REST.Resources;
@@ -100,6 +101,10 @@ public class MaintenanceSchedulesController(
             logger.LogWarning(ex, "Invalid maintenance schedule creation request for organization {OrganizationId}",
                 organizationId);
             return BadRequest(localizer["InvalidMaintenanceScheduleRequest"].Value);
+        }
+        catch (PlanLimitExceededException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

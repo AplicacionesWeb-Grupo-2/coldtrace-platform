@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Queries;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Resources;
@@ -86,6 +87,10 @@ public class UsersController(
         {
             logger.LogWarning(ex, "Invalid user creation request for organization {OrganizationId}", organizationId);
             return BadRequest(localizer["InvalidUserRequest"].Value);
+        }
+        catch (PlanLimitExceededException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

@@ -3,6 +3,7 @@ using ColdTrace.Platform.Alerts.Domain.Model.Queries;
 using ColdTrace.Platform.Alerts.Domain.Services;
 using ColdTrace.Platform.Alerts.Interfaces.REST.Resources;
 using ColdTrace.Platform.Alerts.Interfaces.REST.Transform;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -109,6 +110,10 @@ public class IncidentsController(
                 incidentId,
                 organizationId);
             return BadRequest(localizer["InvalidIncidentRequest"].Value);
+        }
+        catch (PlanLimitExceededException)
+        {
+            throw;
         }
         catch (Exception ex)
         {

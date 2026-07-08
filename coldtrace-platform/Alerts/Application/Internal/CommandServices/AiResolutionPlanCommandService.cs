@@ -11,6 +11,7 @@ using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.Alerts.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
@@ -38,6 +39,7 @@ public class AiResolutionPlanCommandService(
     IMaintenanceScheduleRepository maintenanceScheduleRepository,
     ITechnicalServiceRequestRepository technicalServiceRequestRepository,
     IAiStructuredOutputService aiStructuredOutputService,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IOptions<AiOptions> aiOptions,
     IUnitOfWork unitOfWork,
     ILogger<AiResolutionPlanCommandService> logger)
@@ -259,6 +261,12 @@ public class AiResolutionPlanCommandService(
 
         if (!incident.IsOpen() && !incident.IsAcknowledged())
             return Failure(GenerateAiResolutionPlanError.IncidentCannotReceivePlans);
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementAiGuidance,
+            "AiResolutionPlanPlanLimitExceeded",
+            cancellationToken);
 
         var contextResult = await BuildResolutionContextAsync(incident, cancellationToken);
         if (contextResult is Result<IncidentResolutionPlanContext, GenerateAiResolutionPlanError>.Failure failure)

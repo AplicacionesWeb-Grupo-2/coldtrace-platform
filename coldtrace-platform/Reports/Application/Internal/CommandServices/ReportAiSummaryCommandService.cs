@@ -9,6 +9,7 @@ using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
@@ -36,6 +37,7 @@ public class ReportAiSummaryCommandService(
     ISensorReadingRepository sensorReadingRepository,
     ITechnicalServiceRequestRepository technicalServiceRequestRepository,
     IAiStructuredOutputService aiStructuredOutputService,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IOptions<AiOptions> aiOptions,
     ILogger<ReportAiSummaryCommandService> logger)
     : IReportAiSummaryCommandService
@@ -72,6 +74,12 @@ public class ReportAiSummaryCommandService(
                 command.ReportId);
             return Failure(GenerateReportAiSummaryError.ReportNotFound);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementAiReportSummary,
+            "ReportAiSummaryPlanLimitExceeded",
+            cancellationToken);
 
         try
         {

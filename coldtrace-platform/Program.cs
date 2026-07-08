@@ -99,6 +99,19 @@ builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = context =>
     {
+        if (context.Exception is PlanLimitExceededException planLimitExceededException)
+        {
+            var localizer = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
+            var message = localizer[planLimitExceededException.MessageResourceKey].Value;
+
+            context.HttpContext.Response.StatusCode = StatusCodes.Status409Conflict;
+            context.ProblemDetails.Status = StatusCodes.Status409Conflict;
+            context.ProblemDetails.Title = message;
+            context.ProblemDetails.Detail = message;
+            context.ProblemDetails.AppendPlanEntitlementProperties(planLimitExceededException.Entitlement);
+            return;
+        }
+
         if (context.ProblemDetails.Status is null or >= 500)
         {
             var localizer = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();

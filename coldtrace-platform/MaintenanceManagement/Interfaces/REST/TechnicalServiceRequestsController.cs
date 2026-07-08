@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Queries;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
 using ColdTrace.Platform.MaintenanceManagement.Interfaces.REST.Resources;
@@ -100,6 +101,10 @@ public class TechnicalServiceRequestsController(
                 "Invalid technical service request creation payload for organization {OrganizationId}",
                 organizationId);
             return BadRequest(localizer["InvalidTechnicalServiceRequestRequest"].Value);
+        }
+        catch (PlanLimitExceededException)
+        {
+            throw;
         }
         catch (Exception ex)
         {
