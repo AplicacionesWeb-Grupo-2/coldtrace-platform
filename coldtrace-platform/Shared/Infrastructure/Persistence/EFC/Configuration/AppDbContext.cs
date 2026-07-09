@@ -292,7 +292,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(settings => settings.Asset)
             .WithMany()
             .HasForeignKey(settings => settings.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_asset_settings_assets_asset_id");
 
         builder.Entity<IotDevice>().HasKey(device => device.Id);
@@ -354,7 +354,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(device => device.Asset)
             .WithMany()
             .HasForeignKey(device => device.AssetId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_iot_devices_assets_asset_id");
 
         builder.Entity<SensorReading>().HasKey(reading => reading.Id);
@@ -451,7 +451,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(incident => incident.Asset)
             .WithMany()
             .HasForeignKey(incident => incident.AssetId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_incidents_assets_asset_id");
 
         builder.Entity<AiResolutionPlan>().HasKey(plan => plan.Id);
@@ -607,7 +607,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(s => s.Asset)
             .WithMany()
             .HasForeignKey(s => s.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_maintenance_schedules_assets_asset_id");
 
         builder.Entity<TechnicalServiceRequest>().HasKey(r => r.Id);
@@ -637,7 +637,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(r => r.Asset)
             .WithMany()
             .HasForeignKey(r => r.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_technical_service_requests_assets_asset_id");
 
         UseDateTimeOffsetPrecision(builder);

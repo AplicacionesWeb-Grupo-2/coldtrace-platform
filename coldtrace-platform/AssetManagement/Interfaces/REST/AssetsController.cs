@@ -1,4 +1,5 @@
 ﻿using System.Net.Mime;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
@@ -146,6 +147,54 @@ public class AssetsController(
                 title: localizer["UnexpectedServerError"].Value,
                 detail: localizer["UnexpectedErrorUpdatingAsset"].Value,
                 statusCode: 500);
+        }
+    }
+
+    [HttpDelete("{assetId:int}")]
+    [SwaggerOperation(
+        Summary = "Deletes an asset",
+        Description = "Deletes one cold-chain asset that belongs to the provided organization",
+        OperationId = "DeleteAsset")]
+    [SwaggerResponse(204, "Asset deleted")]
+    [SwaggerResponse(400, "Missing or invalid identifier", typeof(ProblemDetails))]
+    [SwaggerResponse(404, "Organization or asset not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Asset cannot be deleted because related data exists", typeof(ProblemDetails))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> DeleteAsset(
+        [FromRoute] int organizationId,
+        [FromRoute] int assetId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await assetCommandService.Handle(
+                new DeleteAssetCommand(organizationId, assetId),
+                cancellationToken);
+            return ActionResultFromDeleteAssetResultAssembler.ToActionResultFromDeleteAssetResult(
+                result, this, localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid asset deletion request for organization {OrganizationId} and asset {AssetId}",
+                organizationId,
+                assetId);
+            return Problem(
+                detail: localizer[ex.Message].Value,
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error while deleting asset {AssetId} for organization {OrganizationId}",
+                assetId,
+                organizationId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorDeletingAsset"].Value,
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }

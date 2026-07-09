@@ -120,6 +120,12 @@
     <data name="InvalidAssetRequest" xml:space="preserve">
         <value>La solicitud de activo no es valida.</value>
     </data>
+    <data name="AssetOrganizationIdInvalid" xml:space="preserve">
+        <value>El identificador de organizacion no es valido</value>
+    </data>
+    <data name="AssetIdInvalid" xml:space="preserve">
+        <value>El identificador de activo no es valido</value>
+    </data>
     <data name="AssetUuidDuplicated" xml:space="preserve">
         <value>El UUID del activo ya existe en esta organizacion.</value>
     </data>
@@ -134,6 +140,18 @@
     </data>
     <data name="UnexpectedErrorUpdatingAsset" xml:space="preserve">
         <value>Ocurrio un error inesperado al actualizar el activo.</value>
+    </data>
+    <data name="AssetDeleteOrganizationNotFound" xml:space="preserve">
+        <value>La organizacion no fue encontrada</value>
+    </data>
+    <data name="AssetDeleteNotFound" xml:space="preserve">
+        <value>El activo no fue encontrado</value>
+    </data>
+    <data name="AssetDeleteBlocked" xml:space="preserve">
+        <value>El activo no puede eliminarse porque todavia existen dispositivos, lecturas, incidencias o registros relacionados que dependen de el</value>
+    </data>
+    <data name="UnexpectedErrorDeletingAsset" xml:space="preserve">
+        <value>Ocurrio un error inesperado al eliminar el activo.</value>
     </data>
     <data name="UnexpectedErrorGettingAssets" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener activos.</value>
