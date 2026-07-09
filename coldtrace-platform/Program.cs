@@ -173,6 +173,7 @@ builder.Services.AddOptions<AiOptions>()
 builder.Services.AddScoped<IAiChatClientAdapter, ServiceProviderAiChatClientAdapter>();
 builder.Services.AddScoped<IAiProviderStatusQueryService, AiProviderStatusQueryService>();
 builder.Services.AddScoped<IAiStructuredOutputService, MicrosoftExtensionsAiStructuredOutputService>();
+builder.Services.AddScoped<IDashboardAiInterpretationCommandService, DashboardAiInterpretationCommandService>();
 
 // Alerts Bounded Context Injection Configuration
 builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();

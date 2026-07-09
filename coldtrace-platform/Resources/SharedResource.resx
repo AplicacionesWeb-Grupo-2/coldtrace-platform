@@ -372,4 +372,19 @@
     <data name="TechnicalServiceRequestPlanLimitExceeded" xml:space="preserve">
         <value>Current subscription plan does not allow technical service requests</value>
     </data>
+    <data name="InvalidDashboardAiInterpretationRequest" xml:space="preserve">
+        <value>The dashboard AI interpretation request is invalid.</value>
+    </data>
+    <data name="DashboardAiInterpretationContextUnavailable" xml:space="preserve">
+        <value>Dashboard evidence could not be prepared for AI interpretation.</value>
+    </data>
+    <data name="DashboardAiInterpretationInvalidStructuredOutput" xml:space="preserve">
+        <value>The AI provider returned an invalid dashboard interpretation.</value>
+    </data>
+    <data name="UnexpectedErrorGeneratingDashboardAiInterpretation" xml:space="preserve">
+        <value>An unexpected error occurred while generating the dashboard AI interpretation.</value>
+    </data>
+    <data name="DashboardAiInterpretationPlanLimitExceeded" xml:space="preserve">
+        <value>Current subscription plan does not allow AI dashboard interpretation.</value>
+    </data>
 </root>

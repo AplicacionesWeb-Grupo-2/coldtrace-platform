@@ -372,4 +372,19 @@
     <data name="TechnicalServiceRequestPlanLimitExceeded" xml:space="preserve">
         <value>El plan de suscripcion actual no permite solicitudes de servicio tecnico</value>
     </data>
+    <data name="InvalidDashboardAiInterpretationRequest" xml:space="preserve">
+        <value>La solicitud de interpretacion del dashboard con IA no es valida.</value>
+    </data>
+    <data name="DashboardAiInterpretationContextUnavailable" xml:space="preserve">
+        <value>No se pudo preparar la evidencia del dashboard para la interpretacion con IA.</value>
+    </data>
+    <data name="DashboardAiInterpretationInvalidStructuredOutput" xml:space="preserve">
+        <value>El proveedor de IA devolvio una interpretacion del dashboard no valida.</value>
+    </data>
+    <data name="UnexpectedErrorGeneratingDashboardAiInterpretation" xml:space="preserve">
+        <value>Ocurrio un error inesperado al generar la interpretacion del dashboard con IA.</value>
+    </data>
+    <data name="DashboardAiInterpretationPlanLimitExceeded" xml:space="preserve">
+        <value>El plan de suscripcion actual no permite la interpretacion del dashboard con IA.</value>
+    </data>
 </root>

@@ -228,3 +228,21 @@ Accept: application/json
 }
 
 ###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/dashboard/ai-interpretation
+Accept: application/json
+Accept-Language: en
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/dashboard/ai-interpretation
+Content-Type: application/json
+Accept: application/json
+Accept-Language: es
+
+{
+  "question": "Que deberia revisar primero?",
+  "preferredLanguage": "es"
+}
+
+###
