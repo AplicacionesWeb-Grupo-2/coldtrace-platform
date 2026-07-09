@@ -29,4 +29,14 @@ public interface IUserCommandService
     Task<Result<User, AssignUserRoleError>> Handle(
         AssignUserRoleCommand command,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Handles deletion of an organization user.
+    /// </summary>
+    /// <param name="command">Command containing organization and user identifiers.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>A result containing the command or a deletion error.</returns>
+    Task<Result<DeleteUserCommand, DeleteUserError>> Handle(
+        DeleteUserCommand command,
+        CancellationToken cancellationToken = default);
 }

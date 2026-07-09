@@ -1,6 +1,7 @@
 using System.Net.Mime;
 using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
+using ColdTrace.Platform.IdentityAccess.Domain.Model.Commands;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Queries;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Resources;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Transform;
@@ -158,6 +159,51 @@ public class UsersController(
                 title: localizer["UnexpectedServerError"].Value,
                 detail: localizer["UnexpectedErrorAssigningUserRole"].Value,
                 statusCode: 500);
+        }
+    }
+
+    /// <summary>
+    ///     Deletes an existing organization user.
+    /// </summary>
+    /// <param name="organizationId">Organization identifier.</param>
+    /// <param name="userId">User identifier.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>An empty response on success or a problem detail on failure.</returns>
+    [HttpDelete("{userId:int}")]
+    [SwaggerOperation(
+        Summary = "Deletes a user",
+        Description = "Deletes one user that belongs to the provided organization",
+        OperationId = "DeleteUser")]
+    [SwaggerResponse(204, "The user was deleted")]
+    [SwaggerResponse(400, "An identifier is invalid", typeof(ProblemDetails))]
+    [SwaggerResponse(404, "Organization or user not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Related data prevents deletion", typeof(ProblemDetails))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> DeleteUser(
+        [FromRoute] int organizationId,
+        [FromRoute] int userId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await userCommandService.Handle(
+                new DeleteUserCommand(organizationId, userId),
+                cancellationToken);
+            return ActionResultFromDeleteUserResultAssembler.ToActionResultFromDeleteUserResult(
+                result,
+                this,
+                localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid user deletion request for organization {OrganizationId} and user {UserId}",
+                organizationId,
+                userId);
+            return Problem(
+                detail: localizer["InvalidUserRequest"].Value,
+                statusCode: StatusCodes.Status400BadRequest);
         }
     }
 }

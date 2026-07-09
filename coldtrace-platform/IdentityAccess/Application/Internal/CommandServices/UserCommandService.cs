@@ -140,6 +140,57 @@ public class UserCommandService(
         }
     }
 
+    /// <inheritdoc />
+    public async Task<Result<DeleteUserCommand, DeleteUserError>> Handle(
+        DeleteUserCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning("Organization not found for user deletion: {OrganizationId}", command.OrganizationId);
+            return new Result<DeleteUserCommand, DeleteUserError>.Failure(DeleteUserError.OrganizationNotFound);
+        }
+
+        var user = await userRepository.FindByIdAndOrganizationIdAsync(
+            command.UserId,
+            command.OrganizationId,
+            cancellationToken);
+        if (user is null)
+        {
+            logger.LogWarning(
+                "User not found for deletion: {OrganizationId} {UserId}",
+                command.OrganizationId,
+                command.UserId);
+            return new Result<DeleteUserCommand, DeleteUserError>.Failure(DeleteUserError.UserNotFound);
+        }
+
+        try
+        {
+            userRepository.Remove(user);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            return new Result<DeleteUserCommand, DeleteUserError>.Success(command);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "User deletion blocked by related records: {OrganizationId} {UserId}",
+                command.OrganizationId,
+                command.UserId);
+            return new Result<DeleteUserCommand, DeleteUserError>.Failure(DeleteUserError.DeleteBlocked);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error deleting user {UserId} from organization {OrganizationId}",
+                command.UserId,
+                command.OrganizationId);
+            return new Result<DeleteUserCommand, DeleteUserError>.Failure(DeleteUserError.UnexpectedError);
+        }
+    }
+
     private static bool TryGetDuplicateEmailError(DbUpdateException exception)
     {
         for (Exception? current = exception; current is not null; current = current.InnerException)

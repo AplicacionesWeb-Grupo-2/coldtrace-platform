@@ -63,6 +63,12 @@
     <data name="UserNotFound" xml:space="preserve">
         <value>No se encontro el usuario.</value>
     </data>
+    <data name="UserDeleteBlocked" xml:space="preserve">
+        <value>El usuario no puede eliminarse porque todavia existen registros relacionados que dependen de el.</value>
+    </data>
+    <data name="UnexpectedErrorDeletingUser" xml:space="preserve">
+        <value>Ocurrio un error inesperado al eliminar el usuario.</value>
+    </data>
     <data name="RoleNotFound" xml:space="preserve">
         <value>No se encontro el rol.</value>
     </data>
