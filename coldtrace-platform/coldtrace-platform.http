@@ -1,4 +1,5 @@
 @coldtrace_platform_HostAddress = http://localhost:5269
+@accessToken = replace-with-token-from-sign-in
 
 GET {{coldtrace_platform_HostAddress}}/swagger/index.html
 Accept: application/json
@@ -10,21 +11,15 @@ Accept: application/json
 
 ###
 
-GET {{coldtrace_platform_HostAddress}}/api/v1/organizations
+# Public landing-page catalog
+GET {{coldtrace_platform_HostAddress}}/api/v1/subscription-plans
 Accept: application/json
 
 ###
 
-POST {{coldtrace_platform_HostAddress}}/api/v1/organizations
-Content-Type: application/json
+# Expected: 401 application/problem+json
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations
 Accept: application/json
-
-{
-  "legalName": "ColdTrace Demo SAC",
-  "commercialName": "ColdTrace Demo",
-  "taxId": "20123456789",
-  "contactEmail": "admin@coldtrace.demo"
-}
 
 ###
 
@@ -39,22 +34,57 @@ Accept: application/json
   "contactEmail": "owner@signup.demo",
   "firstName": "Mauricio",
   "lastName": "Pajes",
-  "email": "mauricio@signup.demo"
+  "email": "mauricio@signup.demo",
+  "password": "T58Smoke!2026"
+}
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/authentication/sign-in
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "mauricio@signup.demo",
+  "password": "T58Smoke!2026"
+}
+
+###
+
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations
+Authorization: Bearer {{accessToken}}
+Accept: application/json
+
+###
+
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "legalName": "ColdTrace Demo SAC",
+  "commercialName": "ColdTrace Demo",
+  "taxId": "20123456789",
+  "contactEmail": "admin@coldtrace.demo"
 }
 
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/roles
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/users
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/users
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -62,22 +92,26 @@ Accept: application/json
   "firstName": "Andrea",
   "lastName": "Torres",
   "email": "andrea@signup.demo",
+  "password": "UserSmoke!2026",
   "roleId": 2
 }
 
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations/1
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -92,6 +126,7 @@ Accept: application/json
 ###
 
 PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/locations/1
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -106,16 +141,19 @@ Accept: application/json
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways/1
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -130,6 +168,7 @@ Accept: application/json
 ###
 
 PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/gateways/1
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -144,11 +183,13 @@ Accept: application/json
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/assets
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/assets
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -165,16 +206,19 @@ Accept: application/json
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -189,6 +233,7 @@ Accept: application/json
 ###
 
 PUT {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -203,21 +248,25 @@ Accept: application/json
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/sensor-readings
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/sensor-readings/1
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1/sensor-readings
+Authorization: Bearer {{accessToken}}
 Accept: application/json
 
 ###
 
 POST {{coldtrace_platform_HostAddress}}/api/v1/organizations/1/iot-devices/1/sensor-readings
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 Accept: application/json
 

@@ -3,6 +3,7 @@ using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Resources;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Transform;
 using ColdTrace.Platform.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Swashbuckle.AspNetCore.Annotations;
@@ -28,6 +29,7 @@ public class AuthenticationController(
     /// <param name="resource">Sign-in request resource.</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
     /// <returns>The authenticated user resource with a JWT.</returns>
+    [AllowAnonymous] // Public credential exchange; every other controller action uses the fallback policy.
     [HttpPost("sign-in")]
     [SwaggerOperation(
         Summary = "User sign-in",

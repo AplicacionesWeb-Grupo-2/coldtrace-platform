@@ -50,9 +50,11 @@ using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Hashing.BCrypt.Services;
-using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Configuration;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Authorization.Configuration;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Services;
 using ColdTrace.Platform.Shared.Domain.Repositories;
+using ColdTrace.Platform.Shared.Infrastructure.Configuration;
+using ColdTrace.Platform.Shared.Infrastructure.Documentation.OpenApi;
 using ColdTrace.Platform.Shared.Interfaces.ASP.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
@@ -60,36 +62,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Localization;
+using Microsoft.OpenApi;
 using MySql.Data.MySqlClient;
 
 
 var builder = WebApplication.CreateBuilder(args);
-const string corsPolicyName = "ColdTraceCorsPolicy";
 
 // Configure Lower Case URLs
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-// Configure CORS for browser-based clients.
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(corsPolicyName, policy =>
-    {
-        var allowedOrigins = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS")
-            ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        if (allowedOrigins is { Length: > 0 })
-        {
-            policy.WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-            return;
-        }
-
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+// Configure exact browser origins from the environment, with local-only development defaults.
+builder.Services.AddColdTraceCors(builder.Configuration, builder.Environment);
 
 // Localization Configuration
 builder.Services.AddLocalization();
@@ -125,9 +108,25 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Configure Swagger/OpenAPI with bearer authentication for protected operations.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => options.EnableAnnotations());
+builder.Services.AddSwaggerGen(options =>
+{
+    const string bearerScheme = "bearerAuth";
+    options.EnableAnnotations();
+    options.AddSecurityDefinition(bearerScheme, new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Enter the JWT returned by POST /api/v1/authentication/sign-in."
+    });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference(bearerScheme, document)] = []
+    });
+    options.OperationFilter<AllowAnonymousOperationFilter>();
+});
 
 // Configure Database Context and route EF logs through the app logger pipeline.
 builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
@@ -195,9 +194,7 @@ builder.Services.AddScoped<IReportAiSummaryCommandService, ReportAiSummaryComman
 builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
 
 // Identity Access Bounded Context Injection Configuration
-builder.Services.AddOptions<TokenSettings>()
-    .Bind(builder.Configuration.GetSection(TokenSettings.SectionName))
-    .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddColdTraceJwtBearerAuthentication(builder.Configuration);
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -256,7 +253,7 @@ using (var scope = app.Services.CreateScope())
 
 app.UseExceptionHandler();
 
-// Swagger UI is enabled in all environments for course delivery and manual API smoke validation.
+// Intentional public exception: Swagger assets execute before authentication for course API validation.
 app.UseSwagger();
 app.UseSwaggerUI();
 
@@ -273,15 +270,18 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseCors(corsPolicyName);
+app.UseCors(CorsPolicyConfiguration.PolicyName);
 
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Browser preflight carries no credentials and exposes no resource data.
 app.MapMethods("/{*path}", ["OPTIONS"], () => Results.NoContent())
-    .RequireCors(corsPolicyName);
+    .AllowAnonymous()
+    .RequireCors(CorsPolicyConfiguration.PolicyName);
 
 app.MapControllers()
-    .RequireCors(corsPolicyName);
+    .RequireCors(CorsPolicyConfiguration.PolicyName);
 
 app.Run();
 
