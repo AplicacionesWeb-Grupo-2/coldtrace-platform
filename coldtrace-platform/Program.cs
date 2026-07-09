@@ -55,7 +55,9 @@ using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 
@@ -170,6 +172,8 @@ builder.Services.AddScoped<ISubscriptionBillingContextFacade, SubscriptionBillin
 builder.Services.AddOptions<AiOptions>()
     .Bind(builder.Configuration.GetSection(AiOptions.SectionName))
     .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddSingleton<IChatClient>(serviceProvider =>
+    AiChatClientFactory.Create(serviceProvider.GetRequiredService<IOptions<AiOptions>>().Value));
 builder.Services.AddScoped<IAiChatClientAdapter, ServiceProviderAiChatClientAdapter>();
 builder.Services.AddScoped<IAiProviderStatusQueryService, AiProviderStatusQueryService>();
 builder.Services.AddScoped<IAiStructuredOutputService, MicrosoftExtensionsAiStructuredOutputService>();
