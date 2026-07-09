@@ -102,6 +102,14 @@ ASPNETCORE_ENVIRONMENT=Development \
 | Cross-organization resource access | `404` |
 | Invalid payloads or unsupported lifecycle inputs | `400` |
 
+## Error Response Checks
+
+1. Submit an invalid organization payload with `Accept-Language: es`; expect `400`, content type `application/problem+json`, `ValidationProblemDetails`, `code` `VALIDATION_ERROR`, localized `title`/`detail`/`errors`, and the request path in `instance`.
+2. Request organization `2147483647` through an organization-scoped route; expect `404` `ProblemDetails` with `code` `ORGANIZATION_NOT_FOUND` and the same five common fields.
+3. Repeat a create request with an existing unique email, tax identifier, UUID, or name; expect `409` `ProblemDetails` with the feature-specific stable code and localized detail.
+4. Confirm no error payload contains `exception`, `stackTrace`, or application source paths.
+5. Re-run the plan-limit check and confirm its entitlement fields remain alongside `code`; re-run unsigned/misconfigured Stripe webhook checks and confirm their existing `400`/`503` statuses.
+
 ## Data Notes
 
 - Test data should remain internally consistent: organization, location, gateway, asset, IoT device, readings, incidents, maintenance, and reports must belong to the same organization unless the check is intentionally validating a `404`.

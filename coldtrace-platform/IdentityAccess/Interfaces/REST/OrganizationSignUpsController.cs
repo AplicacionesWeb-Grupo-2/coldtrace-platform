@@ -37,8 +37,8 @@ public class OrganizationSignUpsController(
         Description = "Creates an organization and its first super administrator user in one transaction",
         OperationId = "CreateOrganizationSignUp")]
     [SwaggerResponse(201, "The organization sign-up was completed", typeof(OrganizationSignUpResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(409, "The organization or user already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(409, "The organization or user already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateOrganizationSignUp(
         [FromBody] CreateOrganizationSignUpResource resource,
@@ -57,16 +57,13 @@ public class OrganizationSignUpsController(
         {
             logger.LogWarning(ex, "Invalid organization sign-up request for contact email {ContactEmail}",
                 resource.ContactEmail);
-            return BadRequest(localizer["InvalidOrganizationSignUpRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidOrganizationSignUpRequest");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error while signing up organization for contact email {ContactEmail}",
                 resource.ContactEmail);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingOrganizationSignUp"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingOrganizationSignUp", 500);
         }
     }
 }

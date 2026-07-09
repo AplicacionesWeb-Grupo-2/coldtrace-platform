@@ -52,6 +52,7 @@ using ColdTrace.Platform.Shared.Domain.Repositories;
 using ColdTrace.Platform.Shared.Interfaces.ASP.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -92,7 +93,10 @@ builder.Services.AddLocalization();
 
 // Configure Kebab Case Route Naming Convention
 builder.Services.AddControllers(options => options.Conventions.Add(new KebabCaseRouteNamingConvention()))
-    .AddDataAnnotationsLocalization();
+    .AddDataAnnotationsLocalization(options =>
+        options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)));
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+    options.InvalidModelStateResponseFactory = RestProblemDetailsFactory.CreateValidationProblemResponse);
 
 // Register RFC 7807 ProblemDetails payloads for centralized exception handling.
 builder.Services.AddProblemDetails(options =>
@@ -108,16 +112,12 @@ builder.Services.AddProblemDetails(options =>
             context.ProblemDetails.Status = StatusCodes.Status409Conflict;
             context.ProblemDetails.Title = message;
             context.ProblemDetails.Detail = message;
+            context.ProblemDetails.Extensions["code"] =
+                RestErrorCodes.FromResourceKey(planLimitExceededException.MessageResourceKey);
             context.ProblemDetails.AppendPlanEntitlementProperties(planLimitExceededException.Entitlement);
-            return;
         }
 
-        if (context.ProblemDetails.Status is null or >= 500)
-        {
-            var localizer = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
-            context.ProblemDetails.Title ??= localizer["UnexpectedServerError"].Value;
-            context.ProblemDetails.Detail ??= localizer["UnexpectedErrorProcessingRequest"].Value;
-        }
+        RestProblemDetailsFactory.ApplyDefaults(context);
     };
 });
 
@@ -246,6 +246,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 // Swagger UI is enabled in all environments for course delivery and manual API smoke validation.
 app.UseSwagger();
