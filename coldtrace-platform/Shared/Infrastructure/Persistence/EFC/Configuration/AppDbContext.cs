@@ -111,6 +111,24 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(user => user.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<ExternalIdentity>().HasKey(identity => identity.Id);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Provider).IsRequired()
+            .HasConversion(
+                provider => provider.ToCode(),
+                value => SocialProviderExtensions.FromCode(value))
+            .HasMaxLength(32);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.ProviderSubject).IsRequired()
+            .HasMaxLength(255);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Email).HasMaxLength(255);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.UserId).IsRequired();
+        builder.Entity<ExternalIdentity>().Property(identity => identity.CreatedAt);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.UpdatedAt);
+        builder.Entity<ExternalIdentity>()
+            .HasIndex(identity => new { identity.Provider, identity.ProviderSubject })
+            .IsUnique()
+            .HasDatabaseName("uk_external_identities_provider_subject");
+
         builder.Entity<OrganizationSubscription>().HasKey(subscription => subscription.Id);
         builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Id).IsRequired()
             .ValueGeneratedOnAdd();

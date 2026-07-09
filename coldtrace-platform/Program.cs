@@ -45,11 +45,14 @@ using ColdTrace.Platform.Reports.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices.Social;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Hashing.BCrypt.Services;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.OAuth.Configuration;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.OAuth.Services;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Configuration;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Services;
 using ColdTrace.Platform.Shared.Domain.Repositories;
@@ -201,14 +204,24 @@ builder.Services.AddOptions<TokenSettings>()
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IExternalIdentityRepository, ExternalIdentityRepository>();
 builder.Services.AddScoped<IOrganizationCommandService, OrganizationCommandService>();
 builder.Services.AddScoped<IOrganizationQueryService, OrganizationQueryService>();
 builder.Services.AddScoped<IOrganizationSignUpCommandService, OrganizationSignUpCommandService>();
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
+builder.Services.AddScoped<ISocialAuthenticationCommandService, SocialAuthenticationCommandService>();
+builder.Services.AddScoped<ISocialIdentityProfileCommandService, SocialIdentityProfileCommandService>();
+builder.Services.AddScoped<ISocialOrganizationSignUpCommandService, SocialOrganizationSignUpCommandService>();
 builder.Services.AddScoped<IHashingService, HashingService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddOptions<SocialAuthenticationOptions>()
+    .Bind(builder.Configuration.GetSection(SocialAuthenticationOptions.SectionName))
+    .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddHttpClient(OidcExternalIdentityProviderService.HttpClientName, client =>
+    client.Timeout = TimeSpan.FromSeconds(10));
+builder.Services.AddSingleton<IExternalIdentityProviderService, OidcExternalIdentityProviderService>();
 
 // Asset Management Bounded Context Injection Configuration
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
