@@ -372,4 +372,10 @@
     <data name="TechnicalServiceRequestPlanLimitExceeded" xml:space="preserve">
         <value>El plan de suscripcion actual no permite solicitudes de servicio tecnico</value>
     </data>
+    <data name="InvalidPasswordResetRequest" xml:space="preserve">
+        <value>La solicitud de recuperacion de contrasena no es valida.</value>
+    </data>
+    <data name="PasswordResetRequestFailed" xml:space="preserve">
+        <value>No se pudo preparar la solicitud de recuperacion de contrasena.</value>
+    </data>
 </root>

@@ -194,12 +194,14 @@ builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPasswordResetRequestRepository, PasswordResetRequestRepository>();
 builder.Services.AddScoped<IOrganizationCommandService, OrganizationCommandService>();
 builder.Services.AddScoped<IOrganizationQueryService, OrganizationQueryService>();
 builder.Services.AddScoped<IOrganizationSignUpCommandService, OrganizationSignUpCommandService>();
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
+builder.Services.AddScoped<IPasswordResetRequestCommandService, PasswordResetRequestCommandService>();
 
 // Asset Management Bounded Context Injection Configuration
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();

@@ -110,6 +110,17 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasForeignKey(user => user.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Entity<PasswordResetRequest>().HasKey(request => request.Id);
+        builder.Entity<PasswordResetRequest>().Property(request => request.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<PasswordResetRequest>().Property(request => request.Email).IsRequired().HasMaxLength(256);
+        builder.Entity<PasswordResetRequest>().Property(request => request.UserId).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.TokenHash).IsRequired().HasMaxLength(128);
+        builder.Entity<PasswordResetRequest>().Property(request => request.RequestedAt).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.ExpiresAt).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.ConsumedAt);
+        builder.Entity<PasswordResetRequest>().HasIndex(request => request.TokenHash).IsUnique();
+        builder.Entity<PasswordResetRequest>().HasIndex(request => request.UserId);
+
         builder.Entity<OrganizationSubscription>().HasKey(subscription => subscription.Id);
         builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Id).IsRequired()
             .ValueGeneratedOnAdd();

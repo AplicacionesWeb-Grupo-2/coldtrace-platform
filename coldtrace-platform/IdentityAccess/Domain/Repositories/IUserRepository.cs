@@ -17,6 +17,14 @@ public interface IUserRepository : IBaseRepository<User>
     Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Finds a user by normalized email address.
+    /// </summary>
+    /// <param name="email">User email address.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>The user when found; otherwise null.</returns>
+    Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Finds users by owning organization.
     /// </summary>
     /// <param name="organizationId">Organization identifier.</param>
