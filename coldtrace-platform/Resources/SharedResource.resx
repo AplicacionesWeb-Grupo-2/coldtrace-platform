@@ -147,6 +147,9 @@
     <data name="IotDeviceNotFound" xml:space="preserve">
         <value>IoT device was not found.</value>
     </data>
+    <data name="IotDeviceDeleteBlocked" xml:space="preserve">
+        <value>IoT device cannot be deleted because readings or related records still depend on it</value>
+    </data>
     <data name="IotDeviceAssetLocationNotCompatible" xml:space="preserve">
         <value>The selected asset is not located at the same gateway location.</value>
     </data>
@@ -158,6 +161,9 @@
     </data>
     <data name="UnexpectedErrorUpdatingIotDevice" xml:space="preserve">
         <value>An unexpected error occurred while updating the IoT device.</value>
+    </data>
+    <data name="UnexpectedErrorDeletingIotDevice" xml:space="preserve">
+        <value>An unexpected error occurred while deleting the IoT device.</value>
     </data>
     <data name="UnexpectedErrorGettingIotDevices" xml:space="preserve">
         <value>An unexpected error occurred while getting IoT devices.</value>

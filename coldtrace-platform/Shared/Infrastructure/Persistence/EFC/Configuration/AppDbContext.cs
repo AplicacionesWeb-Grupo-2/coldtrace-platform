@@ -400,7 +400,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(reading => reading.IotDevice)
             .WithMany()
             .HasForeignKey(reading => reading.IotDeviceId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_sensor_readings_iot_devices_iot_device_id");
         builder.Entity<SensorReading>()
             .HasOne(reading => reading.Gateway)

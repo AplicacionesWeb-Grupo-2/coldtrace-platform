@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
@@ -159,6 +160,53 @@ public class IotDevicesController(
                 title: localizer["UnexpectedServerError"].Value,
                 detail: localizer["UnexpectedErrorUpdatingIotDevice"].Value,
                 statusCode: 500);
+        }
+    }
+
+    [HttpDelete("{iotDeviceId:int}")]
+    [SwaggerOperation(
+        Summary = "Deletes an IoT device",
+        Description = "Deletes one IoT device that belongs to the provided organization",
+        OperationId = "DeleteIotDevice")]
+    [SwaggerResponse(204, "The IoT device was deleted")]
+    [SwaggerResponse(400, "The route identifiers are invalid", typeof(ProblemDetails))]
+    [SwaggerResponse(404, "Organization or IoT device not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Related records prevent deleting the IoT device", typeof(ProblemDetails))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> DeleteIotDevice(
+        [FromRoute] int organizationId,
+        [FromRoute] int iotDeviceId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var command = new DeleteIotDeviceCommand(organizationId, iotDeviceId);
+            var result = await iotDeviceCommandService.Handle(command, cancellationToken);
+            return ActionResultFromDeleteIotDeviceResultAssembler.ToActionResultFromDeleteIotDeviceResult(
+                result,
+                this,
+                localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(ex,
+                "Invalid IoT device deletion request for organization {OrganizationId} and device {IotDeviceId}",
+                organizationId,
+                iotDeviceId);
+            return Problem(
+                detail: localizer["InvalidIotDeviceRequest"].Value,
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Unexpected error while deleting IoT device {IotDeviceId} for organization {OrganizationId}",
+                iotDeviceId,
+                organizationId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorDeletingIotDevice"].Value,
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }
