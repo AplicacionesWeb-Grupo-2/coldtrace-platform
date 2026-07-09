@@ -44,10 +44,14 @@ using ColdTrace.Platform.Reports.Domain.Services;
 using ColdTrace.Platform.Reports.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Hashing.BCrypt.Services;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Configuration;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Services;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using ColdTrace.Platform.Shared.Interfaces.ASP.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
@@ -191,6 +195,9 @@ builder.Services.AddScoped<IReportAiSummaryCommandService, ReportAiSummaryComman
 builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
 
 // Identity Access Bounded Context Injection Configuration
+builder.Services.AddOptions<TokenSettings>()
+    .Bind(builder.Configuration.GetSection(TokenSettings.SectionName))
+    .PostConfigure(options => options.ExpandEnvironmentVariables());
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -200,6 +207,8 @@ builder.Services.AddScoped<IOrganizationSignUpCommandService, OrganizationSignUp
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
+builder.Services.AddScoped<IHashingService, HashingService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // Asset Management Bounded Context Injection Configuration
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();

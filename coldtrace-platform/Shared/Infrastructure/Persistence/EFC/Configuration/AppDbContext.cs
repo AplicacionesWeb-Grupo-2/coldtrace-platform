@@ -98,6 +98,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<User>().Property(user => user.FirstName).IsRequired().HasMaxLength(120);
         builder.Entity<User>().Property(user => user.LastName).IsRequired().HasMaxLength(120);
         builder.Entity<User>().Property(user => user.Email).IsRequired().HasMaxLength(256);
+        builder.Entity<User>().Property(user => user.PasswordHash).HasMaxLength(60);
         builder.Entity<User>().HasIndex(user => user.Email).IsUnique();
         builder.Entity<User>()
             .HasOne(user => user.Organization)

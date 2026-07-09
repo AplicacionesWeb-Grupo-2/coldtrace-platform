@@ -8,10 +8,11 @@ public record CreateUserCommand
     /// <summary>
     ///     Creates a command with validated and normalized user data.
     /// </summary>
-    public CreateUserCommand(string firstName, string? lastName, string email) : this(
+    public CreateUserCommand(string firstName, string? lastName, string email, string password) : this(
         firstName,
         lastName,
         email,
+        password,
         0,
         0,
         false)
@@ -21,10 +22,17 @@ public record CreateUserCommand
     /// <summary>
     ///     Creates a command with validated and normalized user data and references.
     /// </summary>
-    public CreateUserCommand(string firstName, string? lastName, string email, int organizationId, int roleId) : this(
+    public CreateUserCommand(
+        string firstName,
+        string? lastName,
+        string email,
+        string password,
+        int organizationId,
+        int roleId) : this(
         firstName,
         lastName,
         email,
+        password,
         organizationId,
         roleId,
         true)
@@ -35,6 +43,7 @@ public record CreateUserCommand
         string firstName,
         string? lastName,
         string email,
+        string password,
         int organizationId,
         int roleId,
         bool validateReferences)
@@ -42,6 +51,7 @@ public record CreateUserCommand
         FirstName = RequireNonBlank(firstName);
         LastName = lastName?.Trim() ?? string.Empty;
         Email = RequireValidEmail(email);
+        Password = RequireValidPassword(password);
         OrganizationId = validateReferences ? RequirePositive(organizationId, nameof(organizationId)) : organizationId;
         RoleId = validateReferences ? RequirePositive(roleId, nameof(roleId)) : roleId;
     }
@@ -60,6 +70,11 @@ public record CreateUserCommand
     ///     Gets the user email address.
     /// </summary>
     public string Email { get; init; }
+
+    /// <summary>
+    ///     Gets the raw password used to create the password hash.
+    /// </summary>
+    public string Password { get; init; }
 
     /// <summary>
     ///     Gets the owning organization identifier.
@@ -82,6 +97,13 @@ public record CreateUserCommand
         var normalized = RequireNonBlank(value).ToLowerInvariant();
         if (!normalized.Contains('@')) throw new ArgumentException("Email is invalid.");
         return normalized;
+    }
+
+    private static string RequireValidPassword(string? value)
+    {
+        var password = RequireNonBlank(value);
+        if (password.Length < 8) throw new ArgumentException("Password must have at least 8 characters.");
+        return password;
     }
 
     private static int RequirePositive(int value, string name)

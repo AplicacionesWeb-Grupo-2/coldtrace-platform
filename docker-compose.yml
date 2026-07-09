@@ -22,6 +22,8 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:8080
       ConnectionStrings__DefaultConnection: server=mysql;port=3306;user=root;password=${MYSQL_ROOT_PASSWORD:-root};database=${MYSQL_DATABASE:-coldtrace_platform}
+      TokenSettings__Secret: ${JWT_SECRET:-ColdTraceDevelopmentJwtSecretKeyForHS256NeedsAtLeast32Bytes}
+      TokenSettings__ExpirationDays: ${JWT_EXPIRATION_DAYS:-7}
       AiAssistance__Enabled: ${AI_ASSISTANCE_ENABLED:-false}
       AiAssistance__Provider: ${AI_MODEL_PROVIDER:-disabled}
       AiAssistance__Model: ${AI_MODEL_NAME:-}

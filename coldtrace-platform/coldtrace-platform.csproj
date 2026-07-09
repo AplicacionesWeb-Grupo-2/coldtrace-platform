@@ -24,6 +24,11 @@
         <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.7"/>
         <!-- Naming convention conversion related packages -->
         <PackageReference Include="Humanizer" Version="3.0.10"/>
+        <!-- Password hashing related packages -->
+        <PackageReference Include="BCrypt.Net-Next" Version="4.2.0"/>
+        <!-- JSON Web Token related packages -->
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0"/>
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.18.0"/>
         <PackageReference Include="Stripe.net" Version="52.1.0"/>
         <!-- Swagger related packages -->
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7"/>
