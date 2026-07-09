@@ -117,6 +117,12 @@
     <data name="UnexpectedErrorGettingGateways" xml:space="preserve">
         <value>An unexpected error occurred while getting gateways.</value>
     </data>
+    <data name="GatewayDeleteBlocked" xml:space="preserve">
+        <value>Gateway cannot be deleted because devices or related records still depend on it</value>
+    </data>
+    <data name="UnexpectedErrorDeletingGateway" xml:space="preserve">
+        <value>An unexpected error occurred while deleting the gateway.</value>
+    </data>
     <data name="InvalidAssetRequest" xml:space="preserve">
         <value>The asset request is invalid.</value>
     </data>

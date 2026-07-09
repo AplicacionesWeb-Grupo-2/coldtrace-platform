@@ -117,6 +117,12 @@
     <data name="UnexpectedErrorGettingGateways" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener gateways.</value>
     </data>
+    <data name="GatewayDeleteBlocked" xml:space="preserve">
+        <value>El gateway no puede eliminarse porque todavia existen dispositivos o registros relacionados que dependen de el</value>
+    </data>
+    <data name="UnexpectedErrorDeletingGateway" xml:space="preserve">
+        <value>Ocurrio un error inesperado al eliminar el gateway.</value>
+    </data>
     <data name="InvalidAssetRequest" xml:space="preserve">
         <value>La solicitud de activo no es valida.</value>
     </data>

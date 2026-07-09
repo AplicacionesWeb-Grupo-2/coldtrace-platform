@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
@@ -188,6 +189,61 @@ public class GatewaysController(
             return Problem(
                 title: localizer["UnexpectedServerError"].Value,
                 detail: localizer["UnexpectedErrorUpdatingGateway"].Value,
+                statusCode: 500);
+        }
+    }
+
+    /// <summary>
+    ///     Deletes a gateway under an organization.
+    /// </summary>
+    /// <param name="organizationId">Organization identifier.</param>
+    /// <param name="gatewayId">Gateway identifier.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>An empty response on success or an error response.</returns>
+    [HttpDelete("{gatewayId:int}")]
+    [SwaggerOperation(
+        Summary = "Deletes a gateway",
+        Description = "Deletes one edge gateway that belongs to the provided organization",
+        OperationId = "DeleteGateway")]
+    [SwaggerResponse(204, "Gateway deleted")]
+    [SwaggerResponse(400, "The route identifiers are invalid", typeof(string))]
+    [SwaggerResponse(404, "Organization or gateway not found", typeof(string))]
+    [SwaggerResponse(409, "Gateway cannot be deleted because related data exists", typeof(string))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> DeleteGateway(
+        [FromRoute] int organizationId,
+        [FromRoute] int gatewayId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await gatewayCommandService.Handle(
+                new DeleteGatewayCommand(organizationId, gatewayId),
+                cancellationToken);
+            return ActionResultFromDeleteGatewayResultAssembler.ToActionResultFromDeleteGatewayResult(
+                result,
+                this,
+                localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid gateway deletion request for organization {OrganizationId} and gateway {GatewayId}",
+                organizationId,
+                gatewayId);
+            return BadRequest(localizer["InvalidGatewayRequest"].Value);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error while deleting gateway {GatewayId} for organization {OrganizationId}",
+                gatewayId,
+                organizationId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorDeletingGateway"].Value,
                 statusCode: 500);
         }
     }

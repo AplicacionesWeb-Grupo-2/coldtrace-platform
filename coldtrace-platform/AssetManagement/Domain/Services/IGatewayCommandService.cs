@@ -29,4 +29,14 @@ public interface IGatewayCommandService
     Task<Result<Gateway, UpdateGatewayError>> Handle(
         UpdateGatewayCommand command,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Handles deletion of an organization-scoped gateway.
+    /// </summary>
+    /// <param name="command">Command containing route-scoped deletion identifiers.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>The handled command or a deletion error.</returns>
+    Task<Result<DeleteGatewayCommand, DeleteGatewayError>> Handle(
+        DeleteGatewayCommand command,
+        CancellationToken cancellationToken = default);
 }
