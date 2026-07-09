@@ -87,6 +87,21 @@
     <data name="LocationNotFound" xml:space="preserve">
         <value>No se encontro la ubicacion.</value>
     </data>
+    <data name="LocationOrganizationIdInvalid" xml:space="preserve">
+        <value>El identificador de organizacion no es valido</value>
+    </data>
+    <data name="LocationIdInvalid" xml:space="preserve">
+        <value>El identificador de ubicacion no es valido</value>
+    </data>
+    <data name="DeleteLocationOrganizationNotFound" xml:space="preserve">
+        <value>La organizacion no fue encontrada</value>
+    </data>
+    <data name="DeleteLocationNotFound" xml:space="preserve">
+        <value>La ubicacion no fue encontrada</value>
+    </data>
+    <data name="LocationDeleteBlocked" xml:space="preserve">
+        <value>La ubicacion no puede eliminarse porque todavia existen activos, gateways o registros relacionados que dependen de ella</value>
+    </data>
     <data name="UnexpectedErrorCreatingLocation" xml:space="preserve">
         <value>Ocurrio un error inesperado al crear la ubicacion.</value>
     </data>
@@ -95,6 +110,9 @@
     </data>
     <data name="UnexpectedErrorUpdatingLocation" xml:space="preserve">
         <value>Ocurrio un error inesperado al actualizar la ubicacion.</value>
+    </data>
+    <data name="UnexpectedErrorDeletingLocation" xml:space="preserve">
+        <value>Ocurrio un error inesperado al eliminar la ubicacion.</value>
     </data>
     <data name="UnexpectedErrorGettingLocations" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener ubicaciones.</value>

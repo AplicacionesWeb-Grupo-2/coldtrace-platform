@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
@@ -194,6 +195,68 @@ public class LocationsController(
                 title: localizer["UnexpectedServerError"].Value,
                 detail: localizer["UnexpectedErrorUpdatingLocation"].Value,
                 statusCode: 500);
+        }
+    }
+
+    /// <summary>
+    ///     Deletes a location under an organization.
+    /// </summary>
+    /// <param name="organizationId">Organization identifier.</param>
+    /// <param name="locationId">Location identifier.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>An empty response when deleted or a problem response.</returns>
+    [HttpDelete("{locationId:int}")]
+    [SwaggerOperation(
+        Summary = "Deletes a location",
+        Description = "Deletes one operational location that belongs to the provided organization",
+        OperationId = "DeleteLocation")]
+    [SwaggerResponse(204, "The location was deleted")]
+    [SwaggerResponse(400, "A route identifier is invalid", typeof(ProblemDetails))]
+    [SwaggerResponse(404, "Organization or location not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Related records prevent deleting the location", typeof(ProblemDetails))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> DeleteLocation(
+        [FromRoute] int organizationId,
+        [FromRoute] int locationId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var command = new DeleteLocationCommand(organizationId, locationId);
+            var result = await locationCommandService.Handle(command, cancellationToken);
+            return ActionResultFromDeleteLocationResultAssembler.ToActionResultFromDeleteLocationResult(
+                result,
+                this,
+                localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid location deletion request for organization {OrganizationId} and location {LocationId}",
+                organizationId,
+                locationId);
+            var messageKey = ex.ParamName switch
+            {
+                "organizationId" => "LocationOrganizationIdInvalid",
+                "locationId" => "LocationIdInvalid",
+                _ => "InvalidLocationRequest"
+            };
+            return Problem(
+                detail: localizer[messageKey].Value,
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error while deleting location {LocationId} for organization {OrganizationId}",
+                locationId,
+                organizationId);
+            return Problem(
+                title: localizer["UnexpectedServerError"].Value,
+                detail: localizer["UnexpectedErrorDeletingLocation"].Value,
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }
