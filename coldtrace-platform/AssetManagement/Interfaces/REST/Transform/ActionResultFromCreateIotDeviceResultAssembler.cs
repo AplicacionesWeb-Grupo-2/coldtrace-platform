@@ -26,28 +26,19 @@ public static class ActionResultFromCreateIotDeviceResultAssembler
                 failure.Error switch
                 {
                     CreateIotDeviceError.DuplicateUuid =>
-                        controller.Conflict(localizer["IotDeviceUuidDuplicated"].Value),
+                        controller.ProblemResponse(localizer, "IotDeviceUuidDuplicated", StatusCodes.Status409Conflict),
                     CreateIotDeviceError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     CreateIotDeviceError.GatewayNotFound =>
-                        controller.NotFound(localizer["GatewayNotFound"].Value),
+                        controller.ProblemResponse(localizer, "GatewayNotFound", StatusCodes.Status404NotFound),
                     CreateIotDeviceError.AssetNotFound =>
-                        controller.NotFound(localizer["AssetNotFound"].Value),
+                        controller.ProblemResponse(localizer, "AssetNotFound", StatusCodes.Status404NotFound),
                     CreateIotDeviceError.AssetLocationNotCompatible =>
-                        controller.Conflict(localizer["IotDeviceAssetLocationNotCompatible"].Value),
+                        controller.ProblemResponse(localizer, "IotDeviceAssetLocationNotCompatible", StatusCodes.Status409Conflict),
                     CreateIotDeviceError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingIotDevice"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingIotDevice", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

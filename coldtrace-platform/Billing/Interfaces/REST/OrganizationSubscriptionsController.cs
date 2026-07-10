@@ -32,7 +32,8 @@ public class OrganizationSubscriptionsController(
         Description = "Gets an organization's active plan, billing state, usage and entitlements",
         OperationId = "GetOrganizationSubscription")]
     [SwaggerResponse(200, "Organization subscription found", typeof(OrganizationSubscriptionResource))]
-    [SwaggerResponse(404, "Organization or subscription data not found", typeof(string))]
+    [SwaggerResponse(400, "The organization identifier is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or subscription data not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetOrganizationSubscription(
         [FromRoute] int organizationId,
@@ -52,7 +53,7 @@ public class OrganizationSubscriptionsController(
         {
             logger.LogWarning(ex, "Invalid organization subscription query for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidOrganizationRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidOrganizationRequest");
         }
     }
 }

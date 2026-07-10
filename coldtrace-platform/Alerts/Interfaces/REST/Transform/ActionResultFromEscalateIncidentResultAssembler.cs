@@ -25,27 +25,18 @@ public static class ActionResultFromEscalateIncidentResultAssembler
                 failure.Error switch
                 {
                     EscalateIncidentError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     EscalateIncidentError.IncidentNotFound =>
-                        controller.NotFound(localizer["IncidentNotFound"].Value),
+                        controller.ProblemResponse(localizer, "IncidentNotFound", StatusCodes.Status404NotFound),
                     EscalateIncidentError.AlreadyResolved =>
-                        controller.Conflict(localizer["IncidentAlreadyResolved"].Value),
+                        controller.ProblemResponse(localizer, "IncidentAlreadyResolved", StatusCodes.Status409Conflict),
                     EscalateIncidentError.AlreadyEscalated =>
-                        controller.Conflict(localizer["IncidentAlreadyEscalated"].Value),
+                        controller.ProblemResponse(localizer, "IncidentAlreadyEscalated", StatusCodes.Status409Conflict),
                     EscalateIncidentError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorEscalatingIncident"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorEscalatingIncident", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

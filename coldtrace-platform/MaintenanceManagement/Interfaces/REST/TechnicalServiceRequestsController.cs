@@ -34,7 +34,7 @@ public class TechnicalServiceRequestsController(
         Description = "Gets corrective technical service requests owned by the provided organization",
         OperationId = "GetTechnicalServiceRequestsByOrganization")]
     [SwaggerResponse(200, "Technical service requests found", typeof(IEnumerable<TechnicalServiceRequestResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetTechnicalServiceRequestsByOrganizationId(
         [FromRoute] int organizationId,
@@ -56,7 +56,7 @@ public class TechnicalServiceRequestsController(
         Description = "Gets one corrective technical service request owned by the provided organization",
         OperationId = "GetTechnicalServiceRequestById")]
     [SwaggerResponse(200, "Technical service request found", typeof(TechnicalServiceRequestResource))]
-    [SwaggerResponse(404, "Organization or technical service request not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or technical service request not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetTechnicalServiceRequestById(
         [FromRoute] int organizationId,
@@ -79,8 +79,8 @@ public class TechnicalServiceRequestsController(
         Description = "Opens a corrective technical service request for an organization asset",
         OperationId = "CreateTechnicalServiceRequest")]
     [SwaggerResponse(201, "Technical service request created", typeof(TechnicalServiceRequestResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization or asset not found", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or asset not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateTechnicalServiceRequest(
         [FromRoute] int organizationId,
@@ -100,7 +100,7 @@ public class TechnicalServiceRequestsController(
             logger.LogWarning(ex,
                 "Invalid technical service request creation payload for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidTechnicalServiceRequestRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidTechnicalServiceRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -111,10 +111,7 @@ public class TechnicalServiceRequestsController(
             logger.LogError(ex,
                 "Unexpected error while creating technical service request for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingTechnicalServiceRequest"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingTechnicalServiceRequest", 500);
         }
     }
 
@@ -128,9 +125,9 @@ public class TechnicalServiceRequestsController(
             "Updates the lifecycle status of a technical service request. Closure fields are required when transitioning to 'closed'.",
         OperationId = "UpdateTechnicalServiceRequestStatus")]
     [SwaggerResponse(200, "Technical service request status updated", typeof(TechnicalServiceRequestResource))]
-    [SwaggerResponse(400, "The request payload is invalid or status is not supported", typeof(string))]
-    [SwaggerResponse(404, "Organization or technical service request not found", typeof(string))]
-    [SwaggerResponse(409, "Lifecycle transition is not allowed", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid or status is not supported", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or technical service request not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Lifecycle transition is not allowed", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> UpdateTechnicalServiceRequestStatus(
         [FromRoute] int organizationId,
@@ -151,17 +148,14 @@ public class TechnicalServiceRequestsController(
             logger.LogWarning(ex,
                 "Invalid status update request for technical service request {TechnicalServiceRequestId} in organization {OrganizationId}",
                 technicalServiceRequestId, organizationId);
-            return BadRequest(localizer["InvalidTechnicalServiceRequestRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidTechnicalServiceRequest");
         }
         catch (Exception ex)
         {
             logger.LogError(ex,
                 "Unexpected error while updating technical service request {TechnicalServiceRequestId} status",
                 technicalServiceRequestId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorUpdatingTechnicalServiceRequest"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorUpdatingTechnicalServiceRequest", 500);
         }
     }
 }
