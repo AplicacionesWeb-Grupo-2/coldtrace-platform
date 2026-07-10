@@ -29,6 +29,10 @@ public sealed class AiOptions
 
     public bool HasEndpoint => HasConfiguredValue(Endpoint);
 
+    public bool HasValidEndpoint => HasEndpoint &&
+                                    Uri.TryCreate(Endpoint, UriKind.Absolute, out var endpoint) &&
+                                    (endpoint.Scheme == Uri.UriSchemeHttp || endpoint.Scheme == Uri.UriSchemeHttps);
+
     public bool HasApiKey => HasConfiguredValue(ApiKey);
 
     public bool UsesLocalProvider => string.Equals(Provider, AiProviderNames.Ollama,
@@ -41,7 +45,7 @@ public sealed class AiOptions
     public bool IsConfigured => Enabled &&
                                 HasProvider &&
                                 HasModel &&
-                                (!RequiresEndpoint || HasEndpoint) &&
+                                (!RequiresEndpoint || HasValidEndpoint) &&
                                 (!RequiresApiKey || HasApiKey);
 
     public void ExpandEnvironmentVariables()
