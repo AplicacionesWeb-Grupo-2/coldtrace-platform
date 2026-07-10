@@ -32,23 +32,14 @@ public static class ActionResultFromAssignUserRoleResultAssembler
                 failure.Error switch
                 {
                     AssignUserRoleError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
-                    AssignUserRoleError.UserNotFound => controller.NotFound(localizer["UserNotFound"].Value),
-                    AssignUserRoleError.RoleNotFound => controller.NotFound(localizer["RoleNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
+                    AssignUserRoleError.UserNotFound => controller.ProblemResponse(localizer, "UserNotFound", StatusCodes.Status404NotFound),
+                    AssignUserRoleError.RoleNotFound => controller.ProblemResponse(localizer, "RoleNotFound", StatusCodes.Status404NotFound),
                     AssignUserRoleError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorAssigningUserRole"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorAssigningUserRole", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

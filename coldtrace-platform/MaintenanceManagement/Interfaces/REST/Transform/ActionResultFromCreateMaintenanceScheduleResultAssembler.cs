@@ -30,25 +30,16 @@ public static class ActionResultFromCreateMaintenanceScheduleResultAssembler
                 failure.Error switch
                 {
                     CreateMaintenanceScheduleError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     CreateMaintenanceScheduleError.AssetNotFound =>
-                        controller.NotFound(localizer["AssetNotFound"].Value),
+                        controller.ProblemResponse(localizer, "AssetNotFound", StatusCodes.Status404NotFound),
                     CreateMaintenanceScheduleError.DuplicateActiveSchedule =>
-                        controller.Conflict(localizer["MaintenanceScheduleDuplicateActive"].Value),
+                        controller.ProblemResponse(localizer, "MaintenanceScheduleDuplicateActive", StatusCodes.Status409Conflict),
                     CreateMaintenanceScheduleError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingMaintenanceSchedule"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingMaintenanceSchedule", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

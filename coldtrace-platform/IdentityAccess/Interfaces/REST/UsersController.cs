@@ -37,7 +37,7 @@ public class UsersController(
         Description = "Gets users that belong to the provided organization",
         OperationId = "GetUsersByOrganization")]
     [SwaggerResponse(200, "Users found", typeof(IEnumerable<UserResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetUsersByOrganizationId(
         [FromRoute] int organizationId,
@@ -65,9 +65,9 @@ public class UsersController(
         Description = "Creates a user linked to an organization and role",
         OperationId = "CreateUser")]
     [SwaggerResponse(201, "The user was created", typeof(UserResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization or role not found", typeof(string))]
-    [SwaggerResponse(409, "User email already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or role not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "User email already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateUser(
         [FromRoute] int organizationId,
@@ -86,7 +86,7 @@ public class UsersController(
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Invalid user creation request for organization {OrganizationId}", organizationId);
-            return BadRequest(localizer["InvalidUserRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidUserRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -96,10 +96,7 @@ public class UsersController(
         {
             logger.LogError(ex, "Unexpected error while creating user for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingUser"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingUser", 500);
         }
     }
 
@@ -117,8 +114,8 @@ public class UsersController(
         Description = "Assigns an existing role to an existing user inside the provided organization",
         OperationId = "AssignUserRole")]
     [SwaggerResponse(200, "The user role was assigned", typeof(UserResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization, user or role not found", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization, user or role not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> AssignUserRole(
         [FromRoute] int organizationId,
@@ -145,7 +142,7 @@ public class UsersController(
                 "Invalid user role assignment request for organization {OrganizationId} and user {UserId}",
                 organizationId,
                 userId);
-            return BadRequest(localizer["InvalidUserRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidUserRequest");
         }
         catch (Exception ex)
         {
@@ -154,10 +151,7 @@ public class UsersController(
                 "Unexpected error while assigning a role to user {UserId} for organization {OrganizationId}",
                 userId,
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorAssigningUserRole"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorAssigningUserRole", 500);
         }
     }
 }

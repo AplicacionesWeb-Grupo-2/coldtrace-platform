@@ -36,7 +36,7 @@ public class GatewaysController(
         Description = "Gets edge gateways that belong to the provided organization",
         OperationId = "GetGatewaysByOrganization")]
     [SwaggerResponse(200, "Gateways found", typeof(IEnumerable<GatewayResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetGatewaysByOrganizationId(
         [FromRoute] int organizationId,
@@ -65,7 +65,7 @@ public class GatewaysController(
         Description = "Gets one edge gateway that belongs to the provided organization",
         OperationId = "GetGatewayById")]
     [SwaggerResponse(200, "Gateway found", typeof(GatewayResource))]
-    [SwaggerResponse(404, "Organization or gateway not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or gateway not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetGatewayById(
         [FromRoute] int organizationId,
@@ -94,9 +94,9 @@ public class GatewaysController(
         Description = "Creates an edge gateway for an organization location",
         OperationId = "CreateGateway")]
     [SwaggerResponse(201, "The gateway was created", typeof(GatewayResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization or location not found", typeof(string))]
-    [SwaggerResponse(409, "Gateway UUID already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or location not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Gateway UUID already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateGateway(
         [FromRoute] int organizationId,
@@ -118,7 +118,7 @@ public class GatewaysController(
                 ex,
                 "Invalid gateway creation request for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidGatewayRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidGatewayRequest");
         }
         catch (Exception ex)
         {
@@ -126,10 +126,7 @@ public class GatewaysController(
                 ex,
                 "Unexpected error while creating gateway for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingGateway"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingGateway", 500);
         }
     }
 
@@ -147,9 +144,9 @@ public class GatewaysController(
         Description = "Updates an edge gateway for an organization location",
         OperationId = "UpdateGateway")]
     [SwaggerResponse(200, "The gateway was updated", typeof(GatewayResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization, location or gateway not found", typeof(string))]
-    [SwaggerResponse(409, "Gateway UUID already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization, location or gateway not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Gateway UUID already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> UpdateGateway(
         [FromRoute] int organizationId,
@@ -176,7 +173,7 @@ public class GatewaysController(
                 "Invalid gateway update request for organization {OrganizationId} and gateway {GatewayId}",
                 organizationId,
                 gatewayId);
-            return BadRequest(localizer["InvalidGatewayRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidGatewayRequest");
         }
         catch (Exception ex)
         {
@@ -185,10 +182,7 @@ public class GatewaysController(
                 "Unexpected error while updating gateway {GatewayId} for organization {OrganizationId}",
                 gatewayId,
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorUpdatingGateway"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorUpdatingGateway", 500);
         }
     }
 }

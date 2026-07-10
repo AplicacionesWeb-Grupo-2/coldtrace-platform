@@ -277,3 +277,40 @@ Accept: application/json
 }
 
 ###
+
+# Validation error in Spanish: expect 400 ValidationProblemDetails with
+# status, title, detail, instance, code=VALIDATION_ERROR, and errors.
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations
+Content-Type: application/json
+Accept: application/problem+json
+Accept-Language: es
+
+{
+  "legalName": "",
+  "commercialName": "",
+  "taxId": null,
+  "contactEmail": "not-an-email"
+}
+
+###
+
+# Not found: expect 404 ProblemDetails with code=ORGANIZATION_NOT_FOUND.
+GET {{coldtrace_platform_HostAddress}}/api/v1/organizations/2147483647/locations
+Accept: application/problem+json
+
+###
+
+# Run after the successful organization creation above. Expect 409
+# ProblemDetails with a duplicate contact email or tax identifier code.
+POST {{coldtrace_platform_HostAddress}}/api/v1/organizations
+Content-Type: application/json
+Accept: application/problem+json
+
+{
+  "legalName": "ColdTrace Demo SAC",
+  "commercialName": "ColdTrace Demo",
+  "taxId": "20123456789",
+  "contactEmail": "admin@coldtrace.demo"
+}
+
+###
