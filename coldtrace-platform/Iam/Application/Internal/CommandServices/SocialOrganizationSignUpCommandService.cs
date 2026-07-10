@@ -77,7 +77,7 @@ public class SocialOrganizationSignUpCommandService(
         var role = await roleRepository.FindByNameAsync(InitialRoleName, cancellationToken);
         if (role is null)
             return Failure(SocialAuthenticationError.Unexpected(
-                "identity-access.organization-sign-up.error.initial-role-not-found"));
+                "iam.organization-sign-up.error.initial-role-not-found"));
 
         try
         {
@@ -142,7 +142,7 @@ public class SocialOrganizationSignUpCommandService(
                 "Social organization sign-up failed for provider {Provider}",
                 identity.Provider.ToCode());
             return Failure(SocialAuthenticationError.Unexpected(
-                "identity-access.authentication.error.social-organization-sign-up-failed"));
+                "iam.authentication.error.social-organization-sign-up-failed"));
         }
     }
 

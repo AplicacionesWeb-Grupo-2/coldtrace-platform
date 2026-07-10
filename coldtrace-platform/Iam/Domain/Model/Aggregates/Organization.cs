@@ -3,7 +3,7 @@ using ColdTrace.Platform.Iam.Domain.Model.Commands;
 namespace ColdTrace.Platform.Iam.Domain.Model.Aggregates;
 
 /// <summary>
-///     Organization aggregate root for the identity access context.
+///     Organization aggregate root for the IAM bounded context.
 /// </summary>
 public partial class Organization
 {

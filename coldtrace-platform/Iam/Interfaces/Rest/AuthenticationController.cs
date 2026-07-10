@@ -112,7 +112,7 @@ public class AuthenticationController(
                 new AuthenticationErrorResource(
                     "UNEXPECTED_ERROR",
                     "Unexpected error",
-                    "identity-access.authentication.error.unexpected"));
+                    "iam.authentication.error.unexpected"));
         }
     }
 
@@ -155,7 +155,7 @@ public class AuthenticationController(
                 new AuthenticationErrorResource(
                     "UNEXPECTED_ERROR",
                     "Unexpected error",
-                    "identity-access.authentication.error.unexpected"));
+                    "iam.authentication.error.unexpected"));
         }
     }
 
@@ -201,7 +201,7 @@ public class AuthenticationController(
                 new AuthenticationErrorResource(
                     "UNEXPECTED_ERROR",
                     "Unexpected error",
-                    "identity-access.authentication.error.unexpected"));
+                    "iam.authentication.error.unexpected"));
         }
     }
 }

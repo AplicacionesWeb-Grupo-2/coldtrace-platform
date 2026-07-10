@@ -23,7 +23,7 @@ public static class ActionResultFromSocialAuthenticationResultAssembler
             Result<AuthenticatedUserResult, SocialAuthenticationError>.Failure failure =>
                 ToErrorActionResult(failure.Error, controller),
             _ => ToErrorActionResult(
-                SocialAuthenticationError.Unexpected("identity-access.authentication.error.unexpected"),
+                SocialAuthenticationError.Unexpected("iam.authentication.error.unexpected"),
                 controller)
         };
 
@@ -37,7 +37,7 @@ public static class ActionResultFromSocialAuthenticationResultAssembler
             Result<SocialIdentityProfileResult, SocialAuthenticationError>.Failure failure =>
                 ToErrorActionResult(failure.Error, controller),
             _ => ToErrorActionResult(
-                SocialAuthenticationError.Unexpected("identity-access.authentication.error.unexpected"),
+                SocialAuthenticationError.Unexpected("iam.authentication.error.unexpected"),
                 controller)
         };
 
