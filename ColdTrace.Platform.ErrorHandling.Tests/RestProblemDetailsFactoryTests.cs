@@ -64,6 +64,7 @@ public class RestProblemDetailsFactoryTests
         Assert.Equal("Organization was not found.", problemDetails.Detail);
         Assert.Equal("/api/v1/organizations/999/locations", problemDetails.Instance);
         Assert.Equal("ORGANIZATION_NOT_FOUND", problemDetails.Extensions["code"]);
+        Assert.Equal("test-trace-id", problemDetails.Extensions["traceId"]);
     }
 
     [Fact]
@@ -85,6 +86,7 @@ public class RestProblemDetailsFactoryTests
         Assert.Equal("One or more validation errors occurred.", problemDetails.Detail);
         Assert.Equal("/api/v1/organizations", problemDetails.Instance);
         Assert.Equal(RestErrorCodes.ValidationError, problemDetails.Extensions["code"]);
+        Assert.Equal("test-trace-id", problemDetails.Extensions["traceId"]);
         Assert.Equal(errors["ContactEmail"], problemDetails.Errors["ContactEmail"]);
     }
 
@@ -112,6 +114,7 @@ public class RestProblemDetailsFactoryTests
         Assert.Equal("An unexpected error occurred while processing your request.", problemDetails.Detail);
         Assert.Equal("/api/v1/organizations", problemDetails.Instance);
         Assert.Equal(RestErrorCodes.UnexpectedError, problemDetails.Extensions["code"]);
+        Assert.Equal("test-trace-id", problemDetails.Extensions["traceId"]);
         Assert.DoesNotContain("secret", problemDetails.Detail, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(nameof(InvalidOperationException), problemDetails.Detail, StringComparison.Ordinal);
     }
@@ -122,9 +125,7 @@ public class RestProblemDetailsFactoryTests
         var httpContext = CreateHttpContext("/api/v1/roles");
         var problemDetails = new ProblemDetails
         {
-            Status = StatusCodes.Status401Unauthorized,
-            Title = "Unauthorized",
-            Detail = "Bearer token missing"
+            Status = StatusCodes.Status401Unauthorized
         };
         var context = new ProblemDetailsContext
         {
@@ -137,6 +138,81 @@ public class RestProblemDetailsFactoryTests
         Assert.Equal("Authentication required", problemDetails.Title);
         Assert.Equal("A valid bearer token is required to access this resource.", problemDetails.Detail);
         Assert.Equal(RestErrorCodes.Unauthorized, problemDetails.Extensions["code"]);
+        Assert.Equal("test-trace-id", problemDetails.Extensions["traceId"]);
+    }
+
+    [Theory]
+    [InlineData(
+        StatusCodes.Status503ServiceUnavailable,
+        "AI provider unavailable",
+        "AI assistance is disabled by configuration.",
+        RestErrorCodes.ServiceUnavailable)]
+    [InlineData(
+        StatusCodes.Status409Conflict,
+        "Deletion blocked",
+        "The gateway cannot be deleted because dependent devices exist.",
+        RestErrorCodes.ResourceConflict)]
+    [InlineData(
+        StatusCodes.Status500InternalServerError,
+        "Password reset request failed",
+        "The password reset request could not be created.",
+        RestErrorCodes.UnexpectedError)]
+    public void ApplyDefaults_PreservesExplicitControllerProblemFields(
+        int statusCode,
+        string title,
+        string detail,
+        string expectedCode)
+    {
+        var httpContext = CreateHttpContext("/api/v1/original");
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = title,
+            Detail = detail,
+            Type = "https://coldtrace.example/problems/feature-error",
+            Instance = "/api/v1/custom-instance"
+        };
+        var context = new ProblemDetailsContext
+        {
+            HttpContext = httpContext,
+            ProblemDetails = problemDetails
+        };
+
+        RestProblemDetailsFactory.ApplyDefaults(context);
+
+        Assert.Equal(statusCode, problemDetails.Status);
+        Assert.Equal(title, problemDetails.Title);
+        Assert.Equal(detail, problemDetails.Detail);
+        Assert.Equal("https://coldtrace.example/problems/feature-error", problemDetails.Type);
+        Assert.Equal("/api/v1/custom-instance", problemDetails.Instance);
+        Assert.Equal(expectedCode, problemDetails.Extensions["code"]);
+        Assert.Equal("test-trace-id", problemDetails.Extensions["traceId"]);
+    }
+
+    [Fact]
+    public void ApplyDefaults_PreservesExplicitMappedExceptionWithFeatureCode()
+    {
+        var httpContext = CreateHttpContext("/api/v1/organizations/1/users");
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status409Conflict,
+            Title = "Current subscription plan does not allow creating another user",
+            Detail = "Current subscription plan does not allow creating another user",
+            Extensions = { ["code"] = "USER_PLAN_LIMIT_EXCEEDED" }
+        };
+        var context = new ProblemDetailsContext
+        {
+            HttpContext = httpContext,
+            ProblemDetails = problemDetails,
+            Exception = new InvalidOperationException("mapped feature exception")
+        };
+
+        RestProblemDetailsFactory.ApplyDefaults(context);
+
+        Assert.Equal("Current subscription plan does not allow creating another user", problemDetails.Title);
+        Assert.Equal("Current subscription plan does not allow creating another user", problemDetails.Detail);
+        Assert.Equal("USER_PLAN_LIMIT_EXCEEDED", problemDetails.Extensions["code"]);
+        Assert.Equal("test-trace-id", problemDetails.Extensions["traceId"]);
     }
 
     [Fact]
@@ -151,7 +227,8 @@ public class RestProblemDetailsFactoryTests
             Extensions =
             {
                 ["code"] = "USER_PLAN_LIMIT_EXCEEDED",
-                ["entitlementKey"] = "max_users"
+                ["entitlementKey"] = "max_users",
+                ["traceId"] = "upstream-trace-id"
             }
         };
         var context = new ProblemDetailsContext
@@ -166,6 +243,7 @@ public class RestProblemDetailsFactoryTests
         Assert.Equal("max_users", problemDetails.Extensions["entitlementKey"]);
         Assert.Equal("Current subscription plan does not allow creating another user", problemDetails.Detail);
         Assert.Equal("/api/v1/organizations/1/users", problemDetails.Instance);
+        Assert.Equal("upstream-trace-id", problemDetails.Extensions["traceId"]);
     }
 
     private DefaultHttpContext CreateHttpContext(string path)
@@ -175,6 +253,7 @@ public class RestProblemDetailsFactoryTests
             .BuildServiceProvider();
         var httpContext = new DefaultHttpContext { RequestServices = services };
         httpContext.Request.Path = path;
+        httpContext.TraceIdentifier = "test-trace-id";
         return httpContext;
     }
 

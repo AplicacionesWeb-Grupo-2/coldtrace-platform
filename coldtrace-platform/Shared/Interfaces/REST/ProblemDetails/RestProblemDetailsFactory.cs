@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ColdTrace.Platform.Resources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -13,6 +14,8 @@ namespace ColdTrace.Platform.Shared.Interfaces.REST.ProblemDetails;
 public static class RestProblemDetailsFactory
 {
     private const string ProblemJsonContentType = "application/problem+json";
+    private const string CodeExtensionKey = "code";
+    private const string TraceIdExtensionKey = "traceId";
 
     public static ObjectResult CreateProblemResponse(
         ControllerBase controller,
@@ -75,7 +78,11 @@ public static class RestProblemDetailsFactory
             Title = localizer[TitleResourceKey(statusCode)].Value,
             Detail = localizer[detailResourceKey].Value,
             Instance = RequestInstance(httpContext),
-            Extensions = { ["code"] = code ?? RestErrorCodes.FromResourceKey(detailResourceKey) }
+            Extensions =
+            {
+                [CodeExtensionKey] = code ?? RestErrorCodes.FromResourceKey(detailResourceKey),
+                [TraceIdExtensionKey] = RequestTraceId(httpContext)
+            }
         };
 
     public static MvcValidationProblemDetails BuildValidationProblemDetails(
@@ -90,7 +97,11 @@ public static class RestProblemDetailsFactory
             Title = localizer["ValidationFailedTitle"].Value,
             Detail = localizer[detailResourceKey].Value,
             Instance = RequestInstance(httpContext),
-            Extensions = { ["code"] = code }
+            Extensions =
+            {
+                [CodeExtensionKey] = code,
+                [TraceIdExtensionKey] = RequestTraceId(httpContext)
+            }
         };
 
     public static void ApplyDefaults(ProblemDetailsContext context)
@@ -105,32 +116,26 @@ public static class RestProblemDetailsFactory
             ? RequestInstance(context.HttpContext)
             : problemDetails.Instance;
 
-        if (context.Exception is not null && statusCode >= StatusCodes.Status500InternalServerError)
-        {
-            problemDetails.Title = localizer["UnexpectedServerError"].Value;
-            problemDetails.Detail = localizer["UnexpectedErrorProcessingRequest"].Value;
-            problemDetails.Extensions["code"] = RestErrorCodes.UnexpectedError;
-            return;
-        }
-
-        var hasCode = problemDetails.Extensions.ContainsKey("code");
-        if (!hasCode)
+        var hasFeatureCode = HasFeatureCode(problemDetails, statusCode);
+        if (context.Exception is not null && !hasFeatureCode)
         {
             problemDetails.Title = localizer[TitleResourceKey(statusCode)].Value;
             problemDetails.Detail = localizer[DetailResourceKey(statusCode)].Value;
         }
-        else if (string.IsNullOrWhiteSpace(problemDetails.Detail))
+        else
         {
-            problemDetails.Title = localizer[TitleResourceKey(statusCode)].Value;
-            problemDetails.Detail = localizer[DetailResourceKey(statusCode)].Value;
-        }
-        else if (string.IsNullOrWhiteSpace(problemDetails.Title))
-        {
-            problemDetails.Title = localizer[TitleResourceKey(statusCode)].Value;
+            if (string.IsNullOrWhiteSpace(problemDetails.Title))
+                problemDetails.Title = localizer[TitleResourceKey(statusCode)].Value;
+
+            if (string.IsNullOrWhiteSpace(problemDetails.Detail))
+                problemDetails.Detail = localizer[DetailResourceKey(statusCode)].Value;
         }
 
-        if (!problemDetails.Extensions.ContainsKey("code"))
-            problemDetails.Extensions["code"] = RestErrorCodes.FromStatusCode(statusCode);
+        if (!HasExtensionValue(problemDetails, CodeExtensionKey))
+            problemDetails.Extensions[CodeExtensionKey] = RestErrorCodes.FromStatusCode(statusCode);
+
+        if (!HasExtensionValue(problemDetails, TraceIdExtensionKey))
+            problemDetails.Extensions[TraceIdExtensionKey] = RequestTraceId(context.HttpContext);
     }
 
     private static BadRequestObjectResult CreateValidationProblemResponse(
@@ -209,4 +214,29 @@ public static class RestProblemDetailsFactory
 
     private static string RequestInstance(HttpContext httpContext) =>
         httpContext.Request.Path.HasValue ? httpContext.Request.Path.Value! : "/";
+
+    private static string RequestTraceId(HttpContext httpContext) =>
+        Activity.Current?.Id ?? httpContext.TraceIdentifier;
+
+    private static bool HasFeatureCode(MvcProblemDetails problemDetails, int statusCode)
+    {
+        if (!problemDetails.Extensions.TryGetValue(CodeExtensionKey, out var code) ||
+            code is not string codeValue ||
+            string.IsNullOrWhiteSpace(codeValue))
+            return false;
+
+        return !string.Equals(
+            codeValue,
+            RestErrorCodes.FromStatusCode(statusCode),
+            StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool HasExtensionValue(MvcProblemDetails problemDetails, string extensionKey) =>
+        problemDetails.Extensions.TryGetValue(extensionKey, out var value) &&
+        value switch
+        {
+            null => false,
+            string stringValue => !string.IsNullOrWhiteSpace(stringValue),
+            _ => true
+        };
 }
