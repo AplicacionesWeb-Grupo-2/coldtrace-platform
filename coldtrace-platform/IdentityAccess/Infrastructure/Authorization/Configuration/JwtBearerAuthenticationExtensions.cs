@@ -1,4 +1,6 @@
 using System.Text;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Authorization.Handlers;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Authorization.Requirements;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -37,11 +39,15 @@ public static class JwtBearerAuthenticationExtensions
             .Configure<IOptions<TokenSettings>>((options, tokenSettings) =>
                 ConfigureJwtBearerOptions(options, tokenSettings.Value));
 
+        services.AddSingleton<IAuthorizationHandler, OrganizationRouteAuthorizationHandler>();
         services.AddAuthorization(options =>
         {
-            options.FallbackPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+            var authenticatedPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
                 .RequireAuthenticatedUser()
+                .AddRequirements(new OrganizationRouteRequirement())
                 .Build();
+            options.DefaultPolicy = authenticatedPolicy;
+            options.FallbackPolicy = authenticatedPolicy;
         });
 
         return services;

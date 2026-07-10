@@ -83,6 +83,34 @@ public class AuthenticationPipelineTests
         await AssertProblemDetailsAsync(response, HttpStatusCode.Forbidden, "Forbidden");
     }
 
+    [Fact]
+    public async Task OrganizationEndpoint_WithTokenFromSameOrganization_ReturnsOk()
+    {
+        await using var app = await CreateApplicationAsync();
+        var client = app.GetTestClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            GenerateToken(JwtSecret, organizationId: 7));
+
+        using var response = await client.GetAsync("/organizations/7/assets");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task OrganizationEndpoint_WithTokenFromAnotherOrganization_ReturnsForbiddenProblemDetails()
+    {
+        await using var app = await CreateApplicationAsync();
+        var client = app.GetTestClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            GenerateToken(JwtSecret, organizationId: 7));
+
+        using var response = await client.GetAsync("/organizations/8/assets");
+
+        await AssertProblemDetailsAsync(response, HttpStatusCode.Forbidden, "Forbidden");
+    }
+
     private static async Task<WebApplication> CreateApplicationAsync()
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -104,20 +132,21 @@ public class AuthenticationPipelineTests
         app.UseAuthorization();
         app.MapGet("/public", () => Results.Ok()).AllowAnonymous();
         app.MapGet("/protected", () => Results.Ok());
+        app.MapGet("/organizations/{organizationId:int}/assets", () => Results.Ok());
         app.MapGet("/restricted", () => Results.Ok())
             .RequireAuthorization(policy => policy.RequireClaim("permission", "restricted-resource"));
         await app.StartAsync();
         return app;
     }
 
-    private static string GenerateToken(string secret)
+    private static string GenerateToken(string secret, int organizationId = 7)
     {
         var command = new CreateUserCommand(
             "Cold",
             "Operator",
             "operator@coldtrace.test",
             "ColdTrace123",
-            7,
+            organizationId,
             3);
         var user = new User(command, new HashingService().HashPassword(command.Password));
         typeof(User).GetProperty(nameof(User.Id))!.SetValue(user, 42);

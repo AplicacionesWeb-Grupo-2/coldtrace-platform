@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Authorization.Claims;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -26,7 +27,11 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
             Subject = new ClaimsIdentity([
                 new Claim(ClaimTypes.Sid, user.Id.ToString(CultureInfo.InvariantCulture)),
                 new Claim(ClaimTypes.Name, user.Email),
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(ColdTraceClaimTypes.OrganizationId,
+                    user.OrganizationId.ToString(CultureInfo.InvariantCulture)),
+                new Claim(ColdTraceClaimTypes.RoleId, user.RoleId.ToString(CultureInfo.InvariantCulture)),
+                new Claim(ClaimTypes.Role, user.RoleId.ToString(CultureInfo.InvariantCulture))
             ]),
             IssuedAt = issuedAt,
             Expires = issuedAt.AddDays(GetExpirationDays()),
