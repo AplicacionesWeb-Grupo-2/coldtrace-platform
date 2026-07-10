@@ -3,6 +3,7 @@ using ColdTrace.Platform.Billing.Domain.Model.Queries;
 using ColdTrace.Platform.Billing.Domain.Services;
 using ColdTrace.Platform.Billing.Interfaces.REST.Resources;
 using ColdTrace.Platform.Billing.Interfaces.REST.Transform;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -20,6 +21,7 @@ public class SubscriptionPlansController(ISubscriptionPlanQueryService subscript
     /// <summary>
     ///     Gets active subscription plans.
     /// </summary>
+    [AllowAnonymous] // Public read-only catalog consumed by the landing page.
     [HttpGet]
     [SwaggerOperation(
         Summary = "Gets subscription plans",

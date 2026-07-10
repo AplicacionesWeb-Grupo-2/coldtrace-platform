@@ -34,26 +34,17 @@ public static class ActionResultFromCreateOrganizationResultAssembler
                 failure.Error switch
                 {
                     CreateOrganizationError.DuplicateContactEmail =>
-                        controller.Conflict(localizer["OrganizationContactEmailDuplicated"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationContactEmailDuplicated", StatusCodes.Status409Conflict),
 
                     CreateOrganizationError.DuplicateTaxId =>
-                        controller.Conflict(localizer["OrganizationTaxIdDuplicated"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationTaxIdDuplicated", StatusCodes.Status409Conflict),
 
                     CreateOrganizationError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingOrganization"].Value,
-                            statusCode: 500),
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingOrganization", 500),
 
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

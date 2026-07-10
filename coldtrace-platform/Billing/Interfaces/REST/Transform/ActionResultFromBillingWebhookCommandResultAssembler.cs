@@ -22,10 +22,7 @@ public static class ActionResultFromBillingWebhookCommandResultAssembler
                 controller.Ok(BillingWebhookProcessingResourceFromResultAssembler.ToResourceFromResult(success.Value)),
             Result<BillingWebhookProcessingResult, BillingWebhookError>.Failure failure =>
                 ToFailureActionResult(failure.Error, controller, localizer),
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: StatusCodes.Status500InternalServerError)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", StatusCodes.Status500InternalServerError, RestErrorCodes.UnexpectedError)
         };
 
     private static ActionResult ToFailureActionResult(
@@ -49,10 +46,7 @@ public static class ActionResultFromBillingWebhookCommandResultAssembler
             BillingWebhookError.ProcessingFailed =>
                 Problem(controller, localizer, "BillingWebhookProcessingFailed",
                     StatusCodes.Status502BadGateway),
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: StatusCodes.Status500InternalServerError)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", StatusCodes.Status500InternalServerError, RestErrorCodes.UnexpectedError)
         };
 
     private static ActionResult Problem(
@@ -60,8 +54,5 @@ public static class ActionResultFromBillingWebhookCommandResultAssembler
         IStringLocalizer<SharedResource> localizer,
         string messageKey,
         int statusCode) =>
-        controller.Problem(
-            title: localizer[messageKey].Value,
-            detail: localizer[messageKey].Value,
-            statusCode: statusCode);
+        controller.ProblemResponse(localizer, messageKey, statusCode);
 }

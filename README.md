@@ -11,6 +11,7 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 - Entity Framework Core 10
 - MySQL through `MySql.EntityFrameworkCore`
 - Swagger/OpenAPI through Swashbuckle annotations
+- ASP.NET Core JWT bearer authentication with HS256 validation
 - Resource-based localization for `en` and `es`
 - Microsoft.Extensions.AI abstractions for provider-neutral AI features
 
@@ -85,6 +86,7 @@ ConnectionStrings__DefaultConnection="server=localhost;user=root;password=<your-
 Run the API locally:
 
 ```bash
+JWT_SECRET="$(openssl rand -base64 48)" \
 ASPNETCORE_ENVIRONMENT=Development \
 /Users/mauriciopajes/.dotnet/dotnet run \
   --project coldtrace-platform/coldtrace-platform.csproj \
@@ -123,7 +125,8 @@ DATABASE_URL=127.0.0.1
 DATABASE_SCHEMA=coldtrace_platform
 DATABASE_USER=coldtrace_app
 DATABASE_PASSWORD=<from Secret Manager>
-CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app,http://localhost:5173
+JWT_SECRET_NAME=coldtrace-jwt-secret
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app
 AI_ASSISTANCE_ENABLED=false
 AI_MODEL_PROVIDER=disabled
 AI_MODEL_NAME=
@@ -132,9 +135,11 @@ OPENAI_API_KEY=<from Secret Manager when enabled>
 AI_REQUEST_TIMEOUT=30s
 ```
 
-`CORS_ALLOWED_ORIGINS` is a comma-separated allowlist for browser clients. Keep the stable Vercel production domain in the list and add temporary deployment URLs only when they must be tested directly.
+`CORS_ALLOWED_ORIGINS` is a comma-separated exact allowlist for browser clients. Development defaults to the two Vite origins when it is omitted; every other environment requires it. Keep the stable Vercel production domain in the list and add temporary deployment URLs only when they must be tested directly.
 
-The Cloud Run service account must have `roles/cloudsql.client`. The sidecar runs `gcr.io/cloud-sql-connectors/cloud-sql-proxy:2` against the Cloud SQL instance connection name and exposes MySQL locally on port `3306`.
+API controllers require a valid bearer token by default. The explicit anonymous routes are sign-in, first-tenant organization sign-up, subscription plan catalog reads, and the signed Stripe webhook. Swagger/OpenAPI assets remain public for course validation.
+
+The Cloud Run service account must have `roles/cloudsql.client` and `roles/secretmanager.secretAccessor`. The sidecar runs `gcr.io/cloud-sql-connectors/cloud-sql-proxy:2` against the Cloud SQL instance connection name and exposes MySQL locally on port `3306`.
 
 The Cloud Run manifest is versioned as a template in:
 
@@ -218,7 +223,8 @@ Core commands:
 
 ```bash
 /Users/mauriciopajes/.dotnet/dotnet build coldtrace-platform/coldtrace-platform.csproj
-DRY_RUN=true scripts/deploy-cloud-run.sh
+/Users/mauriciopajes/.dotnet/dotnet test coldtrace-platform.IdentityAccess.Tests/ColdTrace.Platform.IdentityAccess.Tests.csproj
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app DRY_RUN=true scripts/deploy-cloud-run.sh
 ```
 
 See [docs/SMOKE_TESTING.md](docs/SMOKE_TESTING.md) for the current smoke flow and [docs](docs) for ticket-level manual checklists.

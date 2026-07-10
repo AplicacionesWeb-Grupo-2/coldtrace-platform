@@ -25,20 +25,14 @@ public static class ActionResultFromOrganizationSubscriptionQueryResultAssembler
                 failure.Error switch
                 {
                     GetOrganizationSubscriptionError.OrganizationNotFound =>
-                        controller.NotFound(localizer["BillingOrganizationSubscriptionOrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "BillingOrganizationSubscriptionOrganizationNotFound", StatusCodes.Status404NotFound),
                     GetOrganizationSubscriptionError.OrganizationSubscriptionNotFound =>
-                        controller.NotFound(localizer["BillingOrganizationSubscriptionNotFound"].Value),
+                        controller.ProblemResponse(localizer, "BillingOrganizationSubscriptionNotFound", StatusCodes.Status404NotFound),
                     GetOrganizationSubscriptionError.SubscriptionPlanNotFound =>
-                        controller.NotFound(localizer["BillingOrganizationSubscriptionPlanNotFound"].Value),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "BillingOrganizationSubscriptionPlanNotFound", StatusCodes.Status404NotFound),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

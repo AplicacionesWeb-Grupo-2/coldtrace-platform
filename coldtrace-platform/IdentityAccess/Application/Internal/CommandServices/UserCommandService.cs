@@ -1,4 +1,6 @@
 using ColdTrace.Platform.IdentityAccess.Application.Errors;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices;
+using ColdTrace.Platform.IdentityAccess.Application.Results;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Commands;
@@ -17,11 +19,33 @@ public class UserCommandService(
     IUserRepository userRepository,
     IOrganizationRepository organizationRepository,
     IRoleRepository roleRepository,
+    IHashingService hashingService,
+    ITokenService tokenService,
     ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<UserCommandService> logger)
     : IUserCommandService
 {
+    /// <inheritdoc />
+    public async Task<Result<AuthenticatedUserResult, AuthenticationError>> Handle(
+        SignInCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await userRepository.FindByEmailAsync(command.Email, cancellationToken);
+        if (user is null ||
+            string.IsNullOrWhiteSpace(user.PasswordHash) ||
+            !hashingService.VerifyPassword(command.Password, user.PasswordHash))
+        {
+            logger.LogWarning("Invalid sign-in credentials for email {Email}", command.Email);
+            return new Result<AuthenticatedUserResult, AuthenticationError>.Failure(
+                AuthenticationError.InvalidCredentials);
+        }
+
+        var token = tokenService.GenerateToken(user);
+        return new Result<AuthenticatedUserResult, AuthenticationError>.Success(
+            new AuthenticatedUserResult(user, token));
+    }
+
     /// <inheritdoc />
     public async Task<Result<User, CreateUserError>> Handle(
         CreateUserCommand command,
@@ -55,7 +79,8 @@ public class UserCommandService(
 
         try
         {
-            var user = new User(command);
+            var passwordHash = hashingService.HashPassword(command.Password);
+            var user = new User(command, passwordHash);
             await userRepository.AddAsync(user, cancellationToken);
             await unitOfWork.CompleteAsync(cancellationToken);
             return new Result<User, CreateUserError>.Success(user);

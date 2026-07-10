@@ -25,27 +25,18 @@ public static class ActionResultFromAcknowledgeIncidentResultAssembler
                 failure.Error switch
                 {
                     AcknowledgeIncidentError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     AcknowledgeIncidentError.IncidentNotFound =>
-                        controller.NotFound(localizer["IncidentNotFound"].Value),
+                        controller.ProblemResponse(localizer, "IncidentNotFound", StatusCodes.Status404NotFound),
                     AcknowledgeIncidentError.AlreadyAcknowledged =>
-                        controller.Conflict(localizer["IncidentAlreadyAcknowledged"].Value),
+                        controller.ProblemResponse(localizer, "IncidentAlreadyAcknowledged", StatusCodes.Status409Conflict),
                     AcknowledgeIncidentError.AlreadyResolved =>
-                        controller.Conflict(localizer["IncidentAlreadyResolved"].Value),
+                        controller.ProblemResponse(localizer, "IncidentAlreadyResolved", StatusCodes.Status409Conflict),
                     AcknowledgeIncidentError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorAcknowledgingIncident"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorAcknowledgingIncident", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }
