@@ -31,7 +31,7 @@ public class NotificationsController(
         Description = "Gets incident notification read models owned by the provided organization",
         OperationId = "GetNotificationsByOrganization")]
     [SwaggerResponse(200, "Notifications found", typeof(IEnumerable<NotificationResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetNotificationsByOrganizationId(
         [FromRoute] int organizationId,

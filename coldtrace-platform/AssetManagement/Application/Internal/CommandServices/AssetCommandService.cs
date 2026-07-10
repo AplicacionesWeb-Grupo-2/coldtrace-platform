@@ -195,6 +195,64 @@ public class AssetCommandService(
         }
     }
 
+    /// <inheritdoc />
+    public async Task<Result<DeleteAssetCommand, DeleteAssetError>> Handle(
+        DeleteAssetCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for asset deletion: {OrganizationId}",
+                command.OrganizationId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Failure(
+                DeleteAssetError.OrganizationNotFound);
+        }
+
+        var asset = await assetRepository.FindByIdAndOrganizationIdAsync(
+            command.AssetId,
+            command.OrganizationId,
+            cancellationToken);
+        if (asset is null)
+        {
+            logger.LogWarning(
+                "Asset not found for deletion: {OrganizationId} {AssetId}",
+                command.OrganizationId,
+                command.AssetId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Failure(DeleteAssetError.AssetNotFound);
+        }
+
+        try
+        {
+            assetRepository.Remove(asset);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            logger.LogInformation(
+                "Asset deleted: {AssetId} {OrganizationId}",
+                command.AssetId,
+                command.OrganizationId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Success(command);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Asset deletion blocked by a database constraint: {OrganizationId} {AssetId}",
+                command.OrganizationId,
+                command.AssetId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Failure(DeleteAssetError.DeleteBlocked);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error deleting asset {AssetId} for organization {OrganizationId}",
+                command.AssetId,
+                command.OrganizationId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Failure(DeleteAssetError.UnexpectedError);
+        }
+    }
+
     private static bool TryGetDuplicateAssetUuidError(DbUpdateException exception)
     {
         for (Exception? current = exception; current is not null; current = current.InnerException)

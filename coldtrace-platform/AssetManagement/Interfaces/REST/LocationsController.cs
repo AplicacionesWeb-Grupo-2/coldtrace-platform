@@ -38,7 +38,7 @@ public class LocationsController(
         Description = "Gets operational locations that belong to the provided organization",
         OperationId = "GetLocationsByOrganization")]
     [SwaggerResponse(200, "Locations found", typeof(IEnumerable<LocationResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetLocationsByOrganizationId(
         [FromRoute] int organizationId,
@@ -67,7 +67,7 @@ public class LocationsController(
         Description = "Gets one operational location that belongs to the provided organization",
         OperationId = "GetLocationById")]
     [SwaggerResponse(200, "Location found", typeof(LocationResource))]
-    [SwaggerResponse(404, "Organization or location not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or location not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetLocationById(
         [FromRoute] int organizationId,
@@ -96,9 +96,9 @@ public class LocationsController(
         Description = "Creates an operational location for an organization",
         OperationId = "CreateLocation")]
     [SwaggerResponse(201, "The location was created", typeof(LocationResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
-    [SwaggerResponse(409, "Location name already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Location name already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateLocation(
         [FromRoute] int organizationId,
@@ -120,7 +120,7 @@ public class LocationsController(
                 ex,
                 "Invalid location creation request for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidLocationRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidLocationRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -132,10 +132,7 @@ public class LocationsController(
                 ex,
                 "Unexpected error while creating location for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingLocation"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingLocation", 500);
         }
     }
 
@@ -153,9 +150,9 @@ public class LocationsController(
         Description = "Updates an operational location for an organization",
         OperationId = "UpdateLocation")]
     [SwaggerResponse(200, "The location was updated", typeof(LocationResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization or location not found", typeof(string))]
-    [SwaggerResponse(409, "Location name already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or location not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Location name already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> UpdateLocation(
         [FromRoute] int organizationId,
@@ -182,7 +179,7 @@ public class LocationsController(
                 "Invalid location update request for organization {OrganizationId} and location {LocationId}",
                 organizationId,
                 locationId);
-            return BadRequest(localizer["InvalidLocationRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidLocationRequest");
         }
         catch (Exception ex)
         {
@@ -191,10 +188,7 @@ public class LocationsController(
                 "Unexpected error while updating location {LocationId} for organization {OrganizationId}",
                 locationId,
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorUpdatingLocation"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorUpdatingLocation", 500);
         }
     }
 

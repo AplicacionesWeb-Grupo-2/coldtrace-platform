@@ -239,6 +239,62 @@ public class IotDeviceCommandService(
         }
     }
 
+    /// <inheritdoc />
+    public async Task<Result<DeleteIotDeviceCommand, DeleteIotDeviceError>> Handle(
+        DeleteIotDeviceCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning("Organization not found for IoT device deletion: {OrganizationId}",
+                command.OrganizationId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Failure(
+                DeleteIotDeviceError.OrganizationNotFound);
+        }
+
+        var iotDevice = await iotDeviceRepository.FindByIdAndOrganizationIdAsync(
+            command.IotDeviceId,
+            command.OrganizationId,
+            cancellationToken);
+        if (iotDevice is null)
+        {
+            logger.LogWarning("IoT device not found for deletion: {OrganizationId} {IotDeviceId}",
+                command.OrganizationId,
+                command.IotDeviceId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Failure(
+                DeleteIotDeviceError.IotDeviceNotFound);
+        }
+
+        try
+        {
+            iotDeviceRepository.Remove(iotDevice);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            logger.LogInformation("IoT device deleted: {IotDeviceId} {OrganizationId}",
+                command.IotDeviceId,
+                command.OrganizationId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Success(command);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning(ex,
+                "IoT device deletion blocked by related records: {OrganizationId} {IotDeviceId}",
+                command.OrganizationId,
+                command.IotDeviceId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Failure(
+                DeleteIotDeviceError.DeleteBlocked);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Unexpected error deleting IoT device {IotDeviceId} for organization {OrganizationId}",
+                command.IotDeviceId,
+                command.OrganizationId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Failure(
+                DeleteIotDeviceError.UnexpectedError);
+        }
+    }
+
     private static bool TryGetDuplicateIotDeviceUuidError(DbUpdateException exception)
     {
         for (Exception? current = exception; current is not null; current = current.InnerException)

@@ -24,10 +24,7 @@ public static class ActionResultFromBillingCheckoutSessionCommandResultAssembler
             Result<BillingCheckoutSession, BillingCheckoutSessionError>.Failure failure =>
                 ToFailureActionResult(failure.Error, controller, localizer),
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 
     private static ActionResult ToFailureActionResult(
@@ -37,28 +34,19 @@ public static class ActionResultFromBillingCheckoutSessionCommandResultAssembler
         error switch
         {
             BillingCheckoutSessionError.OrganizationNotFound =>
-                controller.NotFound(localizer["BillingCheckoutSessionOrganizationNotFound"].Value),
+                controller.ProblemResponse(localizer, "BillingCheckoutSessionOrganizationNotFound", StatusCodes.Status404NotFound),
             BillingCheckoutSessionError.OrganizationSubscriptionNotFound =>
-                controller.NotFound(localizer["BillingCheckoutSessionOrganizationSubscriptionNotFound"].Value),
+                controller.ProblemResponse(localizer, "BillingCheckoutSessionOrganizationSubscriptionNotFound", StatusCodes.Status404NotFound),
             BillingCheckoutSessionError.TargetPlanNotFound =>
-                controller.NotFound(localizer["BillingCheckoutSessionTargetPlanNotFound"].Value),
+                controller.ProblemResponse(localizer, "BillingCheckoutSessionTargetPlanNotFound", StatusCodes.Status404NotFound),
             BillingCheckoutSessionError.FreePlanCheckoutNotAllowed =>
-                controller.Conflict(localizer["BillingCheckoutSessionFreePlanNotAllowed"].Value),
+                controller.ProblemResponse(localizer, "BillingCheckoutSessionFreePlanNotAllowed", StatusCodes.Status409Conflict),
             BillingCheckoutSessionError.PlanProviderPriceNotConfigured =>
-                controller.Conflict(localizer["BillingCheckoutSessionPlanProviderPriceNotConfigured"].Value),
+                controller.ProblemResponse(localizer, "BillingCheckoutSessionPlanProviderPriceNotConfigured", StatusCodes.Status409Conflict),
             BillingCheckoutSessionError.ProviderNotConfigured =>
-                controller.Problem(
-                    title: localizer["BillingCheckoutSessionProviderNotConfigured"].Value,
-                    detail: localizer["BillingCheckoutSessionProviderNotConfigured"].Value,
-                    statusCode: StatusCodes.Status503ServiceUnavailable),
+                controller.ProblemResponse(localizer, "BillingCheckoutSessionProviderNotConfigured", StatusCodes.Status503ServiceUnavailable),
             BillingCheckoutSessionError.ProviderUnavailable =>
-                controller.Problem(
-                    title: localizer["BillingCheckoutSessionProviderUnavailable"].Value,
-                    detail: localizer["BillingCheckoutSessionProviderUnavailable"].Value,
-                    statusCode: StatusCodes.Status502BadGateway),
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+                controller.ProblemResponse(localizer, "BillingCheckoutSessionProviderUnavailable", StatusCodes.Status502BadGateway),
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }
