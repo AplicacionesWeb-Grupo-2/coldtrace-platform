@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260710163813_AddPasswordResetRequests")]
-    partial class AddPasswordResetRequests
+    [Migration("20260709230204_AddExternalIdentities")]
+    partial class AddExternalIdentities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -892,6 +892,55 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("billing_webhook_events");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.ExternalIdentity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("provider");
+
+                    b.Property<string>("ProviderSubject")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("provider_subject");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_external_identities");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("i_x_external_identities_user_id");
+
+                    b.HasIndex("Provider", "ProviderSubject")
+                        .IsUnique()
+                        .HasDatabaseName("uk_external_identities_provider_subject");
+
+                    b.ToTable("external_identities");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", b =>
                 {
                     b.Property<int>("Id")
@@ -942,54 +991,6 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasDatabaseName("i_x_organizations_tax_id");
 
                     b.ToTable("organizations");
-                });
-
-            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.PasswordResetRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset?>("ConsumedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("consumed_at");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("varchar(256)")
-                        .HasColumnName("email");
-
-                    b.Property<DateTimeOffset>("ExpiresAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("expires_at");
-
-                    b.Property<DateTimeOffset>("RequestedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("requested_at");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
-                        .HasColumnName("token_hash");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("p_k_password_reset_requests");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique()
-                        .HasDatabaseName("i_x_password_reset_requests_token_hash");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("i_x_password_reset_requests_user_id");
-
-                    b.ToTable("password_reset_requests");
                 });
 
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Role", b =>
@@ -1085,6 +1086,11 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.Property<int?>("OrganizationUserId")
                         .HasColumnType("int")
                         .HasColumnName("organization_user_id");
+
+                    b.Property<string>("PasswordHash")
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)")
+                        .HasColumnName("password_hash");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int")
@@ -1812,14 +1818,14 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.Navigation("Organization");
                 });
 
-            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.PasswordResetRequest", b =>
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.ExternalIdentity", b =>
                 {
                     b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("f_k_password_reset_requests_users_user_id");
+                        .HasConstraintName("f_k_external_identities_users_user_id");
                 });
 
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Role", b =>
