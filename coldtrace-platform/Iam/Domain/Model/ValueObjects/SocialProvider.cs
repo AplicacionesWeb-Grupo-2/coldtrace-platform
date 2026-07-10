@@ -25,13 +25,13 @@ public static class SocialProviderExtensions
     public static SocialProvider FromCode(string? code)
     {
         if (string.IsNullOrWhiteSpace(code))
-            throw new ArgumentException("identity-access.authentication.error.provider.required");
+            throw new ArgumentException("iam.authentication.error.provider.required");
 
         return code.Trim().ToLowerInvariant() switch
         {
             "google" => SocialProvider.Google,
             "apple" => SocialProvider.Apple,
-            _ => throw new ArgumentException("identity-access.authentication.error.provider.unsupported")
+            _ => throw new ArgumentException("iam.authentication.error.provider.unsupported")
         };
     }
 }
