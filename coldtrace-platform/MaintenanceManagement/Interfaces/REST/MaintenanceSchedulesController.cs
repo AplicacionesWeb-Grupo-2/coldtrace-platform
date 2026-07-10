@@ -34,7 +34,7 @@ public class MaintenanceSchedulesController(
         Description = "Gets preventive maintenance schedules owned by the provided organization",
         OperationId = "GetMaintenanceSchedulesByOrganization")]
     [SwaggerResponse(200, "Maintenance schedules found", typeof(IEnumerable<MaintenanceScheduleResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetMaintenanceSchedulesByOrganizationId(
         [FromRoute] int organizationId,
@@ -56,7 +56,7 @@ public class MaintenanceSchedulesController(
         Description = "Gets one preventive maintenance schedule owned by the provided organization",
         OperationId = "GetMaintenanceScheduleById")]
     [SwaggerResponse(200, "Maintenance schedule found", typeof(MaintenanceScheduleResource))]
-    [SwaggerResponse(404, "Organization or maintenance schedule not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or maintenance schedule not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetMaintenanceScheduleById(
         [FromRoute] int organizationId,
@@ -79,9 +79,9 @@ public class MaintenanceSchedulesController(
         Description = "Creates a preventive maintenance schedule for an organization asset",
         OperationId = "CreateMaintenanceSchedule")]
     [SwaggerResponse(201, "Maintenance schedule created", typeof(MaintenanceScheduleResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization or asset not found", typeof(string))]
-    [SwaggerResponse(409, "Asset already has an active maintenance schedule", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or asset not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Asset already has an active maintenance schedule", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateMaintenanceSchedule(
         [FromRoute] int organizationId,
@@ -100,7 +100,7 @@ public class MaintenanceSchedulesController(
         {
             logger.LogWarning(ex, "Invalid maintenance schedule creation request for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidMaintenanceScheduleRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidMaintenanceScheduleRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -111,10 +111,7 @@ public class MaintenanceSchedulesController(
             logger.LogError(ex,
                 "Unexpected error while creating maintenance schedule for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingMaintenanceSchedule"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingMaintenanceSchedule", 500);
         }
     }
 
@@ -127,9 +124,9 @@ public class MaintenanceSchedulesController(
         Description = "Updates the lifecycle status of a preventive maintenance schedule",
         OperationId = "UpdateMaintenanceScheduleStatus")]
     [SwaggerResponse(200, "Maintenance schedule status updated", typeof(MaintenanceScheduleResource))]
-    [SwaggerResponse(400, "The request payload is invalid or status is not supported", typeof(string))]
-    [SwaggerResponse(404, "Organization or maintenance schedule not found", typeof(string))]
-    [SwaggerResponse(409, "Lifecycle transition is not allowed", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid or status is not supported", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or maintenance schedule not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Lifecycle transition is not allowed", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> UpdateMaintenanceScheduleStatus(
         [FromRoute] int organizationId,
@@ -150,17 +147,14 @@ public class MaintenanceSchedulesController(
             logger.LogWarning(ex,
                 "Invalid status update request for maintenance schedule {MaintenanceScheduleId} in organization {OrganizationId}",
                 maintenanceScheduleId, organizationId);
-            return BadRequest(localizer["InvalidMaintenanceScheduleRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidMaintenanceScheduleRequest");
         }
         catch (Exception ex)
         {
             logger.LogError(ex,
                 "Unexpected error while updating maintenance schedule {MaintenanceScheduleId} status",
                 maintenanceScheduleId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorUpdatingMaintenanceSchedule"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorUpdatingMaintenanceSchedule", 500);
         }
     }
 }

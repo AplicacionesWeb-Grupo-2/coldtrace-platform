@@ -21,11 +21,18 @@ DB_INSTANCE_NAME="${DB_INSTANCE_NAME:-coldtrace-mysql}"
 DATABASE_NAME="${DATABASE_NAME:-coldtrace_platform}"
 DATABASE_USER="${DATABASE_USER:-coldtrace_app}"
 DB_SECRET_NAME="${DB_SECRET_NAME:-coldtrace-db-password}"
+JWT_SECRET_NAME="${JWT_SECRET_NAME:-coldtrace-jwt-secret}"
+JWT_EXPIRATION_DAYS="${JWT_EXPIRATION_DAYS:-7}"
 MAX_INSTANCES="${MAX_INSTANCES:-1}"
-CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:-https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app,http://localhost:5173}"
+CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:-}"
 BUILD_IMAGE="${BUILD_IMAGE:-true}"
 DRY_RUN="${DRY_RUN:-false}"
-SMOKE_ENDPOINT_PATH="${SMOKE_ENDPOINT_PATH:-/api/v1/roles}"
+SMOKE_ENDPOINT_PATH="${SMOKE_ENDPOINT_PATH:-/api/v1/subscription-plans}"
+
+if [[ -z "$CORS_ALLOWED_ORIGINS" ]]; then
+  echo "CORS_ALLOWED_ORIGINS must contain the exact production browser origins." >&2
+  exit 1
+fi
 
 APP_VERSION="$(
   sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' coldtrace-platform/coldtrace-platform.csproj | head -n 1
@@ -48,6 +55,8 @@ export DB_INSTANCE_CONNECTION_NAME
 export DATABASE_NAME
 export DATABASE_USER
 export DB_SECRET_NAME
+export JWT_SECRET_NAME
+export JWT_EXPIRATION_DAYS
 export MAX_INSTANCES
 export CORS_ALLOWED_ORIGINS
 export CLOUD_RUN_SERVICE_ACCOUNT

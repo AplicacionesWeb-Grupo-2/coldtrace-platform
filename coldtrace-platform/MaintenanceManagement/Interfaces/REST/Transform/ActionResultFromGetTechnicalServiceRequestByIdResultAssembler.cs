@@ -28,23 +28,14 @@ public static class ActionResultFromGetTechnicalServiceRequestByIdResultAssemble
                 failure.Error switch
                 {
                     GetTechnicalServiceRequestByIdAndOrganizationError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     GetTechnicalServiceRequestByIdAndOrganizationError.TechnicalServiceRequestNotFound =>
-                        controller.NotFound(localizer["TechnicalServiceRequestNotFound"].Value),
+                        controller.ProblemResponse(localizer, "TechnicalServiceRequestNotFound", StatusCodes.Status404NotFound),
                     GetTechnicalServiceRequestByIdAndOrganizationError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorGettingTechnicalServiceRequests"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorGettingTechnicalServiceRequests", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

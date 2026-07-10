@@ -31,7 +31,7 @@ public class IotDevicesController(
         Description = "Gets IoT devices that belong to the provided organization",
         OperationId = "GetIotDevicesByOrganization")]
     [SwaggerResponse(200, "IoT devices found", typeof(IEnumerable<IotDeviceResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetIotDevicesByOrganizationId(
         [FromRoute] int organizationId,
@@ -50,7 +50,7 @@ public class IotDevicesController(
         Description = "Gets one IoT device that belongs to the provided organization",
         OperationId = "GetIotDeviceById")]
     [SwaggerResponse(200, "IoT device found", typeof(IotDeviceResource))]
-    [SwaggerResponse(404, "Organization or IoT device not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or IoT device not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetIotDeviceById(
         [FromRoute] int organizationId,
@@ -72,9 +72,9 @@ public class IotDevicesController(
         Description = "Creates an IoT device for an organization gateway and optional asset",
         OperationId = "CreateIotDevice")]
     [SwaggerResponse(201, "The IoT device was created", typeof(IotDeviceResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization, gateway or asset not found", typeof(string))]
-    [SwaggerResponse(409, "IoT device UUID already exists or asset is not compatible", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization, gateway or asset not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "IoT device UUID already exists or asset is not compatible", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateIotDevice(
         [FromRoute] int organizationId,
@@ -95,7 +95,7 @@ public class IotDevicesController(
             logger.LogWarning(ex,
                 "Invalid IoT device creation request for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidIotDeviceRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidIotDeviceRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -106,10 +106,7 @@ public class IotDevicesController(
             logger.LogError(ex,
                 "Unexpected error while creating IoT device for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingIotDevice"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingIotDevice", 500);
         }
     }
 
@@ -119,9 +116,9 @@ public class IotDevicesController(
         Description = "Updates an IoT device for an organization gateway and optional asset",
         OperationId = "UpdateIotDevice")]
     [SwaggerResponse(200, "The IoT device was updated", typeof(IotDeviceResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization, gateway, asset or IoT device not found", typeof(string))]
-    [SwaggerResponse(409, "IoT device UUID already exists or asset is not compatible", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization, gateway, asset or IoT device not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "IoT device UUID already exists or asset is not compatible", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> UpdateIotDevice(
         [FromRoute] int organizationId,
@@ -147,7 +144,7 @@ public class IotDevicesController(
                 "Invalid IoT device update request for organization {OrganizationId} and device {IotDeviceId}",
                 organizationId,
                 iotDeviceId);
-            return BadRequest(localizer["InvalidIotDeviceRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidIotDeviceRequest");
         }
         catch (Exception ex)
         {
@@ -155,10 +152,7 @@ public class IotDevicesController(
                 "Unexpected error while updating IoT device {IotDeviceId} for organization {OrganizationId}",
                 iotDeviceId,
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorUpdatingIotDevice"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorUpdatingIotDevice", 500);
         }
     }
 }

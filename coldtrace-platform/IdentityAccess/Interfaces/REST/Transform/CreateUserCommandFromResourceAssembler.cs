@@ -15,5 +15,11 @@ public static class CreateUserCommandFromResourceAssembler
     /// <param name="organizationId">Organization identifier from the route.</param>
     /// <returns>A create user command.</returns>
     public static CreateUserCommand ToCommandFromResource(CreateUserResource resource, int organizationId) =>
-        new(resource.FirstName, resource.LastName, resource.Email, organizationId, resource.RoleId);
+        new(
+            resource.FirstName,
+            resource.LastName,
+            resource.Email,
+            resource.Password,
+            organizationId,
+            resource.RoleId);
 }

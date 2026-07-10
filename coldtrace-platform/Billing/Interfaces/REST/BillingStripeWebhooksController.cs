@@ -4,6 +4,7 @@ using ColdTrace.Platform.Billing.Domain.Services;
 using ColdTrace.Platform.Billing.Interfaces.REST.Resources;
 using ColdTrace.Platform.Billing.Interfaces.REST.Transform;
 using ColdTrace.Platform.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Swashbuckle.AspNetCore.Annotations;
@@ -28,6 +29,7 @@ public class BillingStripeWebhooksController(
     /// <summary>
     ///     Processes a signed Stripe webhook.
     /// </summary>
+    [AllowAnonymous] // Public transport endpoint authenticated by Stripe's signature validation.
     [HttpPost]
     [Consumes(MediaTypeNames.Application.Json)]
     [SwaggerOperation(

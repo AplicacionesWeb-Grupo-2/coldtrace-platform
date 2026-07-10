@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace ColdTrace.Platform.IdentityAccess.Interfaces.REST.Resources;
@@ -35,4 +36,9 @@ public record CreateOrganizationSignUpResource(
     [Required]
     [EmailAddress]
     [SwaggerParameter(Description = "First user email address")]
-    string Email);
+    string Email,
+    [property: JsonRequired]
+    [Required]
+    [MinLength(8)]
+    [SwaggerParameter(Description = "First user password")]
+    string Password);

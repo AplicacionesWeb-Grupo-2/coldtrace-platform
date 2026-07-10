@@ -26,33 +26,24 @@ public static class ActionResultFromCreateSensorReadingResultAssembler
                 failure.Error switch
                 {
                     CreateSensorReadingError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     CreateSensorReadingError.AssetNotFound =>
-                        controller.NotFound(localizer["AssetNotFound"].Value),
+                        controller.ProblemResponse(localizer, "AssetNotFound", StatusCodes.Status404NotFound),
                     CreateSensorReadingError.IotDeviceNotFound =>
-                        controller.NotFound(localizer["IotDeviceNotFound"].Value),
+                        controller.ProblemResponse(localizer, "IotDeviceNotFound", StatusCodes.Status404NotFound),
                     CreateSensorReadingError.GatewayNotFound =>
-                        controller.NotFound(localizer["GatewayNotFound"].Value),
+                        controller.ProblemResponse(localizer, "GatewayNotFound", StatusCodes.Status404NotFound),
                     CreateSensorReadingError.DeviceNotAssignedToAsset or
                         CreateSensorReadingError.IncompatibleLocation or
                         CreateSensorReadingError.DeviceOffline or
                         CreateSensorReadingError.GatewayOffline or
                         CreateSensorReadingError.AssetSettingsNotFound or
                         CreateSensorReadingError.UnsupportedMeasurement =>
-                        controller.BadRequest(localizer["InvalidSensorReadingRequest"].Value),
+                        controller.ValidationProblemResponse(localizer, "InvalidSensorReadingRequest"),
                     CreateSensorReadingError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingSensorReading"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingSensorReading", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }
