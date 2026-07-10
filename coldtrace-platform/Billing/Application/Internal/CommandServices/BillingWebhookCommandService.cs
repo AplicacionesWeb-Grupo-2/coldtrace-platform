@@ -1,4 +1,4 @@
-using ColdTrace.Platform.Billing.Application.Errors;
+using ColdTrace.Platform.Billing.Domain.Model.Errors;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Webhook;
 using ColdTrace.Platform.Billing.Application.Results;
 using ColdTrace.Platform.Billing.Domain.Model.Aggregates;
@@ -7,8 +7,9 @@ using ColdTrace.Platform.Billing.Domain.Model.Entities;
 using ColdTrace.Platform.Billing.Domain.Model.Queries;
 using ColdTrace.Platform.Billing.Domain.Model.ValueObjects;
 using ColdTrace.Platform.Billing.Domain.Repositories;
-using ColdTrace.Platform.Billing.Domain.Services;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Billing.Application.CommandServices;
+using ColdTrace.Platform.Billing.Application.QueryServices;
+using ColdTrace.Platform.Shared.Application.Model;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 
 namespace ColdTrace.Platform.Billing.Application.Internal.CommandServices;

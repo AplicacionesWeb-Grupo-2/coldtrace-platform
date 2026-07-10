@@ -1,0 +1,22 @@
+namespace ColdTrace.Platform.AssetManagement.Domain.Model.Errors;
+
+/// <summary>
+///     Errors that can occur while retrieving a gateway.
+/// </summary>
+public enum GetGatewayByIdAndOrganizationError
+{
+    /// <summary>
+    ///     The organization was not found.
+    /// </summary>
+    OrganizationNotFound,
+
+    /// <summary>
+    ///     The gateway was not found in the organization.
+    /// </summary>
+    GatewayNotFound,
+
+    /// <summary>
+    ///     An unexpected persistence or application error occurred.
+    /// </summary>
+    UnexpectedError
+}

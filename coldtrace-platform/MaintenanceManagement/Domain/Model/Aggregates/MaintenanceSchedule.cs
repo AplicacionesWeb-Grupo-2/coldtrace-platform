@@ -1,5 +1,4 @@
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Commands;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
@@ -62,9 +61,6 @@ public class MaintenanceSchedule : IAuditableEntity
 
     /// <summary>Gets the lifecycle status.</summary>
     public string Status { get; private set; }
-
-    /// <summary>Gets the owning organization.</summary>
-    public Organization Organization { get; private set; } = null!;
 
     /// <summary>Gets the maintained asset.</summary>
     public Asset Asset { get; private set; } = null!;

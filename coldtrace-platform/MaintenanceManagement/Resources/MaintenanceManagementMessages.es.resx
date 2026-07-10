@@ -1,0 +1,232 @@
+<root>
+    <resheader name='resmimetype'>
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name='version'>
+        <value>1.3</value>
+    </resheader>
+    <resheader name='reader'>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name='writer'>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    
+    <data name='UnexpectedErrorProcessingRequest' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al procesar su solicitud.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='OrganizationNotFound' xml:space='preserve'>
+        <value>No se encontro la organizacion.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='AssetNotFound' xml:space='preserve'>
+        <value>No se encontro el activo.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='InvalidMaintenanceScheduleRequest' xml:space='preserve'>
+        <value>La solicitud de programacion de mantenimiento no es valida.</value>
+    </data>
+    <data name='MaintenanceScheduleNotFound' xml:space='preserve'>
+        <value>La programacion de mantenimiento no fue encontrada.</value>
+    </data>
+    <data name='MaintenanceScheduleDuplicateActive' xml:space='preserve'>
+        <value>El activo ya tiene una programacion de mantenimiento activa.</value>
+    </data>
+    <data name='MaintenanceScheduleInvalidTransition' xml:space='preserve'>
+        <value>La transicion de ciclo de vida de la programacion de mantenimiento no es valida.</value>
+    </data>
+    <data name='UnexpectedErrorCreatingMaintenanceSchedule' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al crear la programacion de mantenimiento.</value>
+    </data>
+    <data name='UnexpectedErrorGettingMaintenanceSchedules' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener las programaciones de mantenimiento.</value>
+    </data>
+    <data name='UnexpectedErrorUpdatingMaintenanceSchedule' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al actualizar la programacion de mantenimiento.</value>
+    </data>
+    <data name='InvalidTechnicalServiceRequest' xml:space='preserve'>
+        <value>La solicitud de servicio tecnico no es valida.</value>
+    </data>
+    <data name='TechnicalServiceRequestNotFound' xml:space='preserve'>
+        <value>La solicitud de servicio tecnico no fue encontrada.</value>
+    </data>
+    <data name='TechnicalServiceRequestInvalidTransition' xml:space='preserve'>
+        <value>La transicion de ciclo de vida de la solicitud de servicio tecnico no es valida.</value>
+    </data>
+    <data name='UnexpectedErrorCreatingTechnicalServiceRequest' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al crear la solicitud de servicio tecnico.</value>
+    </data>
+    <data name='UnexpectedErrorGettingTechnicalServiceRequests' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener las solicitudes de servicio tecnico.</value>
+    </data>
+    <data name='UnexpectedErrorUpdatingTechnicalServiceRequest' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al actualizar la solicitud de servicio tecnico.</value>
+    </data>
+    <data name='MaintenanceSchedulePlanLimitExceeded' xml:space='preserve'>
+        <value>El plan de suscripcion actual no permite programar mantenimiento</value>
+    </data>
+    <data name='TechnicalServiceRequestPlanLimitExceeded' xml:space='preserve'>
+        <value>El plan de suscripcion actual no permite solicitudes de servicio tecnico</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+</root>

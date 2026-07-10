@@ -19,7 +19,7 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 
 | Bounded context | Main capabilities |
 | --- | --- |
-| Identity Access | Organizations, organization sign-up, users, roles, permissions |
+| IAM | Organizations, organization sign-up, users, roles, permissions |
 | Asset Management | Locations, gateways, assets, asset settings, IoT devices |
 | Monitoring | Sensor readings, range evaluation, demo telemetry generation |
 | Alerts | Incidents, acknowledgements, escalation, corrective action, AI resolution plans, resolutions, notifications |
@@ -33,13 +33,13 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 coldtrace-platform/
   Alerts/
   AssetManagement/
-  IdentityAccess/
+  Iam/
   MaintenanceManagement/
   Monitoring/
   Reports/
   AiAssistance/
-  Resources/
   Shared/
+  Migrations/
 docs/
 bruno/
 deploy/
@@ -51,9 +51,13 @@ Each bounded context follows the same high-level structure:
 
 ```text
 Application/
+  CommandServices/
+  Internal/
+  QueryServices/
 Domain/
-Infrastructure/Persistence/EFC/Repositories/
-Interfaces/REST/
+Infrastructure/Persistence/EntityFrameworkCore/Repositories/
+Interfaces/Rest/
+Resources/
 ```
 
 ## Local Setup
@@ -223,13 +227,12 @@ Core commands:
 
 ```bash
 /Users/mauriciopajes/.dotnet/dotnet build coldtrace-platform/coldtrace-platform.csproj
-/Users/mauriciopajes/.dotnet/dotnet test coldtrace-platform.IdentityAccess.Tests/ColdTrace.Platform.IdentityAccess.Tests.csproj
 CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app DRY_RUN=true scripts/deploy-cloud-run.sh
 ```
 
 See [docs/SMOKE_TESTING.md](docs/SMOKE_TESTING.md) for the current smoke flow and [docs](docs) for ticket-level manual checklists.
 
-GitHub Actions also runs restore, release build, optional tests, and Docker image build through [.github/workflows/backend-ci.yml](.github/workflows/backend-ci.yml).
+GitHub Actions also runs restore, release build, and Docker image build through [.github/workflows/backend-ci.yml](.github/workflows/backend-ci.yml).
 
 ## Branching
 

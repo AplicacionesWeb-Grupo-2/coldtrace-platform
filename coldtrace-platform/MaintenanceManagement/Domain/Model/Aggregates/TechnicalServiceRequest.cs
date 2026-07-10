@@ -1,5 +1,4 @@
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Commands;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
@@ -86,9 +85,6 @@ public class TechnicalServiceRequest : IAuditableEntity
 
     /// <summary>Gets the actor who closed the request.</summary>
     public string? ClosedBy { get; private set; }
-
-    /// <summary>Gets the owning organization.</summary>
-    public Organization Organization { get; private set; } = null!;
 
     /// <summary>Gets the serviced asset.</summary>
     public Asset Asset { get; private set; } = null!;

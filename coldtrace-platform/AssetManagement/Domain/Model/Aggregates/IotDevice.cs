@@ -1,5 +1,4 @@
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
 namespace ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
@@ -66,11 +65,6 @@ public class IotDevice : IAuditableEntity
     ///     Gets the optional assigned asset identifier.
     /// </summary>
     public int? AssetId { get; private set; }
-
-    /// <summary>
-    ///     Gets the owning organization.
-    /// </summary>
-    public Organization Organization { get; private set; } = null!;
 
     /// <summary>
     ///     Gets the connected gateway.

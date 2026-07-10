@@ -1,4 +1,3 @@
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Reports.Domain.Model.Commands;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
@@ -78,8 +77,6 @@ public class Report : IAuditableEntity
     public double? AverageHumidity { get; private set; }
 
     public double? CompliancePercentage { get; private set; }
-
-    public Organization Organization { get; private set; } = null!;
 
     public DateTimeOffset? CreatedAt { get; set; }
 

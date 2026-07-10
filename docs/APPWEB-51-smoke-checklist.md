@@ -20,9 +20,8 @@ CREATE DATABASE IF NOT EXISTS coldtrace_platform;
 ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-password>;database=coldtrace_platform
 ```
 
-- EF Core migrations are versioned under
-  `coldtrace-platform/Shared/Infrastructure/Persistence/EFC/Migrations`.
-- Startup ensures `__EFMigrationsHistory` exists and applies pending migrations.
+- EF Core migrations are versioned under `coldtrace-platform/Migrations`.
+- Startup applies pending migrations with the standard `Database.Migrate()` flow.
 - The sensitive data logging warning is expected in `Development`; it should not
   be enabled for production credentials.
 
@@ -35,10 +34,13 @@ ConnectionStrings__DefaultConnection=server=localhost;user=root;password=<your-p
 5. Open `/swagger/v1/swagger.json`.
 6. Confirm future bounded contexts can be added under:
    - `Domain/Model`
-   - `Application`
-   - `Infrastructure/Persistence/EFC/Repositories`
-   - `Interfaces/REST/Resources`
-   - `Interfaces/REST/Transform`
+   - `Application/CommandServices`
+   - `Application/Internal`
+   - `Application/QueryServices`
+   - `Infrastructure/Persistence/EntityFrameworkCore/Repositories`
+   - `Interfaces/Rest/Resources`
+   - `Interfaces/Rest/Transform`
+   - `Resources`
 
 ## Out of Scope
 

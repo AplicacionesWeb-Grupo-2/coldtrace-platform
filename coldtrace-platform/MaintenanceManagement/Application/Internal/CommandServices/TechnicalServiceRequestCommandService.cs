@@ -1,12 +1,13 @@
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.Billing.Interfaces.ACL;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.MaintenanceManagement.Application.Errors;
+using ColdTrace.Platform.Billing.Interfaces.Acl;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Errors;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Commands;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
-using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.MaintenanceManagement.Application.CommandServices;
+using ColdTrace.Platform.MaintenanceManagement.Application.QueryServices;
+using ColdTrace.Platform.Shared.Application.Model;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 
 namespace ColdTrace.Platform.MaintenanceManagement.Application.Internal.CommandServices;
@@ -16,7 +17,7 @@ namespace ColdTrace.Platform.MaintenanceManagement.Application.Internal.CommandS
 /// </summary>
 public class TechnicalServiceRequestCommandService(
     ITechnicalServiceRequestRepository technicalServiceRequestRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IAssetRepository assetRepository,
     ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
@@ -28,8 +29,7 @@ public class TechnicalServiceRequestCommandService(
         CreateTechnicalServiceRequestCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for technical service request creation: {OrganizationId}",
                 command.OrganizationId);
@@ -79,8 +79,7 @@ public class TechnicalServiceRequestCommandService(
         UpdateTechnicalServiceRequestStatusCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for technical service request status update: {OrganizationId}",

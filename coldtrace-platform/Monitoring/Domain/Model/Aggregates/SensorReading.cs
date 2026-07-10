@@ -1,5 +1,4 @@
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Monitoring.Domain.Model.Commands;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
@@ -98,11 +97,6 @@ public class SensorReading : IAuditableEntity
     ///     Gets the location context captured from the asset.
     /// </summary>
     public int LocationId { get; private set; }
-
-    /// <summary>
-    ///     Gets the owning organization.
-    /// </summary>
-    public Organization Organization { get; private set; } = null!;
 
     /// <summary>
     ///     Gets the originating IoT device.

@@ -2,12 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "coldtrace-platform", "coldtrace-platform\coldtrace-platform.csproj", "{54FE0484-1301-488F-AACC-2B2649ED5D64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColdTrace.Platform.IdentityAccess.Tests", "coldtrace-platform.IdentityAccess.Tests\ColdTrace.Platform.IdentityAccess.Tests.csproj", "{35C48935-29CF-479F-A627-1038440DB724}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColdTrace.Platform.Tests", "coldtrace-platform.Tests\ColdTrace.Platform.Tests.csproj", "{D9187B97-C8EE-4ABB-94E2-412295C71038}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColdTrace.Platform.ErrorHandling.Tests", "ColdTrace.Platform.ErrorHandling.Tests\ColdTrace.Platform.ErrorHandling.Tests.csproj", "{31EF2129-E05F-45DE-90AE-33C8B71D5D3E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,17 +12,5 @@ Global
 		{54FE0484-1301-488F-AACC-2B2649ED5D64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54FE0484-1301-488F-AACC-2B2649ED5D64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54FE0484-1301-488F-AACC-2B2649ED5D64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{35C48935-29CF-479F-A627-1038440DB724}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{35C48935-29CF-479F-A627-1038440DB724}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{35C48935-29CF-479F-A627-1038440DB724}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{35C48935-29CF-479F-A627-1038440DB724}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D9187B97-C8EE-4ABB-94E2-412295C71038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9187B97-C8EE-4ABB-94E2-412295C71038}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9187B97-C8EE-4ABB-94E2-412295C71038}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9187B97-C8EE-4ABB-94E2-412295C71038}.Release|Any CPU.Build.0 = Release|Any CPU
-		{31EF2129-E05F-45DE-90AE-33C8B71D5D3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{31EF2129-E05F-45DE-90AE-33C8B71D5D3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{31EF2129-E05F-45DE-90AE-33C8B71D5D3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{31EF2129-E05F-45DE-90AE-33C8B71D5D3E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

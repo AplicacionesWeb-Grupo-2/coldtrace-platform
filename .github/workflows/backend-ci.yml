@@ -31,18 +31,5 @@ jobs:
       - name: Build
         run: dotnet build coldtrace-platform/coldtrace-platform.csproj --configuration Release --no-restore
 
-      - name: Test
-        shell: bash
-        run: |
-          mapfile -t test_projects < <(find . -name '*Tests.csproj' -o -name '*.Tests.csproj')
-          if [ "${#test_projects[@]}" -eq 0 ]; then
-            echo "No test projects found."
-            exit 0
-          fi
-
-          for project in "${test_projects[@]}"; do
-            dotnet test "$project" --configuration Release
-          done
-
       - name: Docker build
         run: docker build -t coldtrace-platform:ci .

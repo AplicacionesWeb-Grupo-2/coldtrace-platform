@@ -1,4 +1,4 @@
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Checkout;
 

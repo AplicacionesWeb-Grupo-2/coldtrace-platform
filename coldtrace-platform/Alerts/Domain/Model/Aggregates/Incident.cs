@@ -1,6 +1,5 @@
 using ColdTrace.Platform.Alerts.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
 namespace ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
@@ -93,8 +92,6 @@ public class Incident : IAuditableEntity
     public DateTimeOffset? LastNotificationAt { get; private set; }
 
     public int NotificationCount { get; private set; }
-
-    public Organization Organization { get; private set; } = null!;
 
     public Asset? Asset { get; private set; }
 

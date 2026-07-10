@@ -1,5 +1,4 @@
 using ColdTrace.Platform.Alerts.Domain.Model.Commands;
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
 namespace ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
@@ -111,8 +110,6 @@ public class AiResolutionPlan : IAuditableEntity
     public string? FinalCorrectiveAction { get; private set; }
 
     public string? FinalResolutionNotes { get; private set; }
-
-    public Organization Organization { get; private set; } = null!;
 
     public Incident Incident { get; private set; } = null!;
 

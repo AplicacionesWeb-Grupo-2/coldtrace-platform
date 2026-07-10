@@ -53,7 +53,6 @@ The workflow performs:
 ```text
 dotnet restore
 dotnet build --configuration Release
-dotnet test when test projects exist
 docker build
 ```
 

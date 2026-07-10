@@ -1,11 +1,12 @@
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Monitoring.Application.Errors;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Monitoring.Domain.Model.Errors;
 using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
 using ColdTrace.Platform.Monitoring.Domain.Model.Queries;
 using ColdTrace.Platform.Monitoring.Domain.Repositories;
-using ColdTrace.Platform.Monitoring.Domain.Services;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Monitoring.Application.CommandServices;
+using ColdTrace.Platform.Monitoring.Application.QueryServices;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.Monitoring.Application.Internal.QueryServices;
 
@@ -14,7 +15,7 @@ namespace ColdTrace.Platform.Monitoring.Application.Internal.QueryServices;
 /// </summary>
 public class SensorReadingQueryService(
     ISensorReadingRepository sensorReadingRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IIotDeviceRepository iotDeviceRepository,
     ILogger<SensorReadingQueryService> logger)
     : ISensorReadingQueryService
@@ -24,8 +25,7 @@ public class SensorReadingQueryService(
         GetSensorReadingsByOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for sensor readings listing: {OrganizationId}", query.OrganizationId);
             return new Result<IEnumerable<SensorReading>, GetSensorReadingsByOrganizationError>.Failure(
@@ -57,8 +57,7 @@ public class SensorReadingQueryService(
         GetSensorReadingsByIotDeviceAndOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for device sensor readings listing: {OrganizationId}",
                 query.OrganizationId);
@@ -104,8 +103,7 @@ public class SensorReadingQueryService(
         GetSensorReadingByIdAndOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for sensor reading query: {OrganizationId}", query.OrganizationId);
             return new Result<SensorReading, GetSensorReadingByIdAndOrganizationError>.Failure(

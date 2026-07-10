@@ -38,34 +38,4 @@
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Alerts\Application\"/>
-        <Folder Include="Alerts\Domain\Model\"/>
-        <Folder Include="Alerts\Infrastructure\Persistence\EFC\Repositories\"/>
-        <Folder Include="Alerts\Interfaces\REST\Resources\"/>
-        <Folder Include="Alerts\Interfaces\REST\Transform\"/>
-        <Folder Include="AssetManagement\Application\"/>
-        <Folder Include="AssetManagement\Domain\Model\"/>
-        <Folder Include="IdentityAccess\Application\"/>
-        <Folder Include="IdentityAccess\Domain\Model\"/>
-        <Folder Include="IdentityAccess\Infrastructure\Persistence\EFC\Repositories\"/>
-        <Folder Include="IdentityAccess\Interfaces\REST\Resources\"/>
-        <Folder Include="IdentityAccess\Interfaces\REST\Transform\"/>
-        <Folder Include="MaintenanceManagement\Application\"/>
-        <Folder Include="MaintenanceManagement\Domain\Model\"/>
-        <Folder Include="MaintenanceManagement\Infrastructure\Persistence\EFC\Repositories\"/>
-        <Folder Include="MaintenanceManagement\Interfaces\REST\Resources\"/>
-        <Folder Include="MaintenanceManagement\Interfaces\REST\Transform\"/>
-        <Folder Include="Monitoring\Application\"/>
-        <Folder Include="Monitoring\Domain\Model\"/>
-        <Folder Include="Monitoring\Infrastructure\Persistence\EFC\Repositories\"/>
-        <Folder Include="Monitoring\Interfaces\REST\Resources\"/>
-        <Folder Include="Monitoring\Interfaces\REST\Transform\"/>
-        <Folder Include="Reports\Application\"/>
-        <Folder Include="Reports\Domain\Model\"/>
-        <Folder Include="Reports\Infrastructure\Persistence\EFC\Repositories\"/>
-        <Folder Include="Reports\Interfaces\REST\Resources\"/>
-        <Folder Include="Reports\Interfaces\REST\Transform\"/>
-    </ItemGroup>
-
 </Project>

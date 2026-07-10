@@ -1,12 +1,13 @@
-using ColdTrace.Platform.Alerts.Application.Errors;
+using ColdTrace.Platform.Alerts.Domain.Model.Errors;
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Model.Commands;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
-using ColdTrace.Platform.Alerts.Domain.Services;
+using ColdTrace.Platform.Alerts.Application.CommandServices;
+using ColdTrace.Platform.Alerts.Application.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ namespace ColdTrace.Platform.Alerts.Application.Internal.CommandServices;
 public class IncidentCommandService(
     IIncidentRepository incidentRepository,
     INotificationRepository notificationRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IAssetRepository assetRepository,
     IUnitOfWork unitOfWork,
     ILogger<IncidentCommandService> logger)
@@ -29,8 +30,7 @@ public class IncidentCommandService(
         CreateIncidentCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for incident creation: {OrganizationId}", command.OrganizationId);
             return new Result<Incident, CreateIncidentError>.Failure(CreateIncidentError.OrganizationNotFound);
@@ -97,8 +97,7 @@ public class IncidentCommandService(
         AcknowledgeIncidentCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for incident acknowledgement: {OrganizationId}",
@@ -158,8 +157,7 @@ public class IncidentCommandService(
         ResolveIncidentCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for incident resolution: {OrganizationId}", command.OrganizationId);
             return new Result<Incident, ResolveIncidentError>.Failure(ResolveIncidentError.OrganizationNotFound);
@@ -216,8 +214,7 @@ public class IncidentCommandService(
         EscalateIncidentCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for incident escalation: {OrganizationId}", command.OrganizationId);
             return new Result<Incident, EscalateIncidentError>.Failure(EscalateIncidentError.OrganizationNotFound);
@@ -274,8 +271,7 @@ public class IncidentCommandService(
         RegisterIncidentCorrectiveActionCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for incident corrective action: {OrganizationId}",

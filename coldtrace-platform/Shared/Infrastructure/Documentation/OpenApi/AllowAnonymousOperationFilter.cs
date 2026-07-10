@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+using ColdTrace.Platform.Iam.Infrastructure.Pipeline.Middleware.Attributes;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -11,7 +11,7 @@ public sealed class AllowAnonymousOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (context.ApiDescription.ActionDescriptor.EndpointMetadata.OfType<IAllowAnonymous>().Any())
+        if (context.ApiDescription.ActionDescriptor.EndpointMetadata.OfType<AllowAnonymousAttribute>().Any())
             operation.Security = [];
     }
 }
