@@ -58,8 +58,8 @@ public class OrganizationsController(
         Description = "Creates an organization with the provided legal, commercial, and contact data",
         OperationId = "CreateOrganization")]
     [SwaggerResponse(201, "The organization was created", typeof(OrganizationResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(409, "The organization already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(409, "The organization already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateOrganization(
         [FromBody] CreateOrganizationResource resource,
@@ -78,16 +78,13 @@ public class OrganizationsController(
         {
             logger.LogWarning(ex, "Invalid organization creation request for contact email {ContactEmail}",
                 resource.ContactEmail);
-            return BadRequest(localizer["InvalidOrganizationRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidOrganizationRequest");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error while creating organization for contact email {ContactEmail}",
                 resource.ContactEmail);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingOrganization"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingOrganization", 500);
         }
     }
 }

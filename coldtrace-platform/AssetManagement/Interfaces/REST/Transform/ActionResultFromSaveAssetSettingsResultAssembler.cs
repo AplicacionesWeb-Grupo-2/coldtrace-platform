@@ -23,14 +23,11 @@ public static class ActionResultFromSaveAssetSettingsResultAssembler
             Result<AssetSettings, SaveAssetSettingsError>.Failure failure =>
                 failure.Error switch
                 {
-                    SaveAssetSettingsError.OrganizationNotFound => controller.NotFound(localizer["OrganizationNotFound"].Value),
-                    SaveAssetSettingsError.AssetNotFound => controller.NotFound(localizer["AssetNotFound"].Value),
-                    SaveAssetSettingsError.UnexpectedError => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500),
-                    _ => controller.BadRequest(localizer["InvalidRequest"].Value)
+                    SaveAssetSettingsError.OrganizationNotFound => controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
+                    SaveAssetSettingsError.AssetNotFound => controller.ProblemResponse(localizer, "AssetNotFound", StatusCodes.Status404NotFound),
+                    SaveAssetSettingsError.UnexpectedError => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError),
+                    _ => controller.ValidationProblemResponse(localizer, "InvalidRequest")
                 },
-            _ => controller.Problem()
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", StatusCodes.Status500InternalServerError, RestErrorCodes.UnexpectedError)
         };
 }

@@ -31,7 +31,7 @@ public class AssetsController(
         Description = "Gets cold-chain assets that belong to the provided organization",
         OperationId = "GetAssetsByOrganization")]
     [SwaggerResponse(200, "Assets found", typeof(IEnumerable<AssetResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetAssetsByOrganizationId(
         [FromRoute] int organizationId,
@@ -50,7 +50,7 @@ public class AssetsController(
         Description = "Gets one cold-chain asset that belongs to the provided organization",
         OperationId = "GetAssetById")]
     [SwaggerResponse(200, "Asset found", typeof(AssetResource))]
-    [SwaggerResponse(404, "Organization or asset not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or asset not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetAssetById(
         [FromRoute] int organizationId,
@@ -70,9 +70,9 @@ public class AssetsController(
         Description = "Creates a cold-chain asset for an organization location",
         OperationId = "CreateAsset")]
     [SwaggerResponse(201, "The asset was created", typeof(AssetResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization or location not found", typeof(string))]
-    [SwaggerResponse(409, "Asset UUID already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or location not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Asset UUID already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateAsset(
         [FromRoute] int organizationId,
@@ -89,7 +89,7 @@ public class AssetsController(
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Invalid asset creation request for organization {OrganizationId}", organizationId);
-            return BadRequest(localizer["InvalidAssetRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidAssetRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -99,10 +99,7 @@ public class AssetsController(
         {
             logger.LogError(ex, "Unexpected error while creating asset for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingAsset"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingAsset", 500);
         }
     }
 
@@ -112,9 +109,9 @@ public class AssetsController(
         Description = "Updates a cold-chain asset for an organization location",
         OperationId = "UpdateAsset")]
     [SwaggerResponse(200, "The asset was updated", typeof(AssetResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization, location or asset not found", typeof(string))]
-    [SwaggerResponse(409, "Asset UUID already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization, location or asset not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Asset UUID already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> UpdateAsset(
         [FromRoute] int organizationId,
@@ -135,17 +132,14 @@ public class AssetsController(
             logger.LogWarning(ex,
                 "Invalid asset update request for organization {OrganizationId} and asset {AssetId}",
                 organizationId, assetId);
-            return BadRequest(localizer["InvalidAssetRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidAssetRequest");
         }
         catch (Exception ex)
         {
             logger.LogError(ex,
                 "Unexpected error while updating asset {AssetId} for organization {OrganizationId}",
                 assetId, organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorUpdatingAsset"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorUpdatingAsset", 500);
         }
     }
 }

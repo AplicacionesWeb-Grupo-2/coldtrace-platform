@@ -31,8 +31,9 @@ public class BillingPortalSessionsController(
         Description = "Creates a provider-hosted Stripe Customer Portal session for an organization with Stripe billing state",
         OperationId = "CreateBillingPortalSession")]
     [SwaggerResponse(200, "Customer portal session created", typeof(BillingPortalSessionResource))]
-    [SwaggerResponse(404, "Organization or subscription not found", typeof(string))]
-    [SwaggerResponse(409, "Organization has no provider customer identifier", typeof(string))]
+    [SwaggerResponse(400, "The organization identifier is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or subscription not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Organization has no provider customer identifier", typeof(ProblemDetails))]
     [SwaggerResponse(502, "Stripe customer portal provider failed", typeof(ProblemDetails))]
     [SwaggerResponse(503, "Stripe customer portal provider is not configured", typeof(ProblemDetails))]
     public async Task<ActionResult> CreatePortalSession(
@@ -53,7 +54,7 @@ public class BillingPortalSessionsController(
         {
             logger.LogWarning(ex, "Invalid portal session request for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["BillingPortalSessionInvalidRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "BillingPortalSessionInvalidRequest");
         }
     }
 
@@ -66,8 +67,9 @@ public class BillingPortalSessionsController(
         Description = "Alias route for creating a provider-hosted Stripe Customer Portal session",
         OperationId = "CreateBillingCustomerPortalSession")]
     [SwaggerResponse(200, "Customer portal session created", typeof(BillingPortalSessionResource))]
-    [SwaggerResponse(404, "Organization or subscription not found", typeof(string))]
-    [SwaggerResponse(409, "Organization has no provider customer identifier", typeof(string))]
+    [SwaggerResponse(400, "The organization identifier is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or subscription not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Organization has no provider customer identifier", typeof(ProblemDetails))]
     [SwaggerResponse(502, "Stripe customer portal provider failed", typeof(ProblemDetails))]
     [SwaggerResponse(503, "Stripe customer portal provider is not configured", typeof(ProblemDetails))]
     public Task<ActionResult> CreateCustomerPortalSessionAlias(

@@ -33,24 +33,15 @@ public static class ActionResultFromCreateGatewayResultAssembler
             Result<Gateway, CreateGatewayError>.Failure failure =>
                 failure.Error switch
                 {
-                    CreateGatewayError.DuplicateUuid => controller.Conflict(localizer["GatewayUuidDuplicated"].Value),
+                    CreateGatewayError.DuplicateUuid => controller.ProblemResponse(localizer, "GatewayUuidDuplicated", StatusCodes.Status409Conflict),
                     CreateGatewayError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
-                    CreateGatewayError.LocationNotFound => controller.NotFound(localizer["LocationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
+                    CreateGatewayError.LocationNotFound => controller.ProblemResponse(localizer, "LocationNotFound", StatusCodes.Status404NotFound),
                     CreateGatewayError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingGateway"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingGateway", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

@@ -28,23 +28,14 @@ public static class ActionResultFromGetMaintenanceScheduleByIdResultAssembler
                 failure.Error switch
                 {
                     GetMaintenanceScheduleByIdAndOrganizationError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     GetMaintenanceScheduleByIdAndOrganizationError.MaintenanceScheduleNotFound =>
-                        controller.NotFound(localizer["MaintenanceScheduleNotFound"].Value),
+                        controller.ProblemResponse(localizer, "MaintenanceScheduleNotFound", StatusCodes.Status404NotFound),
                     GetMaintenanceScheduleByIdAndOrganizationError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorGettingMaintenanceSchedules"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorGettingMaintenanceSchedules", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

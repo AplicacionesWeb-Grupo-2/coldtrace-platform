@@ -36,7 +36,7 @@ public class ReportsController(
         Description = "Gets generated reports owned by the provided organization",
         OperationId = "GetReportsByOrganization")]
     [SwaggerResponse(200, "Reports found", typeof(IEnumerable<ReportResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetReportsByOrganizationId(
         [FromRoute] int organizationId,
@@ -58,8 +58,8 @@ public class ReportsController(
         Description = "Generates an operational report from persisted backend data",
         OperationId = "GenerateReport")]
     [SwaggerResponse(201, "Report generated", typeof(ReportResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GenerateReport(
         [FromRoute] int organizationId,
@@ -77,7 +77,7 @@ public class ReportsController(
         {
             logger.LogWarning(ex, "Invalid report generation payload for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidReportRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidReportRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -87,10 +87,7 @@ public class ReportsController(
         {
             logger.LogError(ex, "Unexpected error while generating report for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorGeneratingReport"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorGeneratingReport", 500);
         }
     }
 
@@ -103,7 +100,7 @@ public class ReportsController(
         Description = "Gets one generated report owned by the provided organization",
         OperationId = "GetReportById")]
     [SwaggerResponse(200, "Report found", typeof(ReportResource))]
-    [SwaggerResponse(404, "Organization or report not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or report not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetReportById(
         [FromRoute] int organizationId,
@@ -126,8 +123,8 @@ public class ReportsController(
         Description = "Loads persisted report metrics and related evidence, then returns a structured advisory AI summary without mutating the source report",
         OperationId = "GenerateReportAiSummary")]
     [SwaggerResponse(200, "AI report summary generated", typeof(ReportAiSummaryResource))]
-    [SwaggerResponse(400, "Missing or invalid identifier", typeof(string))]
-    [SwaggerResponse(404, "Organization or report not found", typeof(string))]
+    [SwaggerResponse(400, "Missing or invalid identifier", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or report not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Report context could not be prepared", typeof(ProblemDetails))]
     [SwaggerResponse(502, "AI provider returned invalid structured output", typeof(ProblemDetails))]
     [SwaggerResponse(503, "AI provider is unavailable or disabled", typeof(ProblemDetails))]
@@ -152,7 +149,7 @@ public class ReportsController(
                 "Invalid report AI summary route for organization {OrganizationId} and report {ReportId}",
                 organizationId,
                 reportId);
-            return BadRequest(localizer["InvalidReportRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidReportRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -165,10 +162,7 @@ public class ReportsController(
                 "Unexpected error while generating AI report summary for organization {OrganizationId} and report {ReportId}",
                 organizationId,
                 reportId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorGeneratingReportAiSummary"].Value,
-                statusCode: StatusCodes.Status500InternalServerError);
+            return this.ProblemResponse(localizer, "UnexpectedErrorGeneratingReportAiSummary", StatusCodes.Status500InternalServerError);
         }
     }
 }
