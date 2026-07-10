@@ -77,11 +77,29 @@ Required Google Cloud resources:
 Cloud Run service: coldtrace-platform
 Cloud SQL instance: coldtrace-mysql
 Secret Manager secret: coldtrace-db-password
-Cloud Run service account role: roles/cloudsql.client
+Secret Manager secret: coldtrace-openai-api-key
+Secret Manager secret: coldtrace-google-oauth-client-secret
+Secret Manager secret: coldtrace-apple-private-key
+Secret Manager secret: coldtrace-stripe-secret-key
+Secret Manager secret: coldtrace-stripe-webhook-secret
+Cloud Run service account roles: roles/cloudsql.client, roles/secretmanager.secretAccessor
 Artifact Registry repository: cloud-run-source-deploy
 ```
 
-Deploy with defaults:
+Secret values are never rendered into the manifest. Create each secret, add its value as a Secret Manager version, and grant the Cloud Run service account access before replacing the service.
+
+External provider setup must also exist outside this repository:
+
+```text
+Google: web OAuth client with the Vue production origin and sign-in redirect authorized
+Apple: Service ID, production return URL, team id, key id, and Sign in with Apple private key
+OpenAI: API key with access to the configured model
+Stripe: products/prices, Customer Portal configuration, and a webhook for /api/v1/billing/stripe/webhooks
+```
+
+The Vue deployment may override the public browser values with `VITE_GOOGLE_OAUTH_CLIENT_ID`, `VITE_APPLE_OAUTH_CLIENT_ID`, and `VITE_APPLE_OAUTH_REDIRECT_URI`. These values are public identifiers; provider secrets stay only in the backend.
+
+After exporting the required public provider configuration, deploy with:
 
 ```bash
 scripts/deploy-cloud-run.sh
@@ -103,8 +121,28 @@ DB_INSTANCE_NAME=coldtrace-mysql \
 DATABASE_NAME=coldtrace_platform \
 DATABASE_USER=coldtrace_app \
 DB_SECRET_NAME=coldtrace-db-password \
+FRONTEND_ORIGIN=https://coldtrace-frontend-web.vercel.app \
+GOOGLE_OAUTH_CLIENT_ID=your-google-web-client-id \
+APPLE_OAUTH_CLIENT_ID=your-apple-service-id \
+APPLE_TEAM_ID=your-apple-team-id \
+APPLE_KEY_ID=your-apple-key-id \
+AI_ASSISTANCE_ENABLED=true \
+AI_MODEL_PROVIDER=openai \
+AI_MODEL_NAME=gpt-5.4-mini \
+STRIPE_OPERATIONS_PRICE_ID=price_operations \
+STRIPE_COMPLIANCE_AI_PRICE_ID=price_compliance_ai \
 scripts/deploy-cloud-run.sh
 ```
+
+By default, provider redirects and Stripe returns are derived from `FRONTEND_ORIGIN`. Billing returns use the canonical Vue route:
+
+```text
+/settings/billing?checkout=success&session_id={CHECKOUT_SESSION_ID}
+/settings/billing?checkout=cancel
+/settings/billing?portal=return
+```
+
+Use `DRY_RUN=true` with non-secret public configuration to inspect the manifest. The output contains Secret Manager names and references, never secret values. The script stops if a required public value or a template placeholder is missing.
 
 The script builds the image tag from the project version in `coldtrace-platform/coldtrace-platform.csproj`. For version `1.0.2`, the default image tag is:
 

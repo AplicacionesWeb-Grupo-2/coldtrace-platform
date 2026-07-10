@@ -38,6 +38,63 @@ spec:
           value: ${DATABASE_USER}
         - name: CORS_ALLOWED_ORIGINS
           value: '${CORS_ALLOWED_ORIGINS}'
+        - name: AiAssistance__Enabled
+          value: '${AI_ASSISTANCE_ENABLED}'
+        - name: AiAssistance__Provider
+          value: '${AI_MODEL_PROVIDER}'
+        - name: AiAssistance__Model
+          value: '${AI_MODEL_NAME}'
+        - name: AiAssistance__Endpoint
+          value: '${OLLAMA_BASE_URL}'
+        - name: AiAssistance__ApiKey
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: ${OPENAI_API_KEY_SECRET_NAME}
+        - name: AiAssistance__RequestTimeout
+          value: '${AI_REQUEST_TIMEOUT}'
+        - name: Authentication__Social__Google__ClientId
+          value: '${GOOGLE_OAUTH_CLIENT_ID}'
+        - name: Authentication__Social__Google__ClientSecret
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: ${GOOGLE_OAUTH_CLIENT_SECRET_NAME}
+        - name: Authentication__Social__Google__RedirectUri
+          value: '${GOOGLE_OAUTH_REDIRECT_URI}'
+        - name: Authentication__Social__Apple__ClientId
+          value: '${APPLE_OAUTH_CLIENT_ID}'
+        - name: Authentication__Social__Apple__RedirectUri
+          value: '${APPLE_OAUTH_REDIRECT_URI}'
+        - name: Authentication__Social__Apple__TeamId
+          value: '${APPLE_TEAM_ID}'
+        - name: Authentication__Social__Apple__KeyId
+          value: '${APPLE_KEY_ID}'
+        - name: Authentication__Social__Apple__PrivateKey
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: ${APPLE_PRIVATE_KEY_SECRET_NAME}
+        - name: Billing__PlanCatalog__OperationsStripePriceId
+          value: '${STRIPE_OPERATIONS_PRICE_ID}'
+        - name: Billing__PlanCatalog__ComplianceAiStripePriceId
+          value: '${STRIPE_COMPLIANCE_AI_PRICE_ID}'
+        - name: Billing__Stripe__SecretKey
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: ${STRIPE_SECRET_KEY_SECRET_NAME}
+        - name: Billing__Stripe__WebhookSigningSecret
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: ${STRIPE_WEBHOOK_SECRET_NAME}
+        - name: Billing__Stripe__CheckoutSuccessUrl
+          value: '${BILLING_CHECKOUT_SUCCESS_URL}'
+        - name: Billing__Stripe__CheckoutCancelUrl
+          value: '${BILLING_CHECKOUT_CANCEL_URL}'
+        - name: Billing__Stripe__CustomerPortalReturnUrl
+          value: '${BILLING_CUSTOMER_PORTAL_RETURN_URL}'
         image: ${IMAGE_URI}
         ports:
         - containerPort: 8080
