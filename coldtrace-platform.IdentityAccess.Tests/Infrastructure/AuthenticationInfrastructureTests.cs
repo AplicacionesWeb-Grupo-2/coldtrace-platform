@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Commands;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Authorization.Claims;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Hashing.BCrypt.Services;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Configuration;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Services;
@@ -37,6 +39,9 @@ public class AuthenticationInfrastructureTests
 
         Assert.Equal("HS256", jwt.Alg);
         Assert.Equal(user.Email, jwt.Subject);
+        Assert.Equal("7", jwt.Claims.Single(claim => claim.Type == ColdTraceClaimTypes.OrganizationId).Value);
+        Assert.Equal("3", jwt.Claims.Single(claim => claim.Type == ColdTraceClaimTypes.RoleId).Value);
+        Assert.Equal("3", jwt.Claims.Single(claim => claim.Type == ClaimTypes.Role).Value);
         Assert.Equal(42, await service.ValidateToken(token));
     }
 

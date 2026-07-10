@@ -12,6 +12,12 @@ Swagger UI:
 /swagger/index.html
 ```
 
+## Authentication
+
+API controller actions require `Authorization: Bearer <token>` by default. Obtain a token from `POST /api/v1/authentication/sign-in`. Missing or invalid tokens return `401 application/problem+json`; authenticated requests that fail an authorization policy return `403 application/problem+json`.
+
+The intentional public API actions are `POST /api/v1/authentication/sign-in`, `POST /api/v1/organization-sign-ups`, `GET /api/v1/subscription-plans`, and `POST /api/v1/billing/stripe/webhooks`. The Stripe webhook validates its provider signature instead of a ColdTrace bearer token. Swagger/OpenAPI assets are also public.
+
 All request and response bodies use JSON. Most operational endpoints are scoped by organization:
 
 ```text

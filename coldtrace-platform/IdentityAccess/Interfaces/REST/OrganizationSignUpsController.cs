@@ -3,6 +3,7 @@ using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Resources;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Transform;
 using ColdTrace.Platform.Resources;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Swashbuckle.AspNetCore.Annotations;
@@ -31,6 +32,7 @@ public class OrganizationSignUpsController(
     /// <param name="resource">Organization sign-up request resource.</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
     /// <returns>A response containing the created organization and first user.</returns>
+    [AllowAnonymous] // Public first-tenant bootstrap; general organization routes remain protected.
     [HttpPost]
     [SwaggerOperation(
         Summary = "Signs up an organization",

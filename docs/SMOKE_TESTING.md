@@ -35,12 +35,14 @@ The smoke flow covered the main frontend-facing workflows:
 - MySQL is running locally.
 - The API can connect to `coldtrace_platform`.
 - The default local credentials are `root` / `root`, unless overridden through `ConnectionStrings__DefaultConnection`.
+- `JWT_SECRET` is set to a private value of at least 32 bytes.
 - The API starts successfully and Swagger is available at `/swagger/index.html`.
 - EF Core migrations are applied on startup.
 
 Run locally:
 
 ```bash
+JWT_SECRET="$(openssl rand -base64 48)" \
 ASPNETCORE_ENVIRONMENT=Development \
 /Users/mauriciopajes/.dotnet/dotnet run \
   --project coldtrace-platform/coldtrace-platform.csproj \
@@ -48,6 +50,8 @@ ASPNETCORE_ENVIRONMENT=Development \
 ```
 
 ## Recommended Smoke Flow
+
+Complete the APPWEB-65 authentication bootstrap first. Attach the returned bearer token to every business request below except the public subscription catalog, organization sign-up, and Stripe webhook.
 
 1. Open `/swagger/index.html`.
 2. Confirm `/swagger/v1/swagger.json` returns `200`.
@@ -113,6 +117,7 @@ ASPNETCORE_ENVIRONMENT=Development \
 
 Detailed manual checks are also available:
 
+- [APPWEB-65 JWT and CORS hardening](APPWEB-65-smoke-checklist.md)
 - [APPWEB-49 IoT Devices](APPWEB-49-smoke-checklist.md)
 - [APPWEB-51 API Foundation](APPWEB-51-smoke-checklist.md)
 - [APPWEB-52 Organization Sign-Up](APPWEB-52-smoke-checklist.md)

@@ -33,6 +33,7 @@ public class AuthenticationController(
     /// <param name="resource">Sign-in request resource.</param>
     /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
     /// <returns>The authenticated user resource with a JWT.</returns>
+    [AllowAnonymous] // Public credential exchange; every other controller action uses the fallback policy.
     [HttpPost("sign-in")]
     [SwaggerOperation(
         Summary = "User sign-in",
