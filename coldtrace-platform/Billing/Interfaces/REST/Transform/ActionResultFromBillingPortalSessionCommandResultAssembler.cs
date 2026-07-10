@@ -24,10 +24,7 @@ public static class ActionResultFromBillingPortalSessionCommandResultAssembler
             Result<BillingPortalSession, BillingPortalSessionError>.Failure failure =>
                 ToFailureActionResult(failure.Error, controller, localizer),
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 
     private static ActionResult ToFailureActionResult(
@@ -37,24 +34,15 @@ public static class ActionResultFromBillingPortalSessionCommandResultAssembler
         error switch
         {
             BillingPortalSessionError.OrganizationNotFound =>
-                controller.NotFound(localizer["BillingPortalSessionOrganizationNotFound"].Value),
+                controller.ProblemResponse(localizer, "BillingPortalSessionOrganizationNotFound", StatusCodes.Status404NotFound),
             BillingPortalSessionError.OrganizationSubscriptionNotFound =>
-                controller.NotFound(localizer["BillingPortalSessionOrganizationSubscriptionNotFound"].Value),
+                controller.ProblemResponse(localizer, "BillingPortalSessionOrganizationSubscriptionNotFound", StatusCodes.Status404NotFound),
             BillingPortalSessionError.ProviderCustomerNotFound =>
-                controller.Conflict(localizer["BillingPortalSessionProviderCustomerNotFound"].Value),
+                controller.ProblemResponse(localizer, "BillingPortalSessionProviderCustomerNotFound", StatusCodes.Status409Conflict),
             BillingPortalSessionError.ProviderNotConfigured =>
-                controller.Problem(
-                    title: localizer["BillingPortalSessionProviderNotConfigured"].Value,
-                    detail: localizer["BillingPortalSessionProviderNotConfigured"].Value,
-                    statusCode: StatusCodes.Status503ServiceUnavailable),
+                controller.ProblemResponse(localizer, "BillingPortalSessionProviderNotConfigured", StatusCodes.Status503ServiceUnavailable),
             BillingPortalSessionError.ProviderUnavailable =>
-                controller.Problem(
-                    title: localizer["BillingPortalSessionProviderUnavailable"].Value,
-                    detail: localizer["BillingPortalSessionProviderUnavailable"].Value,
-                    statusCode: StatusCodes.Status502BadGateway),
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+                controller.ProblemResponse(localizer, "BillingPortalSessionProviderUnavailable", StatusCodes.Status502BadGateway),
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

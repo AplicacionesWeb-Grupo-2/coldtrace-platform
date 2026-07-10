@@ -405,4 +405,16 @@ Expected validation and business-rule responses:
 | `504` | AI provider exceeded the configured timeout. |
 | `500` | Unexpected server error returned as RFC 7807 `ProblemDetails`. |
 
-The API currently exposes Swagger and does not enforce JWT/session authorization.
+Non-validation failures use RFC 7807 `ProblemDetails` with `status`, localized
+`title` and `detail`, request-path `instance`, and a stable `code` extension.
+For example, a missing organization uses `code: "ORGANIZATION_NOT_FOUND"`.
+Request/model validation uses `ValidationProblemDetails` with the same common
+fields plus an `errors` object and `code: "VALIDATION_ERROR"`. Error payloads
+do not expose exception messages or stack traces.
+
+Send `Accept-Language: es` to receive the existing Spanish shared-resource
+messages. Plan-limit conflicts retain their entitlement extension fields, and
+Stripe webhook failures retain their existing status behavior while using the
+same ProblemDetails contract.
+
+JWT issuance and authenticated-by-default route enforcement are delivered by the dedicated TS02 and T58 security stories; this error contract also applies to their `401` and `403` responses after integration.

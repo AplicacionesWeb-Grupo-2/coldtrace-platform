@@ -23,14 +23,11 @@ public static class ActionResultFromGetEffectiveAssetSettingsResultAssembler
             Result<AssetSettings, GetEffectiveAssetSettingsError>.Failure failure =>
                 failure.Error switch
                 {
-                    GetEffectiveAssetSettingsError.AssetNotFound => controller.NotFound(localizer["AssetNotFound"].Value),
-                    GetEffectiveAssetSettingsError.AssetSettingsNotFound => controller.NotFound(localizer["ResourceNotFound"].Value),
-                    GetEffectiveAssetSettingsError.UnexpectedError => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500),
-                    _ => controller.BadRequest(localizer["InvalidRequest"].Value)
+                    GetEffectiveAssetSettingsError.AssetNotFound => controller.ProblemResponse(localizer, "AssetNotFound", StatusCodes.Status404NotFound),
+                    GetEffectiveAssetSettingsError.AssetSettingsNotFound => controller.ProblemResponse(localizer, "ResourceNotFound", StatusCodes.Status404NotFound),
+                    GetEffectiveAssetSettingsError.UnexpectedError => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError),
+                    _ => controller.ValidationProblemResponse(localizer, "InvalidRequest")
                 },
-            _ => controller.Problem()
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", StatusCodes.Status500InternalServerError, RestErrorCodes.UnexpectedError)
         };
 }

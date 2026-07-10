@@ -25,53 +25,26 @@ public static class ActionResultFromGenerateReportAiSummaryResultAssembler
                 failure.Error switch
                 {
                     GenerateReportAiSummaryError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     GenerateReportAiSummaryError.ReportNotFound =>
-                        controller.NotFound(localizer["ReportNotFound"].Value),
+                        controller.ProblemResponse(localizer, "ReportNotFound", StatusCodes.Status404NotFound),
                     GenerateReportAiSummaryError.ReportContextUnavailable =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["ReportAiSummaryContextUnavailable"].Value,
-                            statusCode: StatusCodes.Status500InternalServerError),
+                        controller.ProblemResponse(localizer, "ReportAiSummaryContextUnavailable", StatusCodes.Status500InternalServerError),
                     GenerateReportAiSummaryError.AiProviderDisabled =>
-                        controller.Problem(
-                            title: localizer["AiProviderUnavailable"].Value,
-                            detail: localizer["AiProviderDisabled"].Value,
-                            statusCode: StatusCodes.Status503ServiceUnavailable),
+                        controller.ProblemResponse(localizer, "AiProviderDisabled", StatusCodes.Status503ServiceUnavailable),
                     GenerateReportAiSummaryError.AiProviderNotConfigured =>
-                        controller.Problem(
-                            title: localizer["AiProviderUnavailable"].Value,
-                            detail: localizer["AiProviderNotConfigured"].Value,
-                            statusCode: StatusCodes.Status503ServiceUnavailable),
+                        controller.ProblemResponse(localizer, "AiProviderNotConfigured", StatusCodes.Status503ServiceUnavailable),
                     GenerateReportAiSummaryError.AiProviderUnavailable =>
-                        controller.Problem(
-                            title: localizer["AiProviderUnavailable"].Value,
-                            detail: localizer["AiProviderRequestFailed"].Value,
-                            statusCode: StatusCodes.Status503ServiceUnavailable),
+                        controller.ProblemResponse(localizer, "AiProviderRequestFailed", StatusCodes.Status503ServiceUnavailable),
                     GenerateReportAiSummaryError.AiProviderTimeout =>
-                        controller.Problem(
-                            title: localizer["AiProviderTimeout"].Value,
-                            detail: localizer["AiProviderTimedOut"].Value,
-                            statusCode: StatusCodes.Status504GatewayTimeout),
+                        controller.ProblemResponse(localizer, "AiProviderTimedOut", StatusCodes.Status504GatewayTimeout),
                     GenerateReportAiSummaryError.InvalidStructuredOutput =>
-                        controller.Problem(
-                            title: localizer["InvalidAiStructuredOutput"].Value,
-                            detail: localizer["ReportAiSummaryInvalidStructuredOutput"].Value,
-                            statusCode: StatusCodes.Status502BadGateway),
+                        controller.ProblemResponse(localizer, "ReportAiSummaryInvalidStructuredOutput", StatusCodes.Status502BadGateway),
                     GenerateReportAiSummaryError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorGeneratingReportAiSummary"].Value,
-                            statusCode: StatusCodes.Status500InternalServerError),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: StatusCodes.Status500InternalServerError)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorGeneratingReportAiSummary", StatusCodes.Status500InternalServerError),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", StatusCodes.Status500InternalServerError, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: StatusCodes.Status500InternalServerError)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", StatusCodes.Status500InternalServerError, RestErrorCodes.UnexpectedError)
         };
 }

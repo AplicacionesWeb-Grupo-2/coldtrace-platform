@@ -28,8 +28,8 @@
         <PackageReference Include="Humanizer" Version="3.0.10"/>
         <PackageReference Include="Stripe.net" Version="52.1.0"/>
         <!-- Swagger related packages -->
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7"/>
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.1.7"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="10.2.3"/>
     </ItemGroup>
 
     <ItemGroup>
