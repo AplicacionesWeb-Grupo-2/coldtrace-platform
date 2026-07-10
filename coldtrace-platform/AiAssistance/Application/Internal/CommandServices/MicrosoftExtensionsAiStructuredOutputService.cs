@@ -27,7 +27,8 @@ public class MicrosoftExtensionsAiStructuredOutputService(
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
     {
         PropertyNameCaseInsensitive = true,
-        TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
+        Converters = { new AiStringJsonConverter() }
     };
 
     public Task<Result<IncidentResolutionPlanOutput, AiGenerationError>> GenerateIncidentResolutionPlanAsync(
@@ -123,5 +124,37 @@ public class MicrosoftExtensionsAiStructuredOutputService(
         }
 
         return builder.ToString();
+    }
+
+    private sealed class AiStringJsonConverter : System.Text.Json.Serialization.JsonConverter<string>
+    {
+        private static readonly string[] PreferredPropertyNames =
+            ["text", "description", "risk", "action", "note", "message", "title"];
+
+        public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.String) return reader.GetString() ?? string.Empty;
+            if (reader.TokenType != JsonTokenType.StartObject)
+                throw new JsonException("The AI string value must be text or an object containing text.");
+
+            using var document = JsonDocument.ParseValue(ref reader);
+            var root = document.RootElement;
+            foreach (var propertyName in PreferredPropertyNames)
+                if (root.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String)
+                    return property.GetString() ?? string.Empty;
+
+            var text = string.Join(
+                " ",
+                root.EnumerateObject()
+                    .Where(property => property.Value.ValueKind == JsonValueKind.String)
+                    .Select(property => property.Value.GetString())
+                    .Where(value => !string.IsNullOrWhiteSpace(value)));
+            return string.IsNullOrWhiteSpace(text)
+                ? throw new JsonException("The AI object did not contain a textual value.")
+                : text;
+        }
+
+        public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options) =>
+            writer.WriteStringValue(value);
     }
 }
