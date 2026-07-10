@@ -9,8 +9,7 @@ public record DashboardInterpretationOutput(
     IReadOnlyCollection<DashboardInterpretationInsightOutput> MetricInsights,
     IReadOnlyCollection<string> Risks,
     IReadOnlyCollection<string> RecommendedActions,
-    IReadOnlyCollection<string> UncertaintyNotes,
-    IReadOnlyCollection<DashboardSourceMetricOutput> SourceMetrics);
+    IReadOnlyCollection<string> UncertaintyNotes);
 
 /// <summary>
 ///     Structured AI output contract for one dashboard metric insight.

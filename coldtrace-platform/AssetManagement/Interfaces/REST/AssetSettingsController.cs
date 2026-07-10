@@ -47,7 +47,7 @@ public class AssetSettingsController(
         Description = "Gets asset-specific settings or organization default settings for one asset",
         OperationId = "GetEffectiveAssetSettings")]
     [SwaggerResponse(200, "Settings found", typeof(AssetSettingsResource))]
-    [SwaggerResponse(404, "Asset or settings not found", typeof(string))]
+    [SwaggerResponse(404, "Asset or settings not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetEffectiveAssetSettings(
         [FromRoute] int organizationId,
@@ -67,8 +67,8 @@ public class AssetSettingsController(
         Description = "Creates or updates default safety and telemetry settings for an organization",
         OperationId = "SaveDefaultAssetSettings")]
     [SwaggerResponse(200, "Default settings saved", typeof(AssetSettingsResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> SaveDefaultAssetSettings(
         [FromRoute] int organizationId,
@@ -84,8 +84,8 @@ public class AssetSettingsController(
         Description = "Creates or updates safety and telemetry settings for one organization asset",
         OperationId = "SaveAssetSettings")]
     [SwaggerResponse(200, "Asset settings saved", typeof(AssetSettingsResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization or asset not found", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or asset not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> SaveAssetSettings(
         [FromRoute] int organizationId,
@@ -115,16 +115,13 @@ public class AssetSettingsController(
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Invalid asset settings request for organization {OrganizationId}", organizationId);
-            return BadRequest(localizer["InvalidRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidRequest");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error saving asset settings for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError);
         }
     }
 }

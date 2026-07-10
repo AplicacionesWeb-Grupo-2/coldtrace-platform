@@ -23,4 +23,11 @@ public interface IIotDeviceCommandService
     Task<Result<IotDevice, UpdateIotDeviceError>> Handle(
         UpdateIotDeviceCommand command,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Handles the delete IoT device use case.
+    /// </summary>
+    Task<Result<DeleteIotDeviceCommand, DeleteIotDeviceError>> Handle(
+        DeleteIotDeviceCommand command,
+        CancellationToken cancellationToken = default);
 }

@@ -29,4 +29,14 @@ public interface ILocationCommandService
     Task<Result<Location, UpdateLocationError>> Handle(
         UpdateLocationCommand command,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Handles deletion of an organization-scoped location.
+    /// </summary>
+    /// <param name="command">Command containing route-scoped deletion identifiers.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>The handled command or a deletion error.</returns>
+    Task<Result<DeleteLocationCommand, DeleteLocationError>> Handle(
+        DeleteLocationCommand command,
+        CancellationToken cancellationToken = default);
 }
