@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260710163813_AddPasswordResetRequests")]
+    [Migration("20260709224458_AddPasswordResetRequests")]
     partial class AddPasswordResetRequests
     {
         /// <inheritdoc />
