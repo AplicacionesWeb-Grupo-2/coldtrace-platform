@@ -1,11 +1,12 @@
-using ColdTrace.Platform.Billing.Application.Errors;
+using ColdTrace.Platform.Billing.Domain.Model.Errors;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Portal;
 using ColdTrace.Platform.Billing.Application.Results;
 using ColdTrace.Platform.Billing.Domain.Model.Commands;
 using ColdTrace.Platform.Billing.Domain.Repositories;
-using ColdTrace.Platform.Billing.Domain.Services;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Billing.Application.CommandServices;
+using ColdTrace.Platform.Billing.Application.QueryServices;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 
@@ -13,7 +14,7 @@ namespace ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 ///     Application service implementation for provider-hosted customer portal session creation.
 /// </summary>
 public class BillingPortalSessionCommandService(
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IOrganizationSubscriptionRepository organizationSubscriptionRepository,
     IPortalSessionProviderService portalSessionProviderService,
     ILogger<BillingPortalSessionCommandService> logger)
@@ -25,8 +26,7 @@ public class BillingPortalSessionCommandService(
     {
         try
         {
-            var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-            if (organization is null)
+            if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
             {
                 logger.LogWarning("Organization not found for portal session: {OrganizationId}",
                     command.OrganizationId);

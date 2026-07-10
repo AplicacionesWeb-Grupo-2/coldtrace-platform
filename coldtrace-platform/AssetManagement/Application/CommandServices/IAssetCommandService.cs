@@ -1,0 +1,24 @@
+﻿using ColdTrace.Platform.AssetManagement.Domain.Model.Errors;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
+using ColdTrace.Platform.Shared.Application.Model;
+
+namespace ColdTrace.Platform.AssetManagement.Application.CommandServices;
+
+/// <summary>
+///     Asset command application service contract.
+/// </summary>
+public interface IAssetCommandService
+{
+    Task<Result<Asset, CreateAssetError>> Handle(
+        CreateAssetCommand command,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<Asset, UpdateAssetError>> Handle(
+        UpdateAssetCommand command,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<DeleteAssetCommand, DeleteAssetError>> Handle(
+        DeleteAssetCommand command,
+        CancellationToken cancellationToken = default);
+}

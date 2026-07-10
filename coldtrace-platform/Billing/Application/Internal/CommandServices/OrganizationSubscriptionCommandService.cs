@@ -1,8 +1,9 @@
 using ColdTrace.Platform.Billing.Domain.Model.Aggregates;
 using ColdTrace.Platform.Billing.Domain.Model.Commands;
 using ColdTrace.Platform.Billing.Domain.Repositories;
-using ColdTrace.Platform.Billing.Domain.Services;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.Billing.Application.CommandServices;
+using ColdTrace.Platform.Billing.Application.QueryServices;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 
 namespace ColdTrace.Platform.Billing.Application.Internal.CommandServices;
@@ -12,7 +13,7 @@ namespace ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 /// </summary>
 public class OrganizationSubscriptionCommandService(
     IOrganizationSubscriptionRepository organizationSubscriptionRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<OrganizationSubscriptionCommandService> logger)
     : IOrganizationSubscriptionCommandService
@@ -39,18 +40,18 @@ public class OrganizationSubscriptionCommandService(
         SeedBaseOrganizationSubscriptionsCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organizations = await organizationRepository.ListAsync(cancellationToken);
+        var organizationIds = await iamContextFacade.ListOrganizationIdsAsync(cancellationToken);
         var created = 0;
 
-        foreach (var organization in organizations)
+        foreach (var organizationId in organizationIds)
         {
             var existing = await organizationSubscriptionRepository.FindByOrganizationIdAsync(
-                organization.Id,
+                organizationId,
                 cancellationToken);
             if (existing is not null) continue;
 
             await organizationSubscriptionRepository.AddAsync(
-                new OrganizationSubscription(organization.Id),
+                new OrganizationSubscription(organizationId),
                 cancellationToken);
             created++;
         }
@@ -59,7 +60,7 @@ public class OrganizationSubscriptionCommandService(
             await unitOfWork.CompleteAsync(cancellationToken);
 
         logger.LogDebug("Verified Base subscriptions for {OrganizationCount} organizations; created {CreatedCount}",
-            organizations.Count(),
+            organizationIds.Count(),
             created);
     }
 }

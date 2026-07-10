@@ -1,0 +1,244 @@
+<root>
+    <resheader name='resmimetype'>
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name='version'>
+        <value>1.3</value>
+    </resheader>
+    <resheader name='reader'>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name='writer'>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    
+    <data name='UnexpectedErrorProcessingRequest' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al procesar su solicitud.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='InvalidOrganizationRequest' xml:space='preserve'>
+        <value>La solicitud de organizacion contiene valores no validos.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='BillingOrganizationSubscriptionOrganizationNotFound' xml:space='preserve'>
+        <value>La organizacion no fue encontrada.</value>
+    </data>
+    <data name='BillingOrganizationSubscriptionNotFound' xml:space='preserve'>
+        <value>La suscripcion de la organizacion no fue encontrada.</value>
+    </data>
+    <data name='BillingOrganizationSubscriptionPlanNotFound' xml:space='preserve'>
+        <value>El plan de suscripcion no fue encontrado.</value>
+    </data>
+    <data name='BillingCheckoutSessionInvalidRequest' xml:space='preserve'>
+        <value>La solicitud de checkout no es valida.</value>
+    </data>
+    <data name='BillingCheckoutSessionOrganizationNotFound' xml:space='preserve'>
+        <value>La organizacion no fue encontrada.</value>
+    </data>
+    <data name='BillingCheckoutSessionOrganizationSubscriptionNotFound' xml:space='preserve'>
+        <value>La suscripcion de la organizacion no fue encontrada.</value>
+    </data>
+    <data name='BillingCheckoutSessionTargetPlanNotFound' xml:space='preserve'>
+        <value>El plan destino no fue encontrado.</value>
+    </data>
+    <data name='BillingCheckoutSessionFreePlanNotAllowed' xml:space='preserve'>
+        <value>El plan seleccionado es gratuito y no requiere checkout.</value>
+    </data>
+    <data name='BillingCheckoutSessionPlanProviderPriceNotConfigured' xml:space='preserve'>
+        <value>El plan seleccionado no tiene un precio de Stripe configurado.</value>
+    </data>
+    <data name='BillingCheckoutSessionProviderNotConfigured' xml:space='preserve'>
+        <value>Stripe Checkout no esta configurado.</value>
+    </data>
+    <data name='BillingCheckoutSessionProviderUnavailable' xml:space='preserve'>
+        <value>Stripe Checkout no esta disponible en este momento.</value>
+    </data>
+    <data name='BillingPortalSessionInvalidRequest' xml:space='preserve'>
+        <value>La solicitud de Customer Portal no es valida.</value>
+    </data>
+    <data name='BillingPortalSessionOrganizationNotFound' xml:space='preserve'>
+        <value>La organizacion no fue encontrada.</value>
+    </data>
+    <data name='BillingPortalSessionOrganizationSubscriptionNotFound' xml:space='preserve'>
+        <value>La suscripcion de la organizacion no fue encontrada.</value>
+    </data>
+    <data name='BillingPortalSessionProviderCustomerNotFound' xml:space='preserve'>
+        <value>La organizacion aun no tiene un cliente de Stripe.</value>
+    </data>
+    <data name='BillingPortalSessionProviderNotConfigured' xml:space='preserve'>
+        <value>Stripe Customer Portal no esta configurado.</value>
+    </data>
+    <data name='BillingPortalSessionProviderUnavailable' xml:space='preserve'>
+        <value>Stripe Customer Portal no esta disponible en este momento.</value>
+    </data>
+    <data name='BillingWebhookProviderNotConfigured' xml:space='preserve'>
+        <value>El secreto de firma del webhook de Stripe no esta configurado.</value>
+    </data>
+    <data name='BillingWebhookSignatureMissing' xml:space='preserve'>
+        <value>El encabezado Stripe-Signature es obligatorio.</value>
+    </data>
+    <data name='BillingWebhookSignatureInvalid' xml:space='preserve'>
+        <value>La firma del webhook de Stripe no es valida.</value>
+    </data>
+    <data name='BillingWebhookPayloadInvalid' xml:space='preserve'>
+        <value>El payload del webhook de Stripe no es valido.</value>
+    </data>
+    <data name='BillingWebhookProcessingFailed' xml:space='preserve'>
+        <value>El webhook de Stripe no pudo procesarse.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</root>

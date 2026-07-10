@@ -1,7 +1,8 @@
 using ColdTrace.Platform.Billing.Domain.Model.Aggregates;
 using ColdTrace.Platform.Billing.Domain.Model.Queries;
 using ColdTrace.Platform.Billing.Domain.Model.ValueObjects;
-using ColdTrace.Platform.Billing.Domain.Services;
+using ColdTrace.Platform.Billing.Application.CommandServices;
+using ColdTrace.Platform.Billing.Application.QueryServices;
 using ColdTrace.Platform.Billing.Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 

@@ -1,10 +1,11 @@
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.MaintenanceManagement.Application.Errors;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Errors;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Queries;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
-using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.MaintenanceManagement.Application.CommandServices;
+using ColdTrace.Platform.MaintenanceManagement.Application.QueryServices;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.MaintenanceManagement.Application.Internal.QueryServices;
 
@@ -13,7 +14,7 @@ namespace ColdTrace.Platform.MaintenanceManagement.Application.Internal.QuerySer
 /// </summary>
 public class MaintenanceScheduleQueryService(
     IMaintenanceScheduleRepository maintenanceScheduleRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     ILogger<MaintenanceScheduleQueryService> logger)
     : IMaintenanceScheduleQueryService
 {
@@ -22,8 +23,7 @@ public class MaintenanceScheduleQueryService(
         GetMaintenanceSchedulesByOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for maintenance schedules query: {OrganizationId}",
                 query.OrganizationId);
@@ -52,8 +52,7 @@ public class MaintenanceScheduleQueryService(
         GetMaintenanceScheduleByIdAndOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for maintenance schedule by id query: {OrganizationId}",

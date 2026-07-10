@@ -36,7 +36,7 @@ There is no health endpoint on this branch, so no health route is added to the a
 4. Repeat with a malformed or wrong-signature bearer token and expect the same `401` contract.
 5. Create the first tenant through `POST /api/v1/organization-sign-ups` with a non-default password.
 6. Sign in through `POST /api/v1/authentication/sign-in`, copy the returned `token`, and request `GET /api/v1/roles` with `Authorization: Bearer <token>`; expect `200`.
-7. Run the Identity Access tests and confirm the restricted-policy test returns `403 application/problem+json` for an authenticated user without the required claim.
+7. Call an organization-scoped route with a token from another organization and confirm it returns `403`.
 8. With a valid token, exceed a base-plan limit and confirm the existing `409` response still contains the plan-entitlement properties.
 
 ## CORS Checks
@@ -55,6 +55,5 @@ Expect `204` and `Access-Control-Allow-Origin: http://localhost:5173`. Repeat wi
 
 ```bash
 "$HOME/.dotnet/dotnet" build coldtrace-platform.sln
-"$HOME/.dotnet/dotnet" test coldtrace-platform.IdentityAccess.Tests/ColdTrace.Platform.IdentityAccess.Tests.csproj
 git diff --check
 ```

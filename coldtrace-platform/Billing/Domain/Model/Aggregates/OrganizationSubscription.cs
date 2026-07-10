@@ -1,5 +1,4 @@
 using ColdTrace.Platform.Billing.Domain.Model.ValueObjects;
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
 namespace ColdTrace.Platform.Billing.Domain.Model.Aggregates;
@@ -46,11 +45,6 @@ public class OrganizationSubscription : IAuditableEntity
     ///     Gets the owning organization identifier.
     /// </summary>
     public int OrganizationId { get; private set; }
-
-    /// <summary>
-    ///     Gets the owning organization.
-    /// </summary>
-    public Organization Organization { get; private set; } = null!;
 
     /// <summary>
     ///     Gets the active plan code.

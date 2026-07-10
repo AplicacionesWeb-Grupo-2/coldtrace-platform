@@ -1,4 +1,3 @@
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
 namespace ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
@@ -46,8 +45,6 @@ public class Notification : IAuditableEntity
     public DateTimeOffset? DeliveredAt { get; private set; }
 
     public string? FailureReason { get; private set; }
-
-    public Organization Organization { get; private set; } = null!;
 
     public Incident Incident { get; private set; } = null!;
 

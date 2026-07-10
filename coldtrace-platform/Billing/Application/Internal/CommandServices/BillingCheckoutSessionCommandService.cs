@@ -1,13 +1,14 @@
-using ColdTrace.Platform.Billing.Application.Errors;
+using ColdTrace.Platform.Billing.Domain.Model.Errors;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Checkout;
 using ColdTrace.Platform.Billing.Application.Results;
 using ColdTrace.Platform.Billing.Domain.Model.Aggregates;
 using ColdTrace.Platform.Billing.Domain.Model.Commands;
 using ColdTrace.Platform.Billing.Domain.Model.Queries;
 using ColdTrace.Platform.Billing.Domain.Repositories;
-using ColdTrace.Platform.Billing.Domain.Services;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Billing.Application.CommandServices;
+using ColdTrace.Platform.Billing.Application.QueryServices;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 
@@ -15,7 +16,7 @@ namespace ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 ///     Application service implementation for provider-hosted checkout session creation.
 /// </summary>
 public class BillingCheckoutSessionCommandService(
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IOrganizationSubscriptionRepository organizationSubscriptionRepository,
     ISubscriptionPlanQueryService subscriptionPlanQueryService,
     ICheckoutSessionProviderService checkoutSessionProviderService,
@@ -28,8 +29,7 @@ public class BillingCheckoutSessionCommandService(
     {
         try
         {
-            var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-            if (organization is null)
+            if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
             {
                 logger.LogWarning("Organization not found for checkout session: {OrganizationId}",
                     command.OrganizationId);

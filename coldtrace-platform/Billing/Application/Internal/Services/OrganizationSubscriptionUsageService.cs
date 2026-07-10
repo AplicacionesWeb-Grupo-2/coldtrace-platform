@@ -1,6 +1,6 @@
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
 using ColdTrace.Platform.Billing.Application.Results;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.Iam.Domain.Repositories;
 
 namespace ColdTrace.Platform.Billing.Application.Internal.Services;
 

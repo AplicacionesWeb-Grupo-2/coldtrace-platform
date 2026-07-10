@@ -1,0 +1,30 @@
+using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.AssetManagement.Interfaces.Rest.Resources;
+
+namespace ColdTrace.Platform.AssetManagement.Interfaces.Rest.Transform;
+
+/// <summary>
+///     Assembles an IoT device resource from a domain entity.
+/// </summary>
+public static class IotDeviceResourceFromEntityAssembler
+{
+    /// <summary>
+    ///     Converts an IoT device entity into a response resource.
+    /// </summary>
+    public static IotDeviceResource ToResourceFromEntity(IotDevice entity) =>
+        new(
+            entity.Id,
+            entity.OrganizationId,
+            entity.GatewayId,
+            entity.Uuid,
+            entity.DeviceType,
+            entity.Model,
+            entity.MeasurementType,
+            entity.MeasurementParameters,
+            entity.ReadingFrequencySeconds,
+            entity.AssetId,
+            entity.Status,
+            entity.CalibrationStatus,
+            entity.LastCalibrationDate,
+            entity.NextCalibrationDate);
+}
