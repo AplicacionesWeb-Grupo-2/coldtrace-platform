@@ -21,14 +21,74 @@
     <data name="UnexpectedErrorProcessingRequest" xml:space="preserve">
         <value>An unexpected error occurred while processing your request.</value>
     </data>
+    <data name="BadRequestTitle" xml:space="preserve">
+        <value>Invalid request</value>
+    </data>
+    <data name="UnauthorizedTitle" xml:space="preserve">
+        <value>Authentication required</value>
+    </data>
+    <data name="ForbiddenTitle" xml:space="preserve">
+        <value>Access forbidden</value>
+    </data>
+    <data name="NotFoundTitle" xml:space="preserve">
+        <value>Resource not found</value>
+    </data>
+    <data name="MethodNotAllowedTitle" xml:space="preserve">
+        <value>Method not allowed</value>
+    </data>
+    <data name="ConflictTitle" xml:space="preserve">
+        <value>Resource conflict</value>
+    </data>
+    <data name="UnsupportedMediaTypeTitle" xml:space="preserve">
+        <value>Unsupported media type</value>
+    </data>
+    <data name="BadGatewayTitle" xml:space="preserve">
+        <value>Upstream service error</value>
+    </data>
+    <data name="ServiceUnavailableTitle" xml:space="preserve">
+        <value>Service unavailable</value>
+    </data>
+    <data name="GatewayTimeoutTitle" xml:space="preserve">
+        <value>Upstream service timeout</value>
+    </data>
+    <data name="ValidationFailedTitle" xml:space="preserve">
+        <value>Validation failed</value>
+    </data>
+    <data name="ValidationFailedDetail" xml:space="preserve">
+        <value>One or more validation errors occurred.</value>
+    </data>
+    <data name="InvalidField" xml:space="preserve">
+        <value>The value is invalid.</value>
+    </data>
+    <data name="The {0} field is required." xml:space="preserve">
+        <value>The {0} field is required.</value>
+    </data>
+    <data name="The field {0} must be between {1} and {2}." xml:space="preserve">
+        <value>The field {0} must be between {1} and {2}.</value>
+    </data>
+    <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
+        <value>The {0} field is not a valid e-mail address.</value>
+    </data>
     <data name="InvalidRequest" xml:space="preserve">
         <value>The request contains invalid values.</value>
+    </data>
+    <data name="AuthenticationRequired" xml:space="preserve">
+        <value>A valid bearer token is required to access this resource.</value>
+    </data>
+    <data name="AccessForbidden" xml:space="preserve">
+        <value>The authenticated user is not allowed to access this resource.</value>
     </data>
     <data name="ResourceNotFound" xml:space="preserve">
         <value>The requested resource was not found.</value>
     </data>
+    <data name="MethodNotAllowed" xml:space="preserve">
+        <value>The HTTP method is not allowed for this resource.</value>
+    </data>
     <data name="ResourceConflict" xml:space="preserve">
         <value>The request conflicts with the current resource state.</value>
+    </data>
+    <data name="UnsupportedMediaType" xml:space="preserve">
+        <value>The request content type is not supported.</value>
     </data>
     <data name="InvalidOrganizationRequest" xml:space="preserve">
         <value>The organization request contains invalid values.</value>
@@ -63,6 +123,12 @@
     <data name="UserNotFound" xml:space="preserve">
         <value>User was not found.</value>
     </data>
+    <data name="UserDeleteBlocked" xml:space="preserve">
+        <value>User cannot be deleted because related records still depend on it.</value>
+    </data>
+    <data name="UnexpectedErrorDeletingUser" xml:space="preserve">
+        <value>An unexpected error occurred while deleting the user.</value>
+    </data>
     <data name="RoleNotFound" xml:space="preserve">
         <value>Role was not found.</value>
     </data>
@@ -87,6 +153,21 @@
     <data name="LocationNotFound" xml:space="preserve">
         <value>Location was not found.</value>
     </data>
+    <data name="LocationOrganizationIdInvalid" xml:space="preserve">
+        <value>Organization id is invalid</value>
+    </data>
+    <data name="LocationIdInvalid" xml:space="preserve">
+        <value>Location id is invalid</value>
+    </data>
+    <data name="DeleteLocationOrganizationNotFound" xml:space="preserve">
+        <value>Organization was not found</value>
+    </data>
+    <data name="DeleteLocationNotFound" xml:space="preserve">
+        <value>Location was not found</value>
+    </data>
+    <data name="LocationDeleteBlocked" xml:space="preserve">
+        <value>Location cannot be deleted because assets, gateways or related records still depend on it</value>
+    </data>
     <data name="UnexpectedErrorCreatingLocation" xml:space="preserve">
         <value>An unexpected error occurred while creating the location.</value>
     </data>
@@ -95,6 +176,9 @@
     </data>
     <data name="UnexpectedErrorUpdatingLocation" xml:space="preserve">
         <value>An unexpected error occurred while updating the location.</value>
+    </data>
+    <data name="UnexpectedErrorDeletingLocation" xml:space="preserve">
+        <value>An unexpected error occurred while deleting the location.</value>
     </data>
     <data name="UnexpectedErrorGettingLocations" xml:space="preserve">
         <value>An unexpected error occurred while getting locations.</value>
@@ -117,8 +201,20 @@
     <data name="UnexpectedErrorGettingGateways" xml:space="preserve">
         <value>An unexpected error occurred while getting gateways.</value>
     </data>
+    <data name="GatewayDeleteBlocked" xml:space="preserve">
+        <value>Gateway cannot be deleted because devices or related records still depend on it</value>
+    </data>
+    <data name="UnexpectedErrorDeletingGateway" xml:space="preserve">
+        <value>An unexpected error occurred while deleting the gateway.</value>
+    </data>
     <data name="InvalidAssetRequest" xml:space="preserve">
         <value>The asset request is invalid.</value>
+    </data>
+    <data name="AssetOrganizationIdInvalid" xml:space="preserve">
+        <value>Organization id is invalid</value>
+    </data>
+    <data name="AssetIdInvalid" xml:space="preserve">
+        <value>Asset id is invalid</value>
     </data>
     <data name="AssetUuidDuplicated" xml:space="preserve">
         <value>Asset UUID already exists in this organization.</value>
@@ -135,6 +231,18 @@
     <data name="UnexpectedErrorUpdatingAsset" xml:space="preserve">
         <value>An unexpected error occurred while updating the asset.</value>
     </data>
+    <data name="AssetDeleteOrganizationNotFound" xml:space="preserve">
+        <value>Organization was not found</value>
+    </data>
+    <data name="AssetDeleteNotFound" xml:space="preserve">
+        <value>Asset was not found</value>
+    </data>
+    <data name="AssetDeleteBlocked" xml:space="preserve">
+        <value>Asset cannot be deleted because devices, readings, incidents or related records still depend on it</value>
+    </data>
+    <data name="UnexpectedErrorDeletingAsset" xml:space="preserve">
+        <value>An unexpected error occurred while deleting the asset.</value>
+    </data>
     <data name="UnexpectedErrorGettingAssets" xml:space="preserve">
         <value>An unexpected error occurred while getting assets.</value>
     </data>
@@ -147,6 +255,9 @@
     <data name="IotDeviceNotFound" xml:space="preserve">
         <value>IoT device was not found.</value>
     </data>
+    <data name="IotDeviceDeleteBlocked" xml:space="preserve">
+        <value>IoT device cannot be deleted because readings or related records still depend on it</value>
+    </data>
     <data name="IotDeviceAssetLocationNotCompatible" xml:space="preserve">
         <value>The selected asset is not located at the same gateway location.</value>
     </data>
@@ -158,6 +269,9 @@
     </data>
     <data name="UnexpectedErrorUpdatingIotDevice" xml:space="preserve">
         <value>An unexpected error occurred while updating the IoT device.</value>
+    </data>
+    <data name="UnexpectedErrorDeletingIotDevice" xml:space="preserve">
+        <value>An unexpected error occurred while deleting the IoT device.</value>
     </data>
     <data name="UnexpectedErrorGettingIotDevices" xml:space="preserve">
         <value>An unexpected error occurred while getting IoT devices.</value>
@@ -366,10 +480,58 @@
     <data name="BillingWebhookProcessingFailed" xml:space="preserve">
         <value>Stripe webhook could not be processed.</value>
     </data>
+    <data name="UnexpectedErrorGettingAssetSettings" xml:space="preserve">
+        <value>An unexpected error occurred while getting asset settings.</value>
+    </data>
+    <data name="InvalidMaintenanceScheduleRequest" xml:space="preserve">
+        <value>The maintenance schedule request is invalid.</value>
+    </data>
+    <data name="MaintenanceScheduleNotFound" xml:space="preserve">
+        <value>Maintenance schedule was not found.</value>
+    </data>
+    <data name="MaintenanceScheduleDuplicateActive" xml:space="preserve">
+        <value>The asset already has an active maintenance schedule.</value>
+    </data>
+    <data name="MaintenanceScheduleInvalidTransition" xml:space="preserve">
+        <value>Maintenance schedule lifecycle transition is invalid.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingMaintenanceSchedule" xml:space="preserve">
+        <value>An unexpected error occurred while creating the maintenance schedule.</value>
+    </data>
+    <data name="UnexpectedErrorGettingMaintenanceSchedules" xml:space="preserve">
+        <value>An unexpected error occurred while getting maintenance schedules.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingMaintenanceSchedule" xml:space="preserve">
+        <value>An unexpected error occurred while updating the maintenance schedule.</value>
+    </data>
+    <data name="InvalidTechnicalServiceRequest" xml:space="preserve">
+        <value>The technical service request is invalid.</value>
+    </data>
+    <data name="TechnicalServiceRequestNotFound" xml:space="preserve">
+        <value>Technical service request was not found.</value>
+    </data>
+    <data name="TechnicalServiceRequestInvalidTransition" xml:space="preserve">
+        <value>Technical service request lifecycle transition is invalid.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingTechnicalServiceRequest" xml:space="preserve">
+        <value>An unexpected error occurred while creating the technical service request.</value>
+    </data>
+    <data name="UnexpectedErrorGettingTechnicalServiceRequests" xml:space="preserve">
+        <value>An unexpected error occurred while getting technical service requests.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingTechnicalServiceRequest" xml:space="preserve">
+        <value>An unexpected error occurred while updating the technical service request.</value>
+    </data>
     <data name="MaintenanceSchedulePlanLimitExceeded" xml:space="preserve">
         <value>Current subscription plan does not allow maintenance scheduling</value>
     </data>
     <data name="TechnicalServiceRequestPlanLimitExceeded" xml:space="preserve">
         <value>Current subscription plan does not allow technical service requests</value>
+    </data>
+    <data name="InvalidPasswordResetRequest" xml:space="preserve">
+        <value>The password reset request is invalid.</value>
+    </data>
+    <data name="PasswordResetRequestFailed" xml:space="preserve">
+        <value>Password reset request could not be prepared.</value>
     </data>
 </root>

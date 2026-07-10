@@ -33,24 +33,15 @@ public static class ActionResultFromCreateUserResultAssembler
             Result<User, CreateUserError>.Failure failure =>
                 failure.Error switch
                 {
-                    CreateUserError.DuplicateEmail => controller.Conflict(localizer["UserEmailDuplicated"].Value),
+                    CreateUserError.DuplicateEmail => controller.ProblemResponse(localizer, "UserEmailDuplicated", StatusCodes.Status409Conflict),
                     CreateUserError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
-                    CreateUserError.RoleNotFound => controller.NotFound(localizer["RoleNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
+                    CreateUserError.RoleNotFound => controller.ProblemResponse(localizer, "RoleNotFound", StatusCodes.Status404NotFound),
                     CreateUserError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingUser"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingUser", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

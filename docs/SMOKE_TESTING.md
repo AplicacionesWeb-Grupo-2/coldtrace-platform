@@ -35,12 +35,14 @@ The smoke flow covered the main frontend-facing workflows:
 - MySQL is running locally.
 - The API can connect to `coldtrace_platform`.
 - The default local credentials are `root` / `root`, unless overridden through `ConnectionStrings__DefaultConnection`.
+- `JWT_SECRET` is set to a private value of at least 32 bytes.
 - The API starts successfully and Swagger is available at `/swagger/index.html`.
 - EF Core migrations are applied on startup.
 
 Run locally:
 
 ```bash
+JWT_SECRET="$(openssl rand -base64 48)" \
 ASPNETCORE_ENVIRONMENT=Development \
 /Users/mauriciopajes/.dotnet/dotnet run \
   --project coldtrace-platform/coldtrace-platform.csproj \
@@ -48,6 +50,8 @@ ASPNETCORE_ENVIRONMENT=Development \
 ```
 
 ## Recommended Smoke Flow
+
+Complete the APPWEB-65 authentication bootstrap first. Attach the returned bearer token to every business request below except the public subscription catalog, organization sign-up, and Stripe webhook.
 
 1. Open `/swagger/index.html`.
 2. Confirm `/swagger/v1/swagger.json` returns `200`.
@@ -102,6 +106,14 @@ ASPNETCORE_ENVIRONMENT=Development \
 | Cross-organization resource access | `404` |
 | Invalid payloads or unsupported lifecycle inputs | `400` |
 
+## Error Response Checks
+
+1. Submit an invalid organization payload with `Accept-Language: es`; expect `400`, content type `application/problem+json`, `ValidationProblemDetails`, `code` `VALIDATION_ERROR`, localized `title`/`detail`/`errors`, and the request path in `instance`.
+2. Request organization `2147483647` through an organization-scoped route; expect `404` `ProblemDetails` with `code` `ORGANIZATION_NOT_FOUND` and the same five common fields.
+3. Repeat a create request with an existing unique email, tax identifier, UUID, or name; expect `409` `ProblemDetails` with the feature-specific stable code and localized detail.
+4. Confirm no error payload contains `exception`, `stackTrace`, or application source paths.
+5. Re-run the plan-limit check and confirm its entitlement fields remain alongside `code`; re-run unsigned/misconfigured Stripe webhook checks and confirm their existing `400`/`503` statuses.
+
 ## Data Notes
 
 - Test data should remain internally consistent: organization, location, gateway, asset, IoT device, readings, incidents, maintenance, and reports must belong to the same organization unless the check is intentionally validating a `404`.
@@ -113,6 +125,7 @@ ASPNETCORE_ENVIRONMENT=Development \
 
 Detailed manual checks are also available:
 
+- [APPWEB-65 JWT and CORS hardening](APPWEB-65-smoke-checklist.md)
 - [APPWEB-49 IoT Devices](APPWEB-49-smoke-checklist.md)
 - [APPWEB-51 API Foundation](APPWEB-51-smoke-checklist.md)
 - [APPWEB-52 Organization Sign-Up](APPWEB-52-smoke-checklist.md)

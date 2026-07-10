@@ -1,5 +1,6 @@
 using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Application.Errors;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices;
 using ColdTrace.Platform.IdentityAccess.Application.Results;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
@@ -23,6 +24,7 @@ public class OrganizationSignUpCommandService(
     IOrganizationRepository organizationRepository,
     IUserRepository userRepository,
     IRoleRepository roleRepository,
+    IHashingService hashingService,
     ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<OrganizationSignUpCommandService> logger)
@@ -69,7 +71,9 @@ public class OrganizationSignUpCommandService(
         try
         {
             var organization = new Organization(command.ToCreateOrganizationCommand());
-            var user = new User(command.ToCreateUserCommand(), organization, initialRole);
+            var userCommand = command.ToCreateUserCommand();
+            var passwordHash = hashingService.HashPassword(userCommand.Password);
+            var user = new User(userCommand, organization, initialRole, passwordHash);
 
             await organizationRepository.AddAsync(organization, cancellationToken);
             await userRepository.AddAsync(user, cancellationToken);

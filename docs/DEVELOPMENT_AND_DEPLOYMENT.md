@@ -10,6 +10,8 @@ Copy the sample environment file when you need custom local values:
 cp .env.example .env
 ```
 
+Set `JWT_SECRET` in the untracked `.env` file to a generated value of at least 32 bytes. Docker Compose uses only `http://localhost:5173` and `http://127.0.0.1:5173` when `CORS_ALLOWED_ORIGINS` is blank.
+
 Start MySQL and the API with Docker Compose:
 
 ```bash
@@ -35,6 +37,7 @@ If only the database is needed, start MySQL and run the API with the local SDK:
 ```bash
 docker compose up -d mysql
 
+JWT_SECRET="$(openssl rand -base64 48)" \
 ASPNETCORE_ENVIRONMENT=Development \
 /Users/mauriciopajes/.dotnet/dotnet run \
   --project coldtrace-platform/coldtrace-platform.csproj \
@@ -77,6 +80,7 @@ Required Google Cloud resources:
 Cloud Run service: coldtrace-platform
 Cloud SQL instance: coldtrace-mysql
 Secret Manager secret: coldtrace-db-password
+Secret Manager secret: coldtrace-jwt-secret
 Secret Manager secret: coldtrace-openai-api-key
 Secret Manager secret: coldtrace-google-oauth-client-secret
 Secret Manager secret: coldtrace-apple-private-key
@@ -102,12 +106,14 @@ The Vue deployment may override the public browser values with `VITE_GOOGLE_OAUT
 After exporting the required public provider configuration, deploy with:
 
 ```bash
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app \
 scripts/deploy-cloud-run.sh
 ```
 
 Preview the rendered Cloud Run manifest without deploying:
 
 ```bash
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app \
 DRY_RUN=true scripts/deploy-cloud-run.sh
 ```
 
@@ -121,6 +127,9 @@ DB_INSTANCE_NAME=coldtrace-mysql \
 DATABASE_NAME=coldtrace_platform \
 DATABASE_USER=coldtrace_app \
 DB_SECRET_NAME=coldtrace-db-password \
+JWT_SECRET_NAME=coldtrace-jwt-secret \
+JWT_EXPIRATION_DAYS=7 \
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app \
 FRONTEND_ORIGIN=https://coldtrace-frontend-web.vercel.app \
 GOOGLE_OAUTH_CLIENT_ID=your-google-web-client-id \
 APPLE_OAUTH_CLIENT_ID=your-apple-service-id \
@@ -144,6 +153,8 @@ By default, provider redirects and Stripe returns are derived from `FRONTEND_ORI
 
 Use `DRY_RUN=true` with non-secret public configuration to inspect the manifest. The output contains Secret Manager names and references, never secret values. The script stops if a required public value or a template placeholder is missing.
 
+`JWT_SECRET_NAME` identifies a Secret Manager secret; the JWT value itself is never placed in the manifest or deployment command. Production startup also fails closed when the JWT secret or `CORS_ALLOWED_ORIGINS` is missing.
+
 The script builds the image tag from the project version in `coldtrace-platform/coldtrace-platform.csproj`. For version `1.0.2`, the default image tag is:
 
 ```text
@@ -153,7 +164,7 @@ us-central1-docker.pkg.dev/coldtrace-platform-20260619/cloud-run-source-deploy/c
 After deployment, the script checks:
 
 ```text
-/api/v1/roles
+/api/v1/subscription-plans
 ```
 
 ## Database Access

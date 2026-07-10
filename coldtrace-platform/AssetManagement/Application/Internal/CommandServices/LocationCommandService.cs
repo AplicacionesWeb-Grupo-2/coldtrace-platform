@@ -168,6 +168,67 @@ public class LocationCommandService(
         }
     }
 
+    /// <inheritdoc />
+    public async Task<Result<DeleteLocationCommand, DeleteLocationError>> Handle(
+        DeleteLocationCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for location deletion: {OrganizationId}",
+                command.OrganizationId);
+            return new Result<DeleteLocationCommand, DeleteLocationError>.Failure(
+                DeleteLocationError.OrganizationNotFound);
+        }
+
+        var location = await locationRepository.FindByIdAndOrganizationIdAsync(
+            command.LocationId,
+            command.OrganizationId,
+            cancellationToken);
+        if (location is null)
+        {
+            logger.LogWarning(
+                "Location not found for deletion: {OrganizationId} {LocationId}",
+                command.OrganizationId,
+                command.LocationId);
+            return new Result<DeleteLocationCommand, DeleteLocationError>.Failure(
+                DeleteLocationError.LocationNotFound);
+        }
+
+        try
+        {
+            locationRepository.Remove(location);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            logger.LogInformation(
+                "Location deleted: {OrganizationId} {LocationId}",
+                command.OrganizationId,
+                command.LocationId);
+            return new Result<DeleteLocationCommand, DeleteLocationError>.Success(command);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Location deletion blocked by a database relationship: {OrganizationId} {LocationId}",
+                command.OrganizationId,
+                command.LocationId);
+            return new Result<DeleteLocationCommand, DeleteLocationError>.Failure(
+                DeleteLocationError.DeleteBlocked);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error deleting location {LocationId} for organization {OrganizationId}",
+                command.LocationId,
+                command.OrganizationId);
+            return new Result<DeleteLocationCommand, DeleteLocationError>.Failure(
+                DeleteLocationError.UnexpectedError);
+        }
+    }
+
     private static bool TryGetDuplicateLocationNameError(DbUpdateException exception)
     {
         for (Exception? current = exception; current is not null; current = current.InnerException)

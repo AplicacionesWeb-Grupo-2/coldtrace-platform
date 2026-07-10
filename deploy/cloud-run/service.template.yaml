@@ -36,6 +36,13 @@ spec:
           value: ${DATABASE_NAME}
         - name: DATABASE_USER
           value: ${DATABASE_USER}
+        - name: TokenSettings__Secret
+          valueFrom:
+            secretKeyRef:
+              key: latest
+              name: ${JWT_SECRET_NAME}
+        - name: TokenSettings__ExpirationDays
+          value: '${JWT_EXPIRATION_DAYS}'
         - name: CORS_ALLOWED_ORIGINS
           value: '${CORS_ALLOWED_ORIGINS}'
         - name: AiAssistance__Enabled
