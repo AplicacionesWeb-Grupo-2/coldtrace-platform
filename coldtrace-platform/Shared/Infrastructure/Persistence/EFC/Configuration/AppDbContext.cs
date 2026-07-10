@@ -120,6 +120,12 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<PasswordResetRequest>().Property(request => request.ConsumedAt);
         builder.Entity<PasswordResetRequest>().HasIndex(request => request.TokenHash).IsUnique();
         builder.Entity<PasswordResetRequest>().HasIndex(request => request.UserId);
+        builder.Entity<PasswordResetRequest>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(request => request.UserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_password_reset_requests_users_user_id");
 
         builder.Entity<OrganizationSubscription>().HasKey(subscription => subscription.Id);
         builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Id).IsRequired()

@@ -28,6 +28,12 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("p_k_password_reset_requests", x => x.id);
+                    table.ForeignKey(
+                        name: "f_k_password_reset_requests_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 

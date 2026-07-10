@@ -1809,6 +1809,16 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.PasswordResetRequest", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_password_reset_requests_users_user_id");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Role", b =>
                 {
                     b.OwnsMany("ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects.Permission", "Permissions", b1 =>

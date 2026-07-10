@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260709224458_AddPasswordResetRequests")]
+    [Migration("20260710163813_AddPasswordResetRequests")]
     partial class AddPasswordResetRequests
     {
         /// <inheritdoc />
@@ -1810,6 +1810,16 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasConstraintName("f_k_organization_subscriptions_organizations_organization_id");
 
                     b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.PasswordResetRequest", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_password_reset_requests_users_user_id");
                 });
 
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Role", b =>
