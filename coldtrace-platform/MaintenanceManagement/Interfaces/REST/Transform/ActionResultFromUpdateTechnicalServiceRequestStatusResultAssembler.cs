@@ -28,25 +28,16 @@ public static class ActionResultFromUpdateTechnicalServiceRequestStatusResultAss
                 failure.Error switch
                 {
                     UpdateTechnicalServiceRequestStatusError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     UpdateTechnicalServiceRequestStatusError.TechnicalServiceRequestNotFound =>
-                        controller.NotFound(localizer["TechnicalServiceRequestNotFound"].Value),
+                        controller.ProblemResponse(localizer, "TechnicalServiceRequestNotFound", StatusCodes.Status404NotFound),
                     UpdateTechnicalServiceRequestStatusError.InvalidStatusTransition =>
-                        controller.Conflict(localizer["TechnicalServiceRequestInvalidTransition"].Value),
+                        controller.ProblemResponse(localizer, "TechnicalServiceRequestInvalidTransition", StatusCodes.Status409Conflict),
                     UpdateTechnicalServiceRequestStatusError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorUpdatingTechnicalServiceRequest"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorUpdatingTechnicalServiceRequest", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

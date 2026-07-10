@@ -21,5 +21,6 @@ public static class CreateOrganizationSignUpCommandFromResourceAssembler
             resource.ContactEmail,
             resource.FirstName,
             resource.LastName,
-            resource.Email);
+            resource.Email,
+            resource.Password);
 }

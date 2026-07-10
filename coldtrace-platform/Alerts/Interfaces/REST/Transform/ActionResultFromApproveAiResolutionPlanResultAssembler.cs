@@ -25,31 +25,22 @@ public static class ActionResultFromApproveAiResolutionPlanResultAssembler
                 failure.Error switch
                 {
                     ApproveAiResolutionPlanError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     ApproveAiResolutionPlanError.IncidentNotFound =>
-                        controller.NotFound(localizer["IncidentNotFound"].Value),
+                        controller.ProblemResponse(localizer, "IncidentNotFound", StatusCodes.Status404NotFound),
                     ApproveAiResolutionPlanError.PlanNotFound =>
-                        controller.NotFound(localizer["AiResolutionPlanNotFound"].Value),
+                        controller.ProblemResponse(localizer, "AiResolutionPlanNotFound", StatusCodes.Status404NotFound),
                     ApproveAiResolutionPlanError.PlanAlreadyDecided =>
-                        controller.Conflict(localizer["AiResolutionPlanAlreadyDecided"].Value),
+                        controller.ProblemResponse(localizer, "AiResolutionPlanAlreadyDecided", StatusCodes.Status409Conflict),
                     ApproveAiResolutionPlanError.IncidentAlreadyResolved =>
-                        controller.Conflict(localizer["IncidentAlreadyResolved"].Value),
+                        controller.ProblemResponse(localizer, "IncidentAlreadyResolved", StatusCodes.Status409Conflict),
                     ApproveAiResolutionPlanError.InvalidIncidentLifecycleTransition =>
-                        controller.Conflict(localizer["InvalidIncidentLifecycleTransition"].Value),
+                        controller.ProblemResponse(localizer, "InvalidIncidentLifecycleTransition", StatusCodes.Status409Conflict),
                     ApproveAiResolutionPlanError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorApprovingAiResolutionPlan"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorApprovingAiResolutionPlan", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }
