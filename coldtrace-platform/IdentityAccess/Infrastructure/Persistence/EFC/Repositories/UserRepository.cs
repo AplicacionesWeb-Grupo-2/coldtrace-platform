@@ -21,6 +21,14 @@ public class UserRepository(AppDbContext context) : BaseRepository<User>(context
     }
 
     /// <inheritdoc />
+    public async Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
+    {
+        var normalizedEmail = email.Trim().ToLowerInvariant();
+        return await Context.Set<User>()
+            .FirstOrDefaultAsync(user => user.Email == normalizedEmail, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<IEnumerable<User>> FindAllByOrganizationIdAsync(
         int organizationId,
         CancellationToken cancellationToken = default)

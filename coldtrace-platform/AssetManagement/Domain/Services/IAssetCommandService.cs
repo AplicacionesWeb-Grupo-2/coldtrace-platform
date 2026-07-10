@@ -17,4 +17,8 @@ public interface IAssetCommandService
     Task<Result<Asset, UpdateAssetError>> Handle(
         UpdateAssetCommand command,
         CancellationToken cancellationToken = default);
+
+    Task<Result<DeleteAssetCommand, DeleteAssetError>> Handle(
+        DeleteAssetCommand command,
+        CancellationToken cancellationToken = default);
 }

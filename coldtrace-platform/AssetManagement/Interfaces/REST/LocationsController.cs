@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Interfaces.REST.Resources;
@@ -37,7 +38,7 @@ public class LocationsController(
         Description = "Gets operational locations that belong to the provided organization",
         OperationId = "GetLocationsByOrganization")]
     [SwaggerResponse(200, "Locations found", typeof(IEnumerable<LocationResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetLocationsByOrganizationId(
         [FromRoute] int organizationId,
@@ -66,7 +67,7 @@ public class LocationsController(
         Description = "Gets one operational location that belongs to the provided organization",
         OperationId = "GetLocationById")]
     [SwaggerResponse(200, "Location found", typeof(LocationResource))]
-    [SwaggerResponse(404, "Organization or location not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or location not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetLocationById(
         [FromRoute] int organizationId,
@@ -95,9 +96,9 @@ public class LocationsController(
         Description = "Creates an operational location for an organization",
         OperationId = "CreateLocation")]
     [SwaggerResponse(201, "The location was created", typeof(LocationResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
-    [SwaggerResponse(409, "Location name already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Location name already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateLocation(
         [FromRoute] int organizationId,
@@ -119,7 +120,7 @@ public class LocationsController(
                 ex,
                 "Invalid location creation request for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidLocationRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidLocationRequest");
         }
         catch (PlanLimitExceededException)
         {
@@ -131,10 +132,7 @@ public class LocationsController(
                 ex,
                 "Unexpected error while creating location for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingLocation"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingLocation", 500);
         }
     }
 
@@ -152,9 +150,9 @@ public class LocationsController(
         Description = "Updates an operational location for an organization",
         OperationId = "UpdateLocation")]
     [SwaggerResponse(200, "The location was updated", typeof(LocationResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization or location not found", typeof(string))]
-    [SwaggerResponse(409, "Location name already exists", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or location not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Location name already exists", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> UpdateLocation(
         [FromRoute] int organizationId,
@@ -181,7 +179,7 @@ public class LocationsController(
                 "Invalid location update request for organization {OrganizationId} and location {LocationId}",
                 organizationId,
                 locationId);
-            return BadRequest(localizer["InvalidLocationRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidLocationRequest");
         }
         catch (Exception ex)
         {
@@ -190,10 +188,69 @@ public class LocationsController(
                 "Unexpected error while updating location {LocationId} for organization {OrganizationId}",
                 locationId,
                 organizationId);
+            return this.ProblemResponse(localizer, "UnexpectedErrorUpdatingLocation", 500);
+        }
+    }
+
+    /// <summary>
+    ///     Deletes a location under an organization.
+    /// </summary>
+    /// <param name="organizationId">Organization identifier.</param>
+    /// <param name="locationId">Location identifier.</param>
+    /// <param name="cancellationToken">Token to cancel the asynchronous operation.</param>
+    /// <returns>An empty response when deleted or a problem response.</returns>
+    [HttpDelete("{locationId:int}")]
+    [SwaggerOperation(
+        Summary = "Deletes a location",
+        Description = "Deletes one operational location that belongs to the provided organization",
+        OperationId = "DeleteLocation")]
+    [SwaggerResponse(204, "The location was deleted")]
+    [SwaggerResponse(400, "A route identifier is invalid", typeof(ProblemDetails))]
+    [SwaggerResponse(404, "Organization or location not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Related records prevent deleting the location", typeof(ProblemDetails))]
+    [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
+    public async Task<ActionResult> DeleteLocation(
+        [FromRoute] int organizationId,
+        [FromRoute] int locationId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var command = new DeleteLocationCommand(organizationId, locationId);
+            var result = await locationCommandService.Handle(command, cancellationToken);
+            return ActionResultFromDeleteLocationResultAssembler.ToActionResultFromDeleteLocationResult(
+                result,
+                this,
+                localizer);
+        }
+        catch (ArgumentException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Invalid location deletion request for organization {OrganizationId} and location {LocationId}",
+                organizationId,
+                locationId);
+            var messageKey = ex.ParamName switch
+            {
+                "organizationId" => "LocationOrganizationIdInvalid",
+                "locationId" => "LocationIdInvalid",
+                _ => "InvalidLocationRequest"
+            };
+            return Problem(
+                detail: localizer[messageKey].Value,
+                statusCode: StatusCodes.Status400BadRequest);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error while deleting location {LocationId} for organization {OrganizationId}",
+                locationId,
+                organizationId);
             return Problem(
                 title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorUpdatingLocation"].Value,
-                statusCode: 500);
+                detail: localizer["UnexpectedErrorDeletingLocation"].Value,
+                statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }

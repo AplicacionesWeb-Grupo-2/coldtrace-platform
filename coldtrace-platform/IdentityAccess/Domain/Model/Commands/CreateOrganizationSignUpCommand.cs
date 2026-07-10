@@ -15,7 +15,8 @@ public record CreateOrganizationSignUpCommand
         string contactEmail,
         string firstName,
         string? lastName,
-        string email)
+        string email,
+        string password)
     {
         LegalName = RequireNonBlank(legalName);
         CommercialName = RequireNonBlank(commercialName);
@@ -24,6 +25,7 @@ public record CreateOrganizationSignUpCommand
         FirstName = RequireNonBlank(firstName);
         LastName = lastName?.Trim() ?? string.Empty;
         Email = RequireValidEmail(email);
+        Password = RequireValidPassword(password);
     }
 
     /// <summary>
@@ -62,6 +64,11 @@ public record CreateOrganizationSignUpCommand
     public string Email { get; init; }
 
     /// <summary>
+    ///     Gets the first user raw password used to create the password hash.
+    /// </summary>
+    public string Password { get; init; }
+
+    /// <summary>
     ///     Converts this sign-up command into an organization creation command.
     /// </summary>
     /// <returns>An organization creation command.</returns>
@@ -72,7 +79,7 @@ public record CreateOrganizationSignUpCommand
     ///     Converts this sign-up command into a user creation command.
     /// </summary>
     /// <returns>A user creation command.</returns>
-    public CreateUserCommand ToCreateUserCommand() => new(FirstName, LastName, Email);
+    public CreateUserCommand ToCreateUserCommand() => new(FirstName, LastName, Email, Password);
 
     private static string RequireNonBlank(string? value)
     {
@@ -90,5 +97,12 @@ public record CreateOrganizationSignUpCommand
         var normalized = RequireNonBlank(value).ToLowerInvariant();
         if (!normalized.Contains('@')) throw new ArgumentException("Email is invalid.");
         return normalized;
+    }
+
+    private static string RequireValidPassword(string? value)
+    {
+        var password = RequireNonBlank(value);
+        if (password.Length < 8) throw new ArgumentException("Password must have at least 8 characters.");
+        return password;
     }
 }
