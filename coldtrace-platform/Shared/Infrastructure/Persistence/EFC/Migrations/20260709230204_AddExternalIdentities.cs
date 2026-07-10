@@ -28,19 +28,8 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("p_k_external_identities", x => x.id);
-                    table.ForeignKey(
-                        name: "f_k_external_identities_users_user_id",
-                        column: x => x.user_id,
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateIndex(
-                name: "i_x_external_identities_user_id",
-                table: "external_identities",
-                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "uk_external_identities_provider_subject",
