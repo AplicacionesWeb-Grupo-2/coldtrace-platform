@@ -23,6 +23,7 @@ DATABASE_USER="${DATABASE_USER:-coldtrace_app}"
 DB_SECRET_NAME="${DB_SECRET_NAME:-coldtrace-db-password}"
 JWT_SECRET_NAME="${JWT_SECRET_NAME:-coldtrace-jwt-secret}"
 JWT_EXPIRATION_DAYS="${JWT_EXPIRATION_DAYS:-7}"
+CLOUD_RUN_SERVICE_ACCOUNT_NAME="${CLOUD_RUN_SERVICE_ACCOUNT_NAME:-coldtrace-cloud-run-runtime}"
 MAX_INSTANCES="${MAX_INSTANCES:-1}"
 FRONTEND_ORIGIN="${FRONTEND_ORIGIN:-https://coldtrace-frontend-web.vercel.app}"
 CORS_ALLOWED_ORIGINS="${CORS_ALLOWED_ORIGINS:-${FRONTEND_ORIGIN}}"
@@ -90,7 +91,7 @@ if [[ -z "$APP_VERSION" ]]; then
 fi
 
 GCP_PROJECT_NUMBER="${GCP_PROJECT_NUMBER:-$(gcloud projects describe "$GCP_PROJECT_ID" --format='value(projectNumber)')}"
-CLOUD_RUN_SERVICE_ACCOUNT="${CLOUD_RUN_SERVICE_ACCOUNT:-${GCP_PROJECT_NUMBER}-compute@developer.gserviceaccount.com}"
+CLOUD_RUN_SERVICE_ACCOUNT="${CLOUD_RUN_SERVICE_ACCOUNT:-${CLOUD_RUN_SERVICE_ACCOUNT_NAME}@${GCP_PROJECT_ID}.iam.gserviceaccount.com}"
 DB_INSTANCE_CONNECTION_NAME="${DB_INSTANCE_CONNECTION_NAME:-$(gcloud sql instances describe "$DB_INSTANCE_NAME" --project "$GCP_PROJECT_ID" --format='value(connectionName)')}"
 IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/cloud-run-source-deploy/coldtrace-platform/coldtrace-platform}"
 IMAGE_URI="${IMAGE_URI:-${IMAGE_REPOSITORY}:v${APP_VERSION}}"
