@@ -80,13 +80,7 @@ public class MicrosoftExtensionsAiStructuredOutputService(
                 useJsonSchemaResponseFormat: true,
                 cancellationToken: timeout.Token);
 
-            if (response.TryGetResult(out var output) && output is not null)
-                return new Result<TOutput, AiGenerationError>.Success(output);
-
-            logger.LogWarning(
-                "AI provider returned invalid structured output. Contract: {ContractName}",
-                contractName);
-            return new Result<TOutput, AiGenerationError>.Failure(AiGenerationError.InvalidStructuredOutput);
+            return new Result<TOutput, AiGenerationError>.Success(response.Result);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
