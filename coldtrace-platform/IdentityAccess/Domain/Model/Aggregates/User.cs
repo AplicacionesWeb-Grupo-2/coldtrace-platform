@@ -23,11 +23,13 @@ public class User
     /// <param name="command">Command containing user identity data.</param>
     /// <param name="organization">Organization that owns the user.</param>
     /// <param name="role">Role assigned to the user.</param>
-    public User(CreateUserCommand command, Organization organization, Role role)
+    /// <param name="passwordHash">BCrypt password hash.</param>
+    public User(CreateUserCommand command, Organization organization, Role role, string passwordHash)
     {
         FirstName = command.FirstName;
         LastName = command.LastName;
         Email = command.Email;
+        PasswordHash = RequirePasswordHash(passwordHash);
         Organization = organization;
         Role = role;
     }
@@ -36,11 +38,13 @@ public class User
     ///     Creates a user from a create command with validated identifiers.
     /// </summary>
     /// <param name="command">Command containing user identity data and references.</param>
-    public User(CreateUserCommand command)
+    /// <param name="passwordHash">BCrypt password hash.</param>
+    public User(CreateUserCommand command, string passwordHash)
     {
         FirstName = command.FirstName;
         LastName = command.LastName;
         Email = command.Email;
+        PasswordHash = RequirePasswordHash(passwordHash);
         OrganizationId = command.OrganizationId;
         RoleId = command.RoleId;
     }
@@ -76,6 +80,11 @@ public class User
     public string Email { get; private set; }
 
     /// <summary>
+    ///     Gets the BCrypt password hash, or null for a legacy user without credentials.
+    /// </summary>
+    public string? PasswordHash { get; private set; }
+
+    /// <summary>
     ///     Gets the owning organization identifier.
     /// </summary>
     public int OrganizationId { get; private set; }
@@ -102,5 +111,11 @@ public class User
     public void AssignRole(AssignUserRoleCommand command)
     {
         RoleId = command.RoleId;
+    }
+
+    private static string RequirePasswordHash(string? passwordHash)
+    {
+        if (string.IsNullOrWhiteSpace(passwordHash)) throw new ArgumentException("Password hash is required.");
+        return passwordHash;
     }
 }

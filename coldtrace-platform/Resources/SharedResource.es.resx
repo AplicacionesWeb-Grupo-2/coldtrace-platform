@@ -21,14 +21,74 @@
     <data name="UnexpectedErrorProcessingRequest" xml:space="preserve">
         <value>Ocurrio un error inesperado al procesar su solicitud.</value>
     </data>
+    <data name="BadRequestTitle" xml:space="preserve">
+        <value>Solicitud no valida</value>
+    </data>
+    <data name="UnauthorizedTitle" xml:space="preserve">
+        <value>Autenticacion requerida</value>
+    </data>
+    <data name="ForbiddenTitle" xml:space="preserve">
+        <value>Acceso prohibido</value>
+    </data>
+    <data name="NotFoundTitle" xml:space="preserve">
+        <value>Recurso no encontrado</value>
+    </data>
+    <data name="MethodNotAllowedTitle" xml:space="preserve">
+        <value>Metodo no permitido</value>
+    </data>
+    <data name="ConflictTitle" xml:space="preserve">
+        <value>Conflicto de recurso</value>
+    </data>
+    <data name="UnsupportedMediaTypeTitle" xml:space="preserve">
+        <value>Tipo de contenido no compatible</value>
+    </data>
+    <data name="BadGatewayTitle" xml:space="preserve">
+        <value>Error del servicio externo</value>
+    </data>
+    <data name="ServiceUnavailableTitle" xml:space="preserve">
+        <value>Servicio no disponible</value>
+    </data>
+    <data name="GatewayTimeoutTitle" xml:space="preserve">
+        <value>Tiempo de espera agotado del servicio externo</value>
+    </data>
+    <data name="ValidationFailedTitle" xml:space="preserve">
+        <value>La validacion fallo</value>
+    </data>
+    <data name="ValidationFailedDetail" xml:space="preserve">
+        <value>Ocurrieron uno o mas errores de validacion.</value>
+    </data>
+    <data name="InvalidField" xml:space="preserve">
+        <value>El valor no es valido.</value>
+    </data>
+    <data name="The {0} field is required." xml:space="preserve">
+        <value>El campo {0} es obligatorio.</value>
+    </data>
+    <data name="The field {0} must be between {1} and {2}." xml:space="preserve">
+        <value>El campo {0} debe estar entre {1} y {2}.</value>
+    </data>
+    <data name="The {0} field is not a valid e-mail address." xml:space="preserve">
+        <value>El campo {0} no es una direccion de correo valida.</value>
+    </data>
     <data name="InvalidRequest" xml:space="preserve">
         <value>La solicitud contiene valores no validos.</value>
+    </data>
+    <data name="AuthenticationRequired" xml:space="preserve">
+        <value>Se requiere un token bearer valido para acceder a este recurso.</value>
+    </data>
+    <data name="AccessForbidden" xml:space="preserve">
+        <value>El usuario autenticado no tiene permiso para acceder a este recurso.</value>
     </data>
     <data name="ResourceNotFound" xml:space="preserve">
         <value>El recurso solicitado no fue encontrado.</value>
     </data>
+    <data name="MethodNotAllowed" xml:space="preserve">
+        <value>El metodo HTTP no esta permitido para este recurso.</value>
+    </data>
     <data name="ResourceConflict" xml:space="preserve">
         <value>La solicitud entra en conflicto con el estado actual del recurso.</value>
+    </data>
+    <data name="UnsupportedMediaType" xml:space="preserve">
+        <value>El tipo de contenido de la solicitud no es compatible.</value>
     </data>
     <data name="InvalidOrganizationRequest" xml:space="preserve">
         <value>La solicitud de organizacion contiene valores no validos.</value>
@@ -62,6 +122,12 @@
     </data>
     <data name="UserNotFound" xml:space="preserve">
         <value>No se encontro el usuario.</value>
+    </data>
+    <data name="UserDeleteBlocked" xml:space="preserve">
+        <value>El usuario no puede eliminarse porque todavia existen registros relacionados que dependen de el.</value>
+    </data>
+    <data name="UnexpectedErrorDeletingUser" xml:space="preserve">
+        <value>Ocurrio un error inesperado al eliminar el usuario.</value>
     </data>
     <data name="RoleNotFound" xml:space="preserve">
         <value>No se encontro el rol.</value>
@@ -120,6 +186,12 @@
     <data name="InvalidAssetRequest" xml:space="preserve">
         <value>La solicitud de activo no es valida.</value>
     </data>
+    <data name="AssetOrganizationIdInvalid" xml:space="preserve">
+        <value>El identificador de organizacion no es valido</value>
+    </data>
+    <data name="AssetIdInvalid" xml:space="preserve">
+        <value>El identificador de activo no es valido</value>
+    </data>
     <data name="AssetUuidDuplicated" xml:space="preserve">
         <value>El UUID del activo ya existe en esta organizacion.</value>
     </data>
@@ -134,6 +206,18 @@
     </data>
     <data name="UnexpectedErrorUpdatingAsset" xml:space="preserve">
         <value>Ocurrio un error inesperado al actualizar el activo.</value>
+    </data>
+    <data name="AssetDeleteOrganizationNotFound" xml:space="preserve">
+        <value>La organizacion no fue encontrada</value>
+    </data>
+    <data name="AssetDeleteNotFound" xml:space="preserve">
+        <value>El activo no fue encontrado</value>
+    </data>
+    <data name="AssetDeleteBlocked" xml:space="preserve">
+        <value>El activo no puede eliminarse porque todavia existen dispositivos, lecturas, incidencias o registros relacionados que dependen de el</value>
+    </data>
+    <data name="UnexpectedErrorDeletingAsset" xml:space="preserve">
+        <value>Ocurrio un error inesperado al eliminar el activo.</value>
     </data>
     <data name="UnexpectedErrorGettingAssets" xml:space="preserve">
         <value>Ocurrio un error inesperado al obtener activos.</value>
@@ -372,10 +456,58 @@
     <data name="BillingWebhookProcessingFailed" xml:space="preserve">
         <value>El webhook de Stripe no pudo procesarse.</value>
     </data>
+    <data name="UnexpectedErrorGettingAssetSettings" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener la configuracion de activos.</value>
+    </data>
+    <data name="InvalidMaintenanceScheduleRequest" xml:space="preserve">
+        <value>La solicitud de programacion de mantenimiento no es valida.</value>
+    </data>
+    <data name="MaintenanceScheduleNotFound" xml:space="preserve">
+        <value>La programacion de mantenimiento no fue encontrada.</value>
+    </data>
+    <data name="MaintenanceScheduleDuplicateActive" xml:space="preserve">
+        <value>El activo ya tiene una programacion de mantenimiento activa.</value>
+    </data>
+    <data name="MaintenanceScheduleInvalidTransition" xml:space="preserve">
+        <value>La transicion de ciclo de vida de la programacion de mantenimiento no es valida.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingMaintenanceSchedule" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear la programacion de mantenimiento.</value>
+    </data>
+    <data name="UnexpectedErrorGettingMaintenanceSchedules" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener las programaciones de mantenimiento.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingMaintenanceSchedule" xml:space="preserve">
+        <value>Ocurrio un error inesperado al actualizar la programacion de mantenimiento.</value>
+    </data>
+    <data name="InvalidTechnicalServiceRequest" xml:space="preserve">
+        <value>La solicitud de servicio tecnico no es valida.</value>
+    </data>
+    <data name="TechnicalServiceRequestNotFound" xml:space="preserve">
+        <value>La solicitud de servicio tecnico no fue encontrada.</value>
+    </data>
+    <data name="TechnicalServiceRequestInvalidTransition" xml:space="preserve">
+        <value>La transicion de ciclo de vida de la solicitud de servicio tecnico no es valida.</value>
+    </data>
+    <data name="UnexpectedErrorCreatingTechnicalServiceRequest" xml:space="preserve">
+        <value>Ocurrio un error inesperado al crear la solicitud de servicio tecnico.</value>
+    </data>
+    <data name="UnexpectedErrorGettingTechnicalServiceRequests" xml:space="preserve">
+        <value>Ocurrio un error inesperado al obtener las solicitudes de servicio tecnico.</value>
+    </data>
+    <data name="UnexpectedErrorUpdatingTechnicalServiceRequest" xml:space="preserve">
+        <value>Ocurrio un error inesperado al actualizar la solicitud de servicio tecnico.</value>
+    </data>
     <data name="MaintenanceSchedulePlanLimitExceeded" xml:space="preserve">
         <value>El plan de suscripcion actual no permite programar mantenimiento</value>
     </data>
     <data name="TechnicalServiceRequestPlanLimitExceeded" xml:space="preserve">
         <value>El plan de suscripcion actual no permite solicitudes de servicio tecnico</value>
+    </data>
+    <data name="InvalidPasswordResetRequest" xml:space="preserve">
+        <value>La solicitud de recuperacion de contrasena no es valida.</value>
+    </data>
+    <data name="PasswordResetRequestFailed" xml:space="preserve">
+        <value>No se pudo preparar la solicitud de recuperacion de contrasena.</value>
     </data>
 </root>

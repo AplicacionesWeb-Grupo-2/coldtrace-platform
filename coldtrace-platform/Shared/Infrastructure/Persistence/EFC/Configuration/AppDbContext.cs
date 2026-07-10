@@ -98,6 +98,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<User>().Property(user => user.FirstName).IsRequired().HasMaxLength(120);
         builder.Entity<User>().Property(user => user.LastName).IsRequired().HasMaxLength(120);
         builder.Entity<User>().Property(user => user.Email).IsRequired().HasMaxLength(256);
+        builder.Entity<User>().Property(user => user.PasswordHash).HasMaxLength(60);
         builder.Entity<User>().HasIndex(user => user.Email).IsUnique();
         builder.Entity<User>()
             .HasOne(user => user.Organization)
@@ -109,6 +110,47 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .WithMany()
             .HasForeignKey(user => user.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<PasswordResetRequest>().HasKey(request => request.Id);
+        builder.Entity<PasswordResetRequest>().Property(request => request.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<PasswordResetRequest>().Property(request => request.Email).IsRequired().HasMaxLength(256);
+        builder.Entity<PasswordResetRequest>().Property(request => request.UserId).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.TokenHash).IsRequired().HasMaxLength(128);
+        builder.Entity<PasswordResetRequest>().Property(request => request.RequestedAt).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.ExpiresAt).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.ConsumedAt);
+        builder.Entity<PasswordResetRequest>().HasIndex(request => request.TokenHash).IsUnique();
+        builder.Entity<PasswordResetRequest>().HasIndex(request => request.UserId);
+        builder.Entity<PasswordResetRequest>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(request => request.UserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_password_reset_requests_users_user_id");
+
+        builder.Entity<ExternalIdentity>().HasKey(identity => identity.Id);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Provider).IsRequired()
+            .HasConversion(
+                provider => provider.ToCode(),
+                value => SocialProviderExtensions.FromCode(value))
+            .HasMaxLength(32);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.ProviderSubject).IsRequired()
+            .HasMaxLength(255);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Email).HasMaxLength(255);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.UserId).IsRequired();
+        builder.Entity<ExternalIdentity>().Property(identity => identity.CreatedAt);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.UpdatedAt);
+        builder.Entity<ExternalIdentity>()
+            .HasIndex(identity => new { identity.Provider, identity.ProviderSubject })
+            .IsUnique()
+            .HasDatabaseName("uk_external_identities_provider_subject");
+        builder.Entity<ExternalIdentity>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(identity => identity.UserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_external_identities_users_user_id");
 
         builder.Entity<OrganizationSubscription>().HasKey(subscription => subscription.Id);
         builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Id).IsRequired()
@@ -292,7 +334,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(settings => settings.Asset)
             .WithMany()
             .HasForeignKey(settings => settings.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_asset_settings_assets_asset_id");
 
         builder.Entity<IotDevice>().HasKey(device => device.Id);
@@ -354,7 +396,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(device => device.Asset)
             .WithMany()
             .HasForeignKey(device => device.AssetId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_iot_devices_assets_asset_id");
 
         builder.Entity<SensorReading>().HasKey(reading => reading.Id);
@@ -451,7 +493,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(incident => incident.Asset)
             .WithMany()
             .HasForeignKey(incident => incident.AssetId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_incidents_assets_asset_id");
 
         builder.Entity<AiResolutionPlan>().HasKey(plan => plan.Id);
@@ -607,7 +649,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(s => s.Asset)
             .WithMany()
             .HasForeignKey(s => s.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_maintenance_schedules_assets_asset_id");
 
         builder.Entity<TechnicalServiceRequest>().HasKey(r => r.Id);
@@ -637,7 +679,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(r => r.Asset)
             .WithMany()
             .HasForeignKey(r => r.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_technical_service_requests_assets_asset_id");
 
         UseDateTimeOffsetPrecision(builder);

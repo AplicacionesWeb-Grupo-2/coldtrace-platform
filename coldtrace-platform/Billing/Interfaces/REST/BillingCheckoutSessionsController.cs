@@ -31,9 +31,9 @@ public class BillingCheckoutSessionsController(
         Description = "Creates a provider-hosted Stripe Checkout session for a paid ColdTrace plan",
         OperationId = "CreateBillingCheckoutSession")]
     [SwaggerResponse(200, "Checkout session created", typeof(BillingCheckoutSessionResource))]
-    [SwaggerResponse(400, "Missing or invalid request data", typeof(ProblemDetails))]
-    [SwaggerResponse(404, "Organization, subscription, or target plan not found", typeof(string))]
-    [SwaggerResponse(409, "Plan is not eligible or configured for checkout", typeof(string))]
+    [SwaggerResponse(400, "Missing or invalid request data", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization, subscription, or target plan not found", typeof(ProblemDetails))]
+    [SwaggerResponse(409, "Plan is not eligible or configured for checkout", typeof(ProblemDetails))]
     [SwaggerResponse(502, "Stripe checkout provider failed", typeof(ProblemDetails))]
     [SwaggerResponse(503, "Stripe checkout provider is not configured", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateCheckoutSession(
@@ -56,7 +56,7 @@ public class BillingCheckoutSessionsController(
         {
             logger.LogWarning(ex, "Invalid checkout session request for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["BillingCheckoutSessionInvalidRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "BillingCheckoutSessionInvalidRequest");
         }
     }
 }

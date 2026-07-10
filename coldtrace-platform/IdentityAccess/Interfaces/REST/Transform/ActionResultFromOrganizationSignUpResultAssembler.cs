@@ -34,35 +34,23 @@ public static class ActionResultFromOrganizationSignUpResultAssembler
                 failure.Error switch
                 {
                     CreateOrganizationSignUpError.DuplicateOrganizationContactEmail =>
-                        controller.Conflict(localizer["OrganizationContactEmailDuplicated"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationContactEmailDuplicated", StatusCodes.Status409Conflict),
 
                     CreateOrganizationSignUpError.DuplicateOrganizationTaxId =>
-                        controller.Conflict(localizer["OrganizationTaxIdDuplicated"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationTaxIdDuplicated", StatusCodes.Status409Conflict),
 
                     CreateOrganizationSignUpError.DuplicateUserEmail =>
-                        controller.Conflict(localizer["UserEmailDuplicated"].Value),
+                        controller.ProblemResponse(localizer, "UserEmailDuplicated", StatusCodes.Status409Conflict),
 
                     CreateOrganizationSignUpError.InitialRoleNotFound =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["InitialRoleNotFound"].Value,
-                            statusCode: 500),
+                        controller.ProblemResponse(localizer, "InitialRoleNotFound", 500),
 
                     CreateOrganizationSignUpError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingOrganizationSignUp"].Value,
-                            statusCode: 500),
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingOrganizationSignUp", 500),
 
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }
