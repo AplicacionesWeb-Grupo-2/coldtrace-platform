@@ -119,6 +119,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     options.InvalidModelStateResponseFactory = RestProblemDetailsFactory.CreateValidationProblemResponse);
 
 // Register RFC 7807 ProblemDetails payloads for centralized exception handling.
+builder.Services.AddExceptionHandler<PlanLimitExceededExceptionHandler>();
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = context =>
