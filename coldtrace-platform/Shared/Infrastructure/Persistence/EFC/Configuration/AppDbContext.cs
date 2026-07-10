@@ -128,6 +128,12 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasIndex(identity => new { identity.Provider, identity.ProviderSubject })
             .IsUnique()
             .HasDatabaseName("uk_external_identities_provider_subject");
+        builder.Entity<ExternalIdentity>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(identity => identity.UserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_external_identities_users_user_id");
 
         builder.Entity<OrganizationSubscription>().HasKey(subscription => subscription.Id);
         builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Id).IsRequired()

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260709230204_AddExternalIdentities")]
+    [Migration("20260710163415_AddExternalIdentities")]
     partial class AddExternalIdentities
     {
         /// <inheritdoc />
@@ -931,6 +931,9 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.HasKey("Id")
                         .HasName("p_k_external_identities");
 
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("i_x_external_identities_user_id");
+
                     b.HasIndex("Provider", "ProviderSubject")
                         .IsUnique()
                         .HasDatabaseName("uk_external_identities_provider_subject");
@@ -1813,6 +1816,16 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasConstraintName("f_k_organization_subscriptions_organizations_organization_id");
 
                     b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.ExternalIdentity", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_external_identities_users_user_id");
                 });
 
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Role", b =>

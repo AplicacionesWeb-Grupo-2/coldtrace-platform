@@ -7,7 +7,9 @@ using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Resources;
 using ColdTrace.Platform.IdentityAccess.Interfaces.REST.Transform;
 using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ColdTrace.Platform.IdentityAccess.Tests.Infrastructure;
 
@@ -75,6 +77,23 @@ public class SocialAuthenticationContractTests
         Assert.Equal(
             "identity-access.authentication.error.social-identity-requires-onboarding",
             resource.Details);
+    }
+
+    [Fact]
+    public void ExternalIdentity_UserRelationship_PreventsOrphanedProviderLinks()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseMySQL("server=localhost;database=coldtrace_model_test;user=root;password=root")
+            .Options;
+        using var context = new AppDbContext(options);
+
+        var relationship = context.Model
+            .FindEntityType(typeof(ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.ExternalIdentity))!
+            .GetForeignKeys()
+            .Single(key => key.PrincipalEntityType.ClrType == typeof(ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.User));
+
+        Assert.Equal(DeleteBehavior.Restrict, relationship.DeleteBehavior);
+        Assert.Equal("f_k_external_identities_users_user_id", relationship.GetConstraintName());
     }
 
     private sealed class StubExternalIdentityProviderService(ProviderIdentity identity)
