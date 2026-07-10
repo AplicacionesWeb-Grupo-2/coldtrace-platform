@@ -230,7 +230,6 @@ apply_runtime_hardening() {
   local current_runtime_service_account
   local database_version
   local deletion_protection
-  local require_ssl
   local ssl_mode
   local -a sql_patch_args=()
 
@@ -288,11 +287,6 @@ apply_runtime_hardening() {
       --project "$GCP_PROJECT_ID" \
       --format='value(settings.ipConfiguration.sslMode)'
   )"
-  require_ssl="$(
-    gcloud sql instances describe "$DB_INSTANCE_NAME" \
-      --project "$GCP_PROJECT_ID" \
-      --format='value(settings.ipConfiguration.requireSsl)'
-  )"
   deletion_protection="$(
     gcloud sql instances describe "$DB_INSTANCE_NAME" \
       --project "$GCP_PROJECT_ID" \
@@ -310,8 +304,8 @@ apply_runtime_hardening() {
   )"
 
   [[ -n "$authorized_networks" ]] && sql_patch_args+=(--clear-authorized-networks)
-  if [[ "$ssl_mode" != "ENCRYPTED_ONLY" || "$require_ssl" != "True" ]]; then
-    sql_patch_args+=(--ssl-mode=ENCRYPTED_ONLY --require-ssl)
+  if [[ "$ssl_mode" != "ENCRYPTED_ONLY" ]]; then
+    sql_patch_args+=(--ssl-mode=ENCRYPTED_ONLY)
   fi
   [[ "$deletion_protection" != "True" ]] && sql_patch_args+=(--deletion-protection)
   [[ "$backup_enabled" != "True" ]] && sql_patch_args+=(--backup-start-time="$CLOUD_SQL_BACKUP_START_TIME")
