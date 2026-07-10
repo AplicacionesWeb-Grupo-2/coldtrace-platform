@@ -22,6 +22,7 @@ using ColdTrace.Platform.Reports.Domain.Model.Aggregates;
 using ColdTrace.Platform.Reports.Domain.Repositories;
 using ColdTrace.Platform.Shared.Application.Patterns;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 
 namespace ColdTrace.Platform.AiAssistance.Application.Internal.CommandServices;
 
