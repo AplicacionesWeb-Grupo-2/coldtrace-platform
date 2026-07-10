@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260710163415_AddExternalIdentities")]
+    [Migration("20260709230204_AddExternalIdentities")]
     partial class AddExternalIdentities
     {
         /// <inheritdoc />
