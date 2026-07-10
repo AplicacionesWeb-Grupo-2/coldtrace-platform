@@ -230,8 +230,6 @@ Core commands:
 CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app DRY_RUN=true scripts/deploy-cloud-run.sh
 ```
 
-See [docs/SMOKE_TESTING.md](docs/SMOKE_TESTING.md) for the current smoke flow and [docs](docs) for ticket-level manual checklists.
-
 GitHub Actions also runs restore, release build, and Docker image build through [.github/workflows/backend-ci.yml](.github/workflows/backend-ci.yml).
 
 ## Branching
