@@ -1,0 +1,296 @@
+<root>
+    <resheader name='resmimetype'>
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name='version'>
+        <value>1.3</value>
+    </resheader>
+    <resheader name='reader'>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name='writer'>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name='UnexpectedServerError' xml:space='preserve'>
+        <value>Error inesperado del servidor</value>
+    </data>
+    <data name='UnexpectedErrorProcessingRequest' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al procesar su solicitud.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='InvalidRequest' xml:space='preserve'>
+        <value>La solicitud contiene valores no validos.</value>
+    </data>
+    
+    
+    <data name='ResourceNotFound' xml:space='preserve'>
+        <value>El recurso solicitado no fue encontrado.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='OrganizationNotFound' xml:space='preserve'>
+        <value>No se encontro la organizacion.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='InvalidLocationRequest' xml:space='preserve'>
+        <value>La solicitud de ubicacion no es valida.</value>
+    </data>
+    <data name='LocationNameDuplicated' xml:space='preserve'>
+        <value>El nombre de ubicacion ya existe en esta organizacion.</value>
+    </data>
+    <data name='LocationNotFound' xml:space='preserve'>
+        <value>No se encontro la ubicacion.</value>
+    </data>
+    <data name='LocationOrganizationIdInvalid' xml:space='preserve'>
+        <value>El identificador de organizacion no es valido</value>
+    </data>
+    <data name='LocationIdInvalid' xml:space='preserve'>
+        <value>El identificador de ubicacion no es valido</value>
+    </data>
+    <data name='DeleteLocationOrganizationNotFound' xml:space='preserve'>
+        <value>La organizacion no fue encontrada</value>
+    </data>
+    <data name='DeleteLocationNotFound' xml:space='preserve'>
+        <value>La ubicacion no fue encontrada</value>
+    </data>
+    <data name='LocationDeleteBlocked' xml:space='preserve'>
+        <value>La ubicacion no puede eliminarse porque todavia existen activos, gateways o registros relacionados que dependen de ella</value>
+    </data>
+    <data name='UnexpectedErrorCreatingLocation' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al crear la ubicacion.</value>
+    </data>
+    <data name='LocationPlanLimitExceeded' xml:space='preserve'>
+        <value>El plan de suscripcion actual no permite crear otra ubicacion</value>
+    </data>
+    <data name='UnexpectedErrorUpdatingLocation' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al actualizar la ubicacion.</value>
+    </data>
+    <data name='UnexpectedErrorDeletingLocation' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al eliminar la ubicacion.</value>
+    </data>
+    <data name='UnexpectedErrorGettingLocations' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener ubicaciones.</value>
+    </data>
+    <data name='InvalidGatewayRequest' xml:space='preserve'>
+        <value>La solicitud de gateway no es valida.</value>
+    </data>
+    <data name='GatewayUuidDuplicated' xml:space='preserve'>
+        <value>El UUID del gateway ya existe en esta organizacion.</value>
+    </data>
+    <data name='GatewayNotFound' xml:space='preserve'>
+        <value>No se encontro el gateway.</value>
+    </data>
+    <data name='UnexpectedErrorCreatingGateway' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al crear el gateway.</value>
+    </data>
+    <data name='UnexpectedErrorUpdatingGateway' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al actualizar el gateway.</value>
+    </data>
+    <data name='UnexpectedErrorGettingGateways' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener gateways.</value>
+    </data>
+    <data name='GatewayDeleteBlocked' xml:space='preserve'>
+        <value>El gateway no puede eliminarse porque todavia existen dispositivos o registros relacionados que dependen de el</value>
+    </data>
+    <data name='UnexpectedErrorDeletingGateway' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al eliminar el gateway.</value>
+    </data>
+    <data name='InvalidAssetRequest' xml:space='preserve'>
+        <value>La solicitud de activo no es valida.</value>
+    </data>
+    <data name='AssetOrganizationIdInvalid' xml:space='preserve'>
+        <value>El identificador de organizacion no es valido</value>
+    </data>
+    <data name='AssetIdInvalid' xml:space='preserve'>
+        <value>El identificador de activo no es valido</value>
+    </data>
+    <data name='AssetUuidDuplicated' xml:space='preserve'>
+        <value>El UUID del activo ya existe en esta organizacion.</value>
+    </data>
+    <data name='AssetNotFound' xml:space='preserve'>
+        <value>No se encontro el activo.</value>
+    </data>
+    <data name='UnexpectedErrorCreatingAsset' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al crear el activo.</value>
+    </data>
+    <data name='AssetPlanLimitExceeded' xml:space='preserve'>
+        <value>El plan de suscripcion actual no permite crear otro activo</value>
+    </data>
+    <data name='UnexpectedErrorUpdatingAsset' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al actualizar el activo.</value>
+    </data>
+    <data name='AssetDeleteOrganizationNotFound' xml:space='preserve'>
+        <value>La organizacion no fue encontrada</value>
+    </data>
+    <data name='AssetDeleteNotFound' xml:space='preserve'>
+        <value>El activo no fue encontrado</value>
+    </data>
+    <data name='AssetDeleteBlocked' xml:space='preserve'>
+        <value>El activo no puede eliminarse porque todavia existen dispositivos, lecturas, incidencias o registros relacionados que dependen de el</value>
+    </data>
+    <data name='UnexpectedErrorDeletingAsset' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al eliminar el activo.</value>
+    </data>
+    <data name='UnexpectedErrorGettingAssets' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener activos.</value>
+    </data>
+    <data name='InvalidIotDeviceRequest' xml:space='preserve'>
+        <value>La solicitud de dispositivo IoT no es valida.</value>
+    </data>
+    <data name='IotDeviceUuidDuplicated' xml:space='preserve'>
+        <value>El UUID del dispositivo IoT ya existe en esta organizacion.</value>
+    </data>
+    <data name='IotDeviceNotFound' xml:space='preserve'>
+        <value>No se encontro el dispositivo IoT.</value>
+    </data>
+    <data name='IotDeviceDeleteBlocked' xml:space='preserve'>
+        <value>El dispositivo IoT no puede eliminarse porque todavia existen lecturas o registros relacionados que dependen de el</value>
+    </data>
+    <data name='IotDeviceAssetLocationNotCompatible' xml:space='preserve'>
+        <value>El activo seleccionado no esta en la misma ubicacion del gateway.</value>
+    </data>
+    <data name='UnexpectedErrorCreatingIotDevice' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al crear el dispositivo IoT.</value>
+    </data>
+    <data name='IotDevicePlanLimitExceeded' xml:space='preserve'>
+        <value>El plan de suscripcion actual no permite crear otro dispositivo IoT</value>
+    </data>
+    <data name='UnexpectedErrorUpdatingIotDevice' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al actualizar el dispositivo IoT.</value>
+    </data>
+    <data name='UnexpectedErrorDeletingIotDevice' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al eliminar el dispositivo IoT.</value>
+    </data>
+    <data name='UnexpectedErrorGettingIotDevices' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener dispositivos IoT.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='UnexpectedErrorGettingAssetSettings' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener la configuracion de activos.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</root>

@@ -1,10 +1,11 @@
-using ColdTrace.Platform.AssetManagement.Application.Errors;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Errors;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.AssetManagement.Domain.Services;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.AssetManagement.Application.CommandServices;
+using ColdTrace.Platform.AssetManagement.Application.QueryServices;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,7 @@ namespace ColdTrace.Platform.AssetManagement.Application.Internal.CommandService
 public class AssetSettingsCommandService(
     IAssetSettingsRepository assetSettingsRepository,
     IAssetRepository assetRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<AssetSettingsCommandService> logger)
     : IAssetSettingsCommandService
@@ -26,8 +27,7 @@ public class AssetSettingsCommandService(
         SaveAssetSettingsCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
             return new Result<AssetSettings, SaveAssetSettingsError>.Failure(
                 SaveAssetSettingsError.OrganizationNotFound);
 

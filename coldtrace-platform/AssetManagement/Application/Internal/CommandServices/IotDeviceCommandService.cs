@@ -1,11 +1,12 @@
-using ColdTrace.Platform.AssetManagement.Application.Errors;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Errors;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.AssetManagement.Domain.Services;
-using ColdTrace.Platform.Billing.Interfaces.ACL;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.AssetManagement.Application.CommandServices;
+using ColdTrace.Platform.AssetManagement.Application.QueryServices;
+using ColdTrace.Platform.Billing.Interfaces.Acl;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ public class IotDeviceCommandService(
     IIotDeviceRepository iotDeviceRepository,
     IAssetRepository assetRepository,
     IGatewayRepository gatewayRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<IotDeviceCommandService> logger)
@@ -29,8 +30,7 @@ public class IotDeviceCommandService(
         CreateIotDeviceCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for IoT device creation: {OrganizationId}",
                 command.OrganizationId);
@@ -133,8 +133,7 @@ public class IotDeviceCommandService(
         UpdateIotDeviceCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for IoT device update: {OrganizationId}",
                 command.OrganizationId);
@@ -244,8 +243,7 @@ public class IotDeviceCommandService(
         DeleteIotDeviceCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for IoT device deletion: {OrganizationId}",
                 command.OrganizationId);

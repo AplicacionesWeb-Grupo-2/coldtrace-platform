@@ -1,27 +1,30 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using ColdTrace.Platform.AiAssistance.Application.Errors;
+using ColdTrace.Platform.AiAssistance.Domain.Model.Errors;
 using ColdTrace.Platform.AiAssistance.Application.Prompts;
 using ColdTrace.Platform.AiAssistance.Application.StructuredOutputs;
-using ColdTrace.Platform.AiAssistance.Domain.Services;
+using ColdTrace.Platform.AiAssistance.Application.CommandServices;
+using ColdTrace.Platform.AiAssistance.Application.QueryServices;
+using ColdTrace.Platform.AiAssistance.Application.Internal.OutboundServices;
 using ColdTrace.Platform.AiAssistance.Infrastructure.Configuration;
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.Billing.Interfaces.ACL;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.Acl;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
 using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
 using ColdTrace.Platform.Monitoring.Domain.Repositories;
-using ColdTrace.Platform.Reports.Application.Errors;
+using ColdTrace.Platform.Reports.Domain.Model.Errors;
 using ColdTrace.Platform.Reports.Application.Results;
 using ColdTrace.Platform.Reports.Domain.Model.Aggregates;
 using ColdTrace.Platform.Reports.Domain.Model.Commands;
 using ColdTrace.Platform.Reports.Domain.Repositories;
-using ColdTrace.Platform.Reports.Domain.Services;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Reports.Application.CommandServices;
+using ColdTrace.Platform.Reports.Application.QueryServices;
+using ColdTrace.Platform.Shared.Application.Model;
 using Microsoft.Extensions.Options;
 
 namespace ColdTrace.Platform.Reports.Application.Internal.CommandServices;
@@ -31,7 +34,7 @@ namespace ColdTrace.Platform.Reports.Application.Internal.CommandServices;
 /// </summary>
 public class ReportAiSummaryCommandService(
     IReportRepository reportRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IAssetRepository assetRepository,
     IIncidentRepository incidentRepository,
     ISensorReadingRepository sensorReadingRepository,
@@ -53,8 +56,7 @@ public class ReportAiSummaryCommandService(
         GenerateReportAiSummaryCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for AI report summary: {OrganizationId}",

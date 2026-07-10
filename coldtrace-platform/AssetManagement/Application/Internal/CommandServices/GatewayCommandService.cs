@@ -1,10 +1,11 @@
-using ColdTrace.Platform.AssetManagement.Application.Errors;
-using ColdTrace.Platform.AssetManagement.Domain.Services;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Errors;
+using ColdTrace.Platform.AssetManagement.Application.CommandServices;
+using ColdTrace.Platform.AssetManagement.Application.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,7 @@ namespace ColdTrace.Platform.AssetManagement.Application.Internal.CommandService
 public class GatewayCommandService(
     IGatewayRepository gatewayRepository,
     ILocationRepository locationRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<GatewayCommandService> logger)
     : IGatewayCommandService
@@ -26,8 +27,7 @@ public class GatewayCommandService(
         CreateGatewayCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for gateway creation: {OrganizationId}",
@@ -102,8 +102,7 @@ public class GatewayCommandService(
         UpdateGatewayCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for gateway update: {OrganizationId}",
@@ -192,8 +191,7 @@ public class GatewayCommandService(
         DeleteGatewayCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for gateway deletion: {OrganizationId}",

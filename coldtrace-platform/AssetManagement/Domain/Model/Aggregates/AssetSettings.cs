@@ -1,5 +1,4 @@
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
-using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.Shared.Domain.Model.Entities;
 
 namespace ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
@@ -68,8 +67,6 @@ public class AssetSettings : IAuditableEntity
     public int ReadingFrequencySeconds { get; private set; }
 
     public int AlertThresholdMinutes { get; private set; }
-
-    public Organization Organization { get; private set; } = null!;
 
     public Asset? Asset { get; private set; }
 

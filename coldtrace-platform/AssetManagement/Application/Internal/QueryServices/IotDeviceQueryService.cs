@@ -1,10 +1,11 @@
-using ColdTrace.Platform.AssetManagement.Application.Errors;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Errors;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.AssetManagement.Domain.Services;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.AssetManagement.Application.CommandServices;
+using ColdTrace.Platform.AssetManagement.Application.QueryServices;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 
@@ -13,7 +14,7 @@ namespace ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 /// </summary>
 public class IotDeviceQueryService(
     IIotDeviceRepository iotDeviceRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     ILogger<IotDeviceQueryService> logger)
     : IIotDeviceQueryService
 {
@@ -22,8 +23,7 @@ public class IotDeviceQueryService(
         GetIotDevicesByOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for IoT device listing: {OrganizationId}", query.OrganizationId);
             return new Result<IEnumerable<IotDevice>, GetIotDevicesByOrganizationError>.Failure(
@@ -51,8 +51,7 @@ public class IotDeviceQueryService(
         GetIotDeviceByIdAndOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for IoT device query: {OrganizationId}", query.OrganizationId);
             return new Result<IotDevice, GetIotDeviceByIdAndOrganizationError>.Failure(

@@ -1,8 +1,10 @@
-using ColdTrace.Platform.AiAssistance.Application.Errors;
+using ColdTrace.Platform.AiAssistance.Domain.Model.Errors;
 using ColdTrace.Platform.AiAssistance.Application.Prompts;
 using ColdTrace.Platform.AiAssistance.Application.StructuredOutputs;
-using ColdTrace.Platform.AiAssistance.Domain.Services;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.AiAssistance.Application.CommandServices;
+using ColdTrace.Platform.AiAssistance.Application.QueryServices;
+using ColdTrace.Platform.AiAssistance.Application.Internal.OutboundServices;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.AiAssistance.Application.Internal.CommandServices;
 

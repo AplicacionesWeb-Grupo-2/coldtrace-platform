@@ -1,26 +1,28 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using ColdTrace.Platform.AiAssistance.Application.Errors;
+using ColdTrace.Platform.AiAssistance.Domain.Model.Errors;
 using ColdTrace.Platform.AiAssistance.Application.Prompts;
 using ColdTrace.Platform.AiAssistance.Application.Results;
 using ColdTrace.Platform.AiAssistance.Application.StructuredOutputs;
 using ColdTrace.Platform.AiAssistance.Domain.Model.Commands;
-using ColdTrace.Platform.AiAssistance.Domain.Services;
+using ColdTrace.Platform.AiAssistance.Application.CommandServices;
+using ColdTrace.Platform.AiAssistance.Application.QueryServices;
+using ColdTrace.Platform.AiAssistance.Application.Internal.OutboundServices;
 using ColdTrace.Platform.AiAssistance.Infrastructure.Configuration;
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.Billing.Interfaces.ACL;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.Acl;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
 using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
 using ColdTrace.Platform.Monitoring.Domain.Repositories;
 using ColdTrace.Platform.Reports.Domain.Model.Aggregates;
 using ColdTrace.Platform.Reports.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Shared.Application.Model;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 
@@ -30,7 +32,7 @@ namespace ColdTrace.Platform.AiAssistance.Application.Internal.CommandServices;
 ///     Generates dashboard interpretations from organization-owned persisted evidence.
 /// </summary>
 public class DashboardAiInterpretationCommandService(
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     ISensorReadingRepository sensorReadingRepository,
     IIncidentRepository incidentRepository,
     IAssetRepository assetRepository,
@@ -68,8 +70,7 @@ public class DashboardAiInterpretationCommandService(
         GenerateDashboardAiInterpretationCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for dashboard AI interpretation: {OrganizationId}",

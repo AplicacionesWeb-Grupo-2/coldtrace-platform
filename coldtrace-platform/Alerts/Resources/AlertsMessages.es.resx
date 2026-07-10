@@ -1,0 +1,260 @@
+<root>
+    <resheader name='resmimetype'>
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name='version'>
+        <value>1.3</value>
+    </resheader>
+    <resheader name='reader'>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name='writer'>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    
+    <data name='UnexpectedErrorProcessingRequest' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al procesar su solicitud.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='OrganizationNotFound' xml:space='preserve'>
+        <value>No se encontro la organizacion.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='AssetNotFound' xml:space='preserve'>
+        <value>No se encontro el activo.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='InvalidIncidentRequest' xml:space='preserve'>
+        <value>La solicitud de incidente no es valida.</value>
+    </data>
+    <data name='IncidentNotFound' xml:space='preserve'>
+        <value>No se encontro el incidente.</value>
+    </data>
+    <data name='IncidentAlreadyAcknowledged' xml:space='preserve'>
+        <value>El incidente ya fue reconocido.</value>
+    </data>
+    <data name='IncidentAlreadyResolved' xml:space='preserve'>
+        <value>El incidente ya fue resuelto.</value>
+    </data>
+    <data name='IncidentAlreadyEscalated' xml:space='preserve'>
+        <value>El incidente ya fue escalado.</value>
+    </data>
+    <data name='InvalidIncidentLifecycleTransition' xml:space='preserve'>
+        <value>La transicion del ciclo de vida del incidente no esta permitida.</value>
+    </data>
+    <data name='UnexpectedErrorCreatingIncident' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al crear el incidente.</value>
+    </data>
+    <data name='UnexpectedErrorAcknowledgingIncident' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al reconocer el incidente.</value>
+    </data>
+    <data name='UnexpectedErrorEscalatingIncident' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al escalar el incidente.</value>
+    </data>
+    <data name='UnexpectedErrorRegisteringIncidentCorrectiveAction' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al registrar la accion correctiva del incidente.</value>
+    </data>
+    <data name='UnexpectedErrorResolvingIncident' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al resolver el incidente.</value>
+    </data>
+    <data name='IncidentCannotReceiveAiResolutionPlan' xml:space='preserve'>
+        <value>El incidente no puede recibir planes de resolucion con IA en su estado actual.</value>
+    </data>
+    <data name='IncidentAiContextUnavailable' xml:space='preserve'>
+        <value>El contexto del incidente esta incompleto o no esta disponible para generar el plan de resolucion con IA.</value>
+    </data>
+    
+    <data name='AiProviderDisabled' xml:space='preserve'>
+        <value>La asistencia de IA esta deshabilitada.</value>
+    </data>
+    <data name='AiProviderNotConfigured' xml:space='preserve'>
+        <value>El proveedor de IA no esta configurado.</value>
+    </data>
+    <data name='AiProviderRequestFailed' xml:space='preserve'>
+        <value>La solicitud al proveedor de IA fallo.</value>
+    </data>
+    
+    <data name='AiProviderTimedOut' xml:space='preserve'>
+        <value>El proveedor de IA no respondio antes del tiempo configurado.</value>
+    </data>
+    
+    <data name='AiResolutionPlanInvalidStructuredOutput' xml:space='preserve'>
+        <value>El proveedor de IA devolvio una estructura invalida para el plan de resolucion.</value>
+    </data>
+    <data name='InvalidAiResolutionPlanApprovalRequest' xml:space='preserve'>
+        <value>La solicitud de aprobacion del plan de resolucion con IA no es valida.</value>
+    </data>
+    <data name='InvalidAiResolutionPlanRejectionRequest' xml:space='preserve'>
+        <value>La solicitud de rechazo del plan de resolucion con IA no es valida.</value>
+    </data>
+    <data name='AiResolutionPlanNotFound' xml:space='preserve'>
+        <value>No se encontro el plan de resolucion con IA.</value>
+    </data>
+    <data name='AiResolutionPlanAlreadyDecided' xml:space='preserve'>
+        <value>El plan de resolucion con IA ya fue aprobado o rechazado.</value>
+    </data>
+    <data name='UnexpectedErrorGeneratingAiResolutionPlan' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al generar el plan de resolucion con IA.</value>
+    </data>
+    <data name='AiResolutionPlanPlanLimitExceeded' xml:space='preserve'>
+        <value>El plan de suscripcion actual no permite guia de incidentes con AI</value>
+    </data>
+    <data name='UnexpectedErrorApprovingAiResolutionPlan' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al aprobar el plan de resolucion con IA.</value>
+    </data>
+    <data name='UnexpectedErrorRejectingAiResolutionPlan' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al rechazar el plan de resolucion con IA.</value>
+    </data>
+    <data name='UnexpectedErrorGettingAiResolutionPlans' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener planes de resolucion con IA.</value>
+    </data>
+    <data name='UnexpectedErrorGettingIncidents' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener incidentes.</value>
+    </data>
+    <data name='UnexpectedErrorGettingNotifications' xml:space='preserve'>
+        <value>Ocurrio un error inesperado al obtener notificaciones.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+</root>

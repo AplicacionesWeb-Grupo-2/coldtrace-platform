@@ -1,23 +1,26 @@
 using System.Text.Json;
-using ColdTrace.Platform.AiAssistance.Application.Errors;
+using ColdTrace.Platform.AiAssistance.Domain.Model.Errors;
 using ColdTrace.Platform.AiAssistance.Application.Prompts;
 using ColdTrace.Platform.AiAssistance.Application.StructuredOutputs;
-using ColdTrace.Platform.AiAssistance.Domain.Services;
+using ColdTrace.Platform.AiAssistance.Application.CommandServices;
+using ColdTrace.Platform.AiAssistance.Application.QueryServices;
+using ColdTrace.Platform.AiAssistance.Application.Internal.OutboundServices;
 using ColdTrace.Platform.AiAssistance.Infrastructure.Configuration;
-using ColdTrace.Platform.Alerts.Application.Errors;
+using ColdTrace.Platform.Alerts.Domain.Model.Errors;
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Model.Commands;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
-using ColdTrace.Platform.Alerts.Domain.Services;
+using ColdTrace.Platform.Alerts.Application.CommandServices;
+using ColdTrace.Platform.Alerts.Application.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.Billing.Interfaces.ACL;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.Acl;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
 using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
 using ColdTrace.Platform.Monitoring.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Shared.Application.Model;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -31,7 +34,7 @@ public class AiResolutionPlanCommandService(
     IAiResolutionPlanRepository aiResolutionPlanRepository,
     IIncidentRepository incidentRepository,
     INotificationRepository notificationRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IAssetRepository assetRepository,
     IIotDeviceRepository iotDeviceRepository,
     IAssetSettingsRepository assetSettingsRepository,
@@ -55,8 +58,7 @@ public class AiResolutionPlanCommandService(
         RejectAiResolutionPlanCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for AI resolution plan rejection: {OrganizationId}",
@@ -134,8 +136,7 @@ public class AiResolutionPlanCommandService(
         ApproveAiResolutionPlanCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for AI resolution plan approval: {OrganizationId}",
@@ -237,8 +238,7 @@ public class AiResolutionPlanCommandService(
         GenerateAiResolutionPlanCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for AI resolution plan generation: {OrganizationId}",
