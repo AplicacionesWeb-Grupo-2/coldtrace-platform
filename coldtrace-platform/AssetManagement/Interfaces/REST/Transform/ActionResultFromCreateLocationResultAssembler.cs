@@ -33,23 +33,14 @@ public static class ActionResultFromCreateLocationResultAssembler
             Result<Location, CreateLocationError>.Failure failure =>
                 failure.Error switch
                 {
-                    CreateLocationError.DuplicateName => controller.Conflict(localizer["LocationNameDuplicated"].Value),
+                    CreateLocationError.DuplicateName => controller.ProblemResponse(localizer, "LocationNameDuplicated", StatusCodes.Status409Conflict),
                     CreateLocationError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     CreateLocationError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingLocation"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingLocation", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

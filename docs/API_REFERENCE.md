@@ -12,6 +12,12 @@ Swagger UI:
 /swagger/index.html
 ```
 
+## Authentication
+
+API controller actions require `Authorization: Bearer <token>` by default. Obtain a token from `POST /api/v1/authentication/sign-in`. Missing or invalid tokens return `401 application/problem+json`; authenticated requests that fail an authorization policy return `403 application/problem+json`.
+
+The intentional public API actions are `POST /api/v1/authentication/sign-in`, `POST /api/v1/organization-sign-ups`, `GET /api/v1/subscription-plans`, and `POST /api/v1/billing/stripe/webhooks`. The Stripe webhook validates its provider signature instead of a ColdTrace bearer token. Swagger/OpenAPI assets are also public.
+
 All request and response bodies use JSON. Most operational endpoints are scoped by organization:
 
 ```text
@@ -115,11 +121,19 @@ The response includes `gatewayId`, `locationId`, `outOfRange`, and `isOutOfRange
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/acknowledgements` | Acknowledge an incident. |
 | `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation` | Register escalation details. |
 | `PATCH` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action` | Register corrective action details. |
+| `GET` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` | List generated, approved, and rejected AI resolution plans for one incident. |
+| `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` | Generate and persist a pending AI resolution plan. |
+| `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals` | Approve a pending AI resolution plan and resolve the incident. |
+| `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/rejections` | Reject a pending AI resolution plan without changing incident state. |
 | `POST` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/resolutions` | Resolve an incident. |
 | `GET` | `/api/v1/organizations/{organizationId}/incidents/{incidentId}/notifications` | List notifications for one incident. |
 | `GET` | `/api/v1/organizations/{organizationId}/notifications` | List organization notifications. |
 
 Incident lifecycle endpoints return `409 Conflict` when a transition is not allowed.
+AI resolution plan generation also returns `409 Conflict` for resolved incidents or incidents with incomplete referenced context, `502 Bad Gateway` for invalid structured provider output, `503 Service Unavailable` when AI is disabled/unconfigured/unavailable, and `504 Gateway Timeout` when the provider times out.
+AI resolution plan history returns the same resource shape as generation/approval/rejection, ordered from newest to oldest and scoped by organization plus incident.
+AI resolution plan approval returns `404 Not Found` when the organization, incident, or plan is missing, and `409 Conflict` when the plan was already approved/rejected or the incident can no longer be resolved.
+AI resolution plan rejection returns `404 Not Found` when the organization, incident, or plan is missing, and `409 Conflict` when the plan was already approved or rejected.
 
 Important request fields:
 
@@ -128,6 +142,173 @@ Important request fields:
 - Escalation: `escalatedBy`, `escalationReason`.
 - Corrective action: `correctiveAction`, `registeredBy`.
 - Resolution: `resolvedBy`, `resolutionNotes`.
+- AI plan approval: `approvedBy`, `finalCorrectiveAction`, `finalResolutionNotes`.
+- AI plan rejection: `rejectedBy`, `rejectionReason`.
+
+AI resolution plan generation has no request body. The response mirrors the Spring Boot contract:
+
+```text
+id
+organizationId
+incidentId
+status
+summary
+probableCause
+recommendedSteps[{ sequence, action, rationale, expectedOutcome }]
+correctiveActionDraft
+resolutionNotesDraft
+escalationRecommended
+escalationUrgency
+escalationReason
+requiredEvidence
+uncertaintyNotes
+modelProvider
+modelName
+providerMetadata
+generatedAt
+approvedAt
+approvedBy
+rejectedAt
+rejectedBy
+rejectionReason
+finalCorrectiveAction
+finalResolutionNotes
+```
+
+AI resolution plan approval accepts:
+
+```json
+{
+  "approvedBy": "operations.manager@coldtrace.test",
+  "finalCorrectiveAction": "Moved inventory to backup freezer and recalibrated the affected sensor",
+  "finalResolutionNotes": "Temperature returned to safe range after transfer and recalibration."
+}
+```
+
+The approval response uses the same `AiResolutionPlanResource` shape with `status` set to `approved`, approval metadata populated, and the final corrective action and resolution notes persisted. The incident is resolved through backend lifecycle rules during the same command.
+
+AI resolution plan rejection accepts:
+
+```json
+{
+  "rejectedBy": "operations.manager@coldtrace.test",
+  "rejectionReason": "Plan requires on-site compressor inspection before closure."
+}
+```
+
+The rejection response uses the same `AiResolutionPlanResource` shape with `status` set to `rejected`, rejection metadata populated, and the incident lifecycle unchanged.
+
+## Billing
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/subscription-plans` | List visible subscription plans and pricing catalog. |
+| `GET` | `/api/v1/organizations/{organizationId}/subscription` | Get an organization's active subscription, usage and entitlements. |
+| `POST` | `/api/v1/organizations/{organizationId}/billing/checkout-sessions` | Create a Stripe Checkout session for a paid plan upgrade. |
+| `POST` | `/api/v1/organizations/{organizationId}/billing/portal-sessions` | Create a Stripe Customer Portal session for billing management. |
+| `POST` | `/api/v1/organizations/{organizationId}/billing/customer-portal-sessions` | Alias for creating a Stripe Customer Portal session. |
+| `POST` | `/api/v1/billing/stripe/webhooks` | Process a signed Stripe billing webhook and synchronize local subscription state. |
+
+The subscription plan catalog response mirrors the Spring Boot contract:
+
+```text
+id
+code
+displayName
+description
+monthlyPriceCents
+currency
+stripePriceId
+recommended
+recommendedLabel
+visible
+usageLimits { maxLocations, maxAssets, maxIotDevices, maxUsers, historyRetentionDays }
+featureFlags { allowsExports, allowsMaintenance, allowsAiGuidance, allowsAiReportSummary }
+includedFeatures
+```
+
+The organization subscription response mirrors the Spring Boot contract:
+
+```text
+id
+organizationId
+status
+provider
+providerCustomerId
+providerSubscriptionId
+currentPeriodStart
+currentPeriodEnd
+cancelAtPeriodEnd
+metadata
+plan { ...subscription plan resource }
+usage { locations, assets, iotDevices, users }
+entitlements [{ key, category, enabled, limit, used, remaining, lockedReason }]
+```
+
+Restricted writes and paid AI operations use those backend-computed entitlements before persistence. When the current plan does not allow the operation, the API returns `409 Conflict` with `ProblemDetails` and the Spring Boot-compatible extension fields:
+
+```text
+organizationId
+planCode
+subscriptionStatus
+entitlementKey
+entitlementCategory
+entitlementEnabled
+limit
+used
+remaining
+lockedReason
+requiredPlanCode
+```
+
+Protected operations currently include creating locations, assets, IoT devices, users, reports, maintenance schedules, technical service requests, AI incident resolution plans, and AI report summaries.
+
+Create a checkout session with:
+
+```json
+{
+  "targetPlanCode": "operations"
+}
+```
+
+The checkout response returns only safe redirect metadata:
+
+```json
+{
+  "provider": "STRIPE",
+  "sessionId": "cs_test_...",
+  "checkoutUrl": "https://checkout.stripe.com/c/pay/cs_test_...",
+  "targetPlanCode": "operations"
+}
+```
+
+The customer portal session response returns only safe redirect metadata and mirrors the Spring Boot contract:
+
+```json
+{
+  "provider": "STRIPE",
+  "sessionId": "bps_test_...",
+  "portalUrl": "https://billing.stripe.com/p/session/test_...",
+  "organizationId": 1
+}
+```
+
+The Stripe webhook endpoint requires the `Stripe-Signature` header and returns the processing outcome:
+
+```json
+{
+  "provider": "STRIPE",
+  "eventId": "evt_...",
+  "eventType": "checkout.session.completed",
+  "processingStatus": "PROCESSED",
+  "duplicate": false,
+  "organizationId": 1,
+  "planCode": "operations",
+  "subscriptionStatus": "ACTIVE"
+}
+```
+
+The public catalog currently returns `base`, `operations`, and `compliance-ai` using backend-owned values. Stripe price identifiers are read from `STRIPE_OPERATIONS_PRICE_ID` and `STRIPE_COMPLIANCE_AI_PRICE_ID` when configured.
 
 ## Maintenance Management
 
@@ -156,6 +337,7 @@ Important request fields:
 | `GET` | `/api/v1/organizations/{organizationId}/reports` | List generated reports. |
 | `POST` | `/api/v1/organizations/{organizationId}/reports` | Generate an operational report. |
 | `GET` | `/api/v1/organizations/{organizationId}/reports/{reportId}` | Get one generated report. |
+| `POST` | `/api/v1/organizations/{organizationId}/reports/{reportId}/ai-summary` | Generate an advisory AI compliance summary for one report. |
 
 Report generation request fields:
 
@@ -168,6 +350,53 @@ periodEnd
 
 The generated report includes asset, reading, incident, average temperature, average humidity, and compliance summary fields.
 
+Report AI summary generation has no request body. The response mirrors the Spring Boot contract:
+
+```text
+organizationId
+reportId
+reportUuid
+reportType
+reportTitle
+summaryGeneratedAt
+sourceReport
+executiveSummary
+findings[{ area, status, evidence, recommendation }]
+evidenceGaps
+recommendedActions
+uncertaintyNotes
+modelProvider
+modelName
+```
+
+Report AI summary generation returns `404 Not Found` when the organization or report is missing, `502 Bad Gateway` for invalid structured provider output, `503 Service Unavailable` when AI is disabled/unconfigured/unavailable, and `504 Gateway Timeout` when the provider times out.
+
+## AI Assistance
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/api/v1/ai-assistance/provider-status` | Get non-secret AI assistance provider configuration and structured output contract status. |
+
+The AI status response includes:
+
+```text
+provider
+model
+enabled
+configured
+hasEndpoint
+hasApiKey
+hasChatClient
+timeoutSeconds
+structuredOutputContracts
+```
+
+Supported provider values are `disabled`, `ollama`, and `openai`.
+
+The structured output contracts prepared by this context are consumed by product
+endpoints owned by their respective bounded contexts. Incident AI resolution
+plans are exposed from Alerts.
+
 ## Error Responses
 
 Expected validation and business-rule responses:
@@ -177,6 +406,21 @@ Expected validation and business-rule responses:
 | `400` | Invalid request payload or unsupported input. |
 | `404` | Organization or scoped resource was not found. |
 | `409` | Duplicate resource or invalid lifecycle transition. |
+| `502` | Upstream AI provider returned invalid structured output. |
+| `503` | AI provider is disabled, unavailable, or not configured. |
+| `504` | AI provider exceeded the configured timeout. |
 | `500` | Unexpected server error returned as RFC 7807 `ProblemDetails`. |
 
-The API currently exposes Swagger and does not enforce JWT/session authorization.
+Non-validation failures use RFC 7807 `ProblemDetails` with `status`, localized
+`title` and `detail`, request-path `instance`, and a stable `code` extension.
+For example, a missing organization uses `code: "ORGANIZATION_NOT_FOUND"`.
+Request/model validation uses `ValidationProblemDetails` with the same common
+fields plus an `errors` object and `code: "VALIDATION_ERROR"`. Error payloads
+do not expose exception messages or stack traces.
+
+Send `Accept-Language: es` to receive the existing Spanish shared-resource
+messages. Plan-limit conflicts retain their entitlement extension fields, and
+Stripe webhook failures retain their existing status behavior while using the
+same ProblemDetails contract.
+
+JWT issuance and authenticated-by-default route enforcement are delivered by the dedicated TS02 and T58 security stories; this error contract also applies to their `401` and `403` responses after integration.

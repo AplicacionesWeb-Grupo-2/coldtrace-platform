@@ -25,6 +25,7 @@ The smoke flow covered the main frontend-facing workflows:
 - Sensor readings
 - Incident lifecycle
 - Notifications
+- Subscription plan catalog
 - Maintenance schedules
 - Technical service requests
 - Reports
@@ -34,12 +35,14 @@ The smoke flow covered the main frontend-facing workflows:
 - MySQL is running locally.
 - The API can connect to `coldtrace_platform`.
 - The default local credentials are `root` / `root`, unless overridden through `ConnectionStrings__DefaultConnection`.
+- `JWT_SECRET` is set to a private value of at least 32 bytes.
 - The API starts successfully and Swagger is available at `/swagger/index.html`.
 - EF Core migrations are applied on startup.
 
 Run locally:
 
 ```bash
+JWT_SECRET="$(openssl rand -base64 48)" \
 ASPNETCORE_ENVIRONMENT=Development \
 /Users/mauriciopajes/.dotnet/dotnet run \
   --project coldtrace-platform/coldtrace-platform.csproj \
@@ -48,33 +51,49 @@ ASPNETCORE_ENVIRONMENT=Development \
 
 ## Recommended Smoke Flow
 
+Complete the APPWEB-65 authentication bootstrap first. Attach the returned bearer token to every business request below except the public subscription catalog, organization sign-up, and Stripe webhook.
+
 1. Open `/swagger/index.html`.
 2. Confirm `/swagger/v1/swagger.json` returns `200`.
-3. Create an organization and first user with `POST /api/v1/organization-sign-ups`.
-4. List roles with `GET /api/v1/roles`.
-5. Create an organization-scoped user with `POST /api/v1/organizations/{organizationId}/users`.
-6. Assign or replace the user's role with `PATCH /api/v1/organizations/{organizationId}/users/{userId}/role`.
-7. Create at least one location with `POST /api/v1/organizations/{organizationId}/locations`.
-8. Create at least one gateway with `POST /api/v1/organizations/{organizationId}/gateways`.
-9. Create at least one asset with `POST /api/v1/organizations/{organizationId}/assets`.
-10. Save default asset settings with `PUT /api/v1/organizations/{organizationId}/asset-settings/default`.
-11. Save asset-specific settings with `PUT /api/v1/organizations/{organizationId}/assets/{assetId}/settings`.
-12. Create an assigned IoT device with `POST /api/v1/organizations/{organizationId}/iot-devices`.
-13. Create telemetry with `POST /api/v1/organizations/{organizationId}/sensor-readings`.
-14. Query telemetry with `GET /api/v1/organizations/{organizationId}/sensor-readings?assetId={assetId}&iotDeviceId={iotDeviceId}`.
-15. Generate demo telemetry with `POST /api/v1/organizations/{organizationId}/sensor-readings/demo-generations`.
-16. Register an incident with `POST /api/v1/organizations/{organizationId}/incidents`.
-17. Acknowledge the incident with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/acknowledgements`.
-18. Escalate it with `PATCH /api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation`.
-19. Register corrective action with `PATCH /api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action`.
-20. Resolve it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/resolutions`.
-21. Check incident notifications with `GET /api/v1/organizations/{organizationId}/incidents/{incidentId}/notifications`.
-22. Create a maintenance schedule with `POST /api/v1/organizations/{organizationId}/maintenance-schedules`.
-23. Update the maintenance schedule status with `PATCH /api/v1/organizations/{organizationId}/maintenance-schedules/{maintenanceScheduleId}`.
-24. Create a technical service request with `POST /api/v1/organizations/{organizationId}/technical-service-requests`.
-25. Update the technical service request status with `PATCH /api/v1/organizations/{organizationId}/technical-service-requests/{technicalServiceRequestId}`.
-26. Generate an operational report with `POST /api/v1/organizations/{organizationId}/reports`.
-27. Confirm the report can be listed and read with `GET /api/v1/organizations/{organizationId}/reports` and `GET /api/v1/organizations/{organizationId}/reports/{reportId}`.
+3. List subscription plans with `GET /api/v1/subscription-plans` and expect `base`, `operations`, and `compliance-ai`.
+4. Create an organization and first user with `POST /api/v1/organization-sign-ups`.
+5. Get the new organization's subscription with `GET /api/v1/organizations/{organizationId}/subscription` and expect `plan.code` `base`, `status` `FREE`, `provider` `NONE`, usage counters, and `LIMIT`/`FEATURE` entitlements.
+6. With Stripe not configured, request `POST /api/v1/organizations/{organizationId}/billing/checkout-sessions` for `operations` and expect `503`.
+7. With `STRIPE_SECRET_KEY`, `STRIPE_OPERATIONS_PRICE_ID`, `BILLING_CHECKOUT_SUCCESS_URL`, and `BILLING_CHECKOUT_CANCEL_URL` configured, request the same checkout endpoint and expect `200` with `provider`, `sessionId`, `checkoutUrl`, and `targetPlanCode`.
+8. With a paid Stripe customer id stored on the organization subscription, request `POST /api/v1/organizations/{organizationId}/billing/portal-sessions` and expect `200` with `provider`, `sessionId`, `portalUrl`, and `organizationId`; without a provider customer id, expect `409`.
+9. With `STRIPE_WEBHOOK_SECRET` missing, request `POST /api/v1/billing/stripe/webhooks` and expect `503`; with the secret configured, signed Stripe events should return `200` with `provider`, `eventId`, `eventType`, `processingStatus`, `duplicate`, `organizationId`, `planCode`, and `subscriptionStatus`.
+10. While the organization is still on `base`, exceed a plan-limited operation such as creating a second location or fourth user, and expect `409` with `entitlementKey`, `planCode`, `subscriptionStatus`, `limit`, `used`, `remaining`, `lockedReason`, and `requiredPlanCode`.
+11. List roles with `GET /api/v1/roles`.
+12. Create an organization-scoped user with `POST /api/v1/organizations/{organizationId}/users`.
+13. Assign or replace the user's role with `PATCH /api/v1/organizations/{organizationId}/users/{userId}/role`.
+14. Create at least one location with `POST /api/v1/organizations/{organizationId}/locations`.
+15. Create at least one gateway with `POST /api/v1/organizations/{organizationId}/gateways`.
+16. Create at least one asset with `POST /api/v1/organizations/{organizationId}/assets`.
+17. Save default asset settings with `PUT /api/v1/organizations/{organizationId}/asset-settings/default`.
+18. Save asset-specific settings with `PUT /api/v1/organizations/{organizationId}/assets/{assetId}/settings`.
+19. Create an assigned IoT device with `POST /api/v1/organizations/{organizationId}/iot-devices`.
+20. Create telemetry with `POST /api/v1/organizations/{organizationId}/sensor-readings`.
+21. Query telemetry with `GET /api/v1/organizations/{organizationId}/sensor-readings?assetId={assetId}&iotDeviceId={iotDeviceId}`.
+22. Generate demo telemetry with `POST /api/v1/organizations/{organizationId}/sensor-readings/demo-generations`.
+22. Register an incident with `POST /api/v1/organizations/{organizationId}/incidents`.
+23. Acknowledge the incident with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/acknowledgements`.
+24. Escalate it with `PATCH /api/v1/organizations/{organizationId}/incidents/{incidentId}/escalation`.
+25. Register corrective action with `PATCH /api/v1/organizations/{organizationId}/incidents/{incidentId}/corrective-action`.
+26. With AI disabled or unconfigured, request `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` and expect `503` without creating a plan.
+27. List plan history with `GET /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` and expect `200` with an array, even when no plans exist.
+28. When AI is enabled and a pending plan exists, approve it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals` and expect `200` with `status: "approved"`, `approvedBy`, `finalCorrectiveAction`, and `finalResolutionNotes`.
+29. For a separate pending plan, reject it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans/{planId}/rejections` and expect `200` with `status: "rejected"`, `rejectedBy`, and `rejectionReason` while the incident remains open or acknowledged.
+30. Resolve it with `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/resolutions` when not using the AI approval path.
+31. Request `POST /api/v1/organizations/{organizationId}/incidents/{incidentId}/ai-resolution-plans` again and expect `409` because resolved incidents cannot receive new AI plans.
+32. Check incident notifications with `GET /api/v1/organizations/{organizationId}/incidents/{incidentId}/notifications`.
+33. Create a maintenance schedule with `POST /api/v1/organizations/{organizationId}/maintenance-schedules`.
+34. Update the maintenance schedule status with `PATCH /api/v1/organizations/{organizationId}/maintenance-schedules/{maintenanceScheduleId}`.
+35. Create a technical service request with `POST /api/v1/organizations/{organizationId}/technical-service-requests`.
+36. Update the technical service request status with `PATCH /api/v1/organizations/{organizationId}/technical-service-requests/{technicalServiceRequestId}`.
+37. Generate an operational report with `POST /api/v1/organizations/{organizationId}/reports`.
+38. Confirm the report can be listed and read with `GET /api/v1/organizations/{organizationId}/reports` and `GET /api/v1/organizations/{organizationId}/reports/{reportId}`.
+39. With AI disabled or unconfigured, request `POST /api/v1/organizations/{organizationId}/reports/{reportId}/ai-summary` and expect `503`.
+40. When AI is enabled, request the same report AI summary endpoint and expect `200` with `sourceReport`, `executiveSummary`, `findings`, `evidenceGaps`, `recommendedActions`, `uncertaintyNotes`, `modelProvider`, and `modelName`.
 
 ## Expected Status Codes
 
@@ -87,6 +106,14 @@ ASPNETCORE_ENVIRONMENT=Development \
 | Cross-organization resource access | `404` |
 | Invalid payloads or unsupported lifecycle inputs | `400` |
 
+## Error Response Checks
+
+1. Submit an invalid organization payload with `Accept-Language: es`; expect `400`, content type `application/problem+json`, `ValidationProblemDetails`, `code` `VALIDATION_ERROR`, localized `title`/`detail`/`errors`, and the request path in `instance`.
+2. Request organization `2147483647` through an organization-scoped route; expect `404` `ProblemDetails` with `code` `ORGANIZATION_NOT_FOUND` and the same five common fields.
+3. Repeat a create request with an existing unique email, tax identifier, UUID, or name; expect `409` `ProblemDetails` with the feature-specific stable code and localized detail.
+4. Confirm no error payload contains `exception`, `stackTrace`, or application source paths.
+5. Re-run the plan-limit check and confirm its entitlement fields remain alongside `code`; re-run unsigned/misconfigured Stripe webhook checks and confirm their existing `400`/`503` statuses.
+
 ## Data Notes
 
 - Test data should remain internally consistent: organization, location, gateway, asset, IoT device, readings, incidents, maintenance, and reports must belong to the same organization unless the check is intentionally validating a `404`.
@@ -98,6 +125,7 @@ ASPNETCORE_ENVIRONMENT=Development \
 
 Detailed manual checks are also available:
 
+- [APPWEB-65 JWT and CORS hardening](APPWEB-65-smoke-checklist.md)
 - [APPWEB-49 IoT Devices](APPWEB-49-smoke-checklist.md)
 - [APPWEB-51 API Foundation](APPWEB-51-smoke-checklist.md)
 - [APPWEB-52 Organization Sign-Up](APPWEB-52-smoke-checklist.md)

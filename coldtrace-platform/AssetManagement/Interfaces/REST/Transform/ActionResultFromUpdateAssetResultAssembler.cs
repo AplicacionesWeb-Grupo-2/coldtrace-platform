@@ -25,27 +25,18 @@ public static class ActionResultFromUpdateAssetResultAssembler
                 failure.Error switch
                 {
                     UpdateAssetError.DuplicateUuid =>
-                        controller.Conflict(localizer["AssetUuidDuplicated"].Value),
+                        controller.ProblemResponse(localizer, "AssetUuidDuplicated", StatusCodes.Status409Conflict),
                     UpdateAssetError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     UpdateAssetError.AssetNotFound =>
-                        controller.NotFound(localizer["AssetNotFound"].Value),
+                        controller.ProblemResponse(localizer, "AssetNotFound", StatusCodes.Status404NotFound),
                     UpdateAssetError.LocationNotFound =>
-                        controller.NotFound(localizer["LocationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "LocationNotFound", StatusCodes.Status404NotFound),
                     UpdateAssetError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorUpdatingAsset"].Value,
-                            statusCode: 500),
-                    _ => controller.Problem(
-                        title: localizer["UnexpectedServerError"].Value,
-                        detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                        statusCode: 500)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorUpdatingAsset", 500),
+                    _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
                 },
 
-            _ => controller.Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorProcessingRequest"].Value,
-                statusCode: 500)
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", 500, RestErrorCodes.UnexpectedError)
         };
 }

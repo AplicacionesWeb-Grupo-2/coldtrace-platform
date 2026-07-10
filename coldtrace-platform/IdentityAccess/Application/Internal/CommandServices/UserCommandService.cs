@@ -1,8 +1,11 @@
 using ColdTrace.Platform.IdentityAccess.Application.Errors;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices;
+using ColdTrace.Platform.IdentityAccess.Application.Results;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Commands;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.Shared.Application.Patterns;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +19,33 @@ public class UserCommandService(
     IUserRepository userRepository,
     IOrganizationRepository organizationRepository,
     IRoleRepository roleRepository,
+    IHashingService hashingService,
+    ITokenService tokenService,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<UserCommandService> logger)
     : IUserCommandService
 {
+    /// <inheritdoc />
+    public async Task<Result<AuthenticatedUserResult, AuthenticationError>> Handle(
+        SignInCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var user = await userRepository.FindByEmailAsync(command.Email, cancellationToken);
+        if (user is null ||
+            string.IsNullOrWhiteSpace(user.PasswordHash) ||
+            !hashingService.VerifyPassword(command.Password, user.PasswordHash))
+        {
+            logger.LogWarning("Invalid sign-in credentials for email {Email}", command.Email);
+            return new Result<AuthenticatedUserResult, AuthenticationError>.Failure(
+                AuthenticationError.InvalidCredentials);
+        }
+
+        var token = tokenService.GenerateToken(user);
+        return new Result<AuthenticatedUserResult, AuthenticationError>.Success(
+            new AuthenticatedUserResult(user, token));
+    }
+
     /// <inheritdoc />
     public async Task<Result<User, CreateUserError>> Handle(
         CreateUserCommand command,
@@ -45,9 +71,16 @@ public class UserCommandService(
             return new Result<User, CreateUserError>.Failure(CreateUserError.RoleNotFound);
         }
 
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementUsers,
+            "UserPlanLimitExceeded",
+            cancellationToken);
+
         try
         {
-            var user = new User(command);
+            var passwordHash = hashingService.HashPassword(command.Password);
+            var user = new User(command, passwordHash);
             await userRepository.AddAsync(user, cancellationToken);
             await unitOfWork.CompleteAsync(cancellationToken);
             return new Result<User, CreateUserError>.Success(user);
@@ -129,6 +162,57 @@ public class UserCommandService(
                 command.UserId,
                 command.OrganizationId);
             return new Result<User, AssignUserRoleError>.Failure(AssignUserRoleError.UnexpectedError);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<DeleteUserCommand, DeleteUserError>> Handle(
+        DeleteUserCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning("Organization not found for user deletion: {OrganizationId}", command.OrganizationId);
+            return new Result<DeleteUserCommand, DeleteUserError>.Failure(DeleteUserError.OrganizationNotFound);
+        }
+
+        var user = await userRepository.FindByIdAndOrganizationIdAsync(
+            command.UserId,
+            command.OrganizationId,
+            cancellationToken);
+        if (user is null)
+        {
+            logger.LogWarning(
+                "User not found for deletion: {OrganizationId} {UserId}",
+                command.OrganizationId,
+                command.UserId);
+            return new Result<DeleteUserCommand, DeleteUserError>.Failure(DeleteUserError.UserNotFound);
+        }
+
+        try
+        {
+            userRepository.Remove(user);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            return new Result<DeleteUserCommand, DeleteUserError>.Success(command);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "User deletion blocked by related records: {OrganizationId} {UserId}",
+                command.OrganizationId,
+                command.UserId);
+            return new Result<DeleteUserCommand, DeleteUserError>.Failure(DeleteUserError.DeleteBlocked);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error deleting user {UserId} from organization {OrganizationId}",
+                command.UserId,
+                command.OrganizationId);
+            return new Result<DeleteUserCommand, DeleteUserError>.Failure(DeleteUserError.UnexpectedError);
         }
     }
 

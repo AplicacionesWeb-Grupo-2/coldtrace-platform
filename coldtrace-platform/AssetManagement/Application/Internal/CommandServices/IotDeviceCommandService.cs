@@ -3,6 +3,7 @@ using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.Shared.Application.Patterns;
 using ColdTrace.Platform.Shared.Domain.Repositories;
@@ -18,6 +19,7 @@ public class IotDeviceCommandService(
     IAssetRepository assetRepository,
     IGatewayRepository gatewayRepository,
     IOrganizationRepository organizationRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<IotDeviceCommandService> logger)
     : IIotDeviceCommandService
@@ -85,6 +87,12 @@ public class IotDeviceCommandService(
                 command.Uuid);
             return new Result<IotDevice, CreateIotDeviceError>.Failure(CreateIotDeviceError.DuplicateUuid);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementIotDevices,
+            "IotDevicePlanLimitExceeded",
+            cancellationToken);
 
         try
         {
@@ -228,6 +236,62 @@ public class IotDeviceCommandService(
                 command.IotDeviceId,
                 command.OrganizationId);
             return new Result<IotDevice, UpdateIotDeviceError>.Failure(UpdateIotDeviceError.UnexpectedError);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<DeleteIotDeviceCommand, DeleteIotDeviceError>> Handle(
+        DeleteIotDeviceCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning("Organization not found for IoT device deletion: {OrganizationId}",
+                command.OrganizationId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Failure(
+                DeleteIotDeviceError.OrganizationNotFound);
+        }
+
+        var iotDevice = await iotDeviceRepository.FindByIdAndOrganizationIdAsync(
+            command.IotDeviceId,
+            command.OrganizationId,
+            cancellationToken);
+        if (iotDevice is null)
+        {
+            logger.LogWarning("IoT device not found for deletion: {OrganizationId} {IotDeviceId}",
+                command.OrganizationId,
+                command.IotDeviceId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Failure(
+                DeleteIotDeviceError.IotDeviceNotFound);
+        }
+
+        try
+        {
+            iotDeviceRepository.Remove(iotDevice);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            logger.LogInformation("IoT device deleted: {IotDeviceId} {OrganizationId}",
+                command.IotDeviceId,
+                command.OrganizationId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Success(command);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning(ex,
+                "IoT device deletion blocked by related records: {OrganizationId} {IotDeviceId}",
+                command.OrganizationId,
+                command.IotDeviceId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Failure(
+                DeleteIotDeviceError.DeleteBlocked);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex,
+                "Unexpected error deleting IoT device {IotDeviceId} for organization {OrganizationId}",
+                command.IotDeviceId,
+                command.OrganizationId);
+            return new Result<DeleteIotDeviceCommand, DeleteIotDeviceError>.Failure(
+                DeleteIotDeviceError.UnexpectedError);
         }
     }
 

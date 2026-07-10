@@ -26,18 +26,15 @@ public static class ActionResultFromGenerateDemoSensorReadingsResultAssembler
                 failure.Error switch
                 {
                     GenerateDemoSensorReadingsError.OrganizationNotFound =>
-                        controller.NotFound(localizer["OrganizationNotFound"].Value),
+                        controller.ProblemResponse(localizer, "OrganizationNotFound", StatusCodes.Status404NotFound),
                     GenerateDemoSensorReadingsError.AssetNotFound =>
-                        controller.NotFound(localizer["AssetNotFound"].Value),
+                        controller.ProblemResponse(localizer, "AssetNotFound", StatusCodes.Status404NotFound),
                     GenerateDemoSensorReadingsError.NoEligibleDevices =>
-                        controller.BadRequest(localizer["InvalidRequest"].Value),
+                        controller.ValidationProblemResponse(localizer, "InvalidRequest"),
                     GenerateDemoSensorReadingsError.UnexpectedError =>
-                        controller.Problem(
-                            title: localizer["UnexpectedServerError"].Value,
-                            detail: localizer["UnexpectedErrorCreatingSensorReading"].Value,
-                            statusCode: 500),
-                    _ => controller.BadRequest(localizer["InvalidRequest"].Value)
+                        controller.ProblemResponse(localizer, "UnexpectedErrorCreatingSensorReading", 500),
+                    _ => controller.ValidationProblemResponse(localizer, "InvalidRequest")
                 },
-            _ => controller.Problem()
+            _ => controller.ProblemResponse(localizer, "UnexpectedErrorProcessingRequest", StatusCodes.Status500InternalServerError, RestErrorCodes.UnexpectedError)
         };
 }

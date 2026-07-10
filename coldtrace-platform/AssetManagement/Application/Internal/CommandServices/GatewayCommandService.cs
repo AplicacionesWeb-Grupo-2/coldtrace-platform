@@ -187,6 +187,64 @@ public class GatewayCommandService(
         }
     }
 
+    /// <inheritdoc />
+    public async Task<Result<DeleteGatewayCommand, DeleteGatewayError>> Handle(
+        DeleteGatewayCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for gateway deletion: {OrganizationId}",
+                command.OrganizationId);
+            return new Result<DeleteGatewayCommand, DeleteGatewayError>.Failure(
+                DeleteGatewayError.OrganizationNotFound);
+        }
+
+        var gateway = await gatewayRepository.FindByIdAndOrganizationIdAsync(
+            command.GatewayId,
+            command.OrganizationId,
+            cancellationToken);
+        if (gateway is null)
+        {
+            logger.LogWarning(
+                "Gateway not found for deletion: {OrganizationId} {GatewayId}",
+                command.OrganizationId,
+                command.GatewayId);
+            return new Result<DeleteGatewayCommand, DeleteGatewayError>.Failure(DeleteGatewayError.GatewayNotFound);
+        }
+
+        try
+        {
+            gatewayRepository.Remove(gateway);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            logger.LogInformation(
+                "Gateway deleted: {GatewayId} {OrganizationId}",
+                command.GatewayId,
+                command.OrganizationId);
+            return new Result<DeleteGatewayCommand, DeleteGatewayError>.Success(command);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Gateway deletion blocked by related records: {OrganizationId} {GatewayId}",
+                command.OrganizationId,
+                command.GatewayId);
+            return new Result<DeleteGatewayCommand, DeleteGatewayError>.Failure(DeleteGatewayError.DeleteBlocked);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error deleting gateway {GatewayId} for organization {OrganizationId}",
+                command.GatewayId,
+                command.OrganizationId);
+            return new Result<DeleteGatewayCommand, DeleteGatewayError>.Failure(DeleteGatewayError.UnexpectedError);
+        }
+    }
+
     private static bool TryGetDuplicateGatewayUuidError(DbUpdateException exception)
     {
         for (Exception? current = exception; current is not null; current = current.InnerException)

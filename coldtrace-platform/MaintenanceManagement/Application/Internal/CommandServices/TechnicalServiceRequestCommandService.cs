@@ -1,4 +1,5 @@
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.MaintenanceManagement.Application.Errors;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
@@ -17,6 +18,7 @@ public class TechnicalServiceRequestCommandService(
     ITechnicalServiceRequestRepository technicalServiceRequestRepository,
     IOrganizationRepository organizationRepository,
     IAssetRepository assetRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<TechnicalServiceRequestCommandService> logger)
     : ITechnicalServiceRequestCommandService
@@ -45,6 +47,12 @@ public class TechnicalServiceRequestCommandService(
             return new Result<TechnicalServiceRequest, CreateTechnicalServiceRequestError>.Failure(
                 CreateTechnicalServiceRequestError.AssetNotFound);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementMaintenance,
+            "TechnicalServiceRequestPlanLimitExceeded",
+            cancellationToken);
 
         try
         {

@@ -11,7 +11,9 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 - Entity Framework Core 10
 - MySQL through `MySql.EntityFrameworkCore`
 - Swagger/OpenAPI through Swashbuckle annotations
-- Resource-based localization for `en`, `en-US`, `es`, and `es-PE`
+- ASP.NET Core JWT bearer authentication with HS256 validation
+- Resource-based localization for `en` and `es`
+- Microsoft.Extensions.AI abstractions for provider-neutral AI features
 
 ## Backend Scope
 
@@ -20,9 +22,10 @@ The backend exposes organization-scoped REST endpoints for identity access, asse
 | Identity Access | Organizations, organization sign-up, users, roles, permissions |
 | Asset Management | Locations, gateways, assets, asset settings, IoT devices |
 | Monitoring | Sensor readings, range evaluation, demo telemetry generation |
-| Alerts | Incidents, acknowledgements, escalation, corrective action, resolutions, notifications |
+| Alerts | Incidents, acknowledgements, escalation, corrective action, AI resolution plans, resolutions, notifications |
 | Maintenance Management | Maintenance schedules and technical service requests |
 | Reports | Operational report generation and report lookup |
+| AI Assistance | Provider configuration, structured output contracts for dashboard interpretation, report AI summaries, incident AI resolution plans, and AI diagnostics |
 
 ## Repository Layout
 
@@ -34,6 +37,7 @@ coldtrace-platform/
   MaintenanceManagement/
   Monitoring/
   Reports/
+  AiAssistance/
   Resources/
   Shared/
 docs/
@@ -82,6 +86,7 @@ ConnectionStrings__DefaultConnection="server=localhost;user=root;password=<your-
 Run the API locally:
 
 ```bash
+JWT_SECRET="$(openssl rand -base64 48)" \
 ASPNETCORE_ENVIRONMENT=Development \
 /Users/mauriciopajes/.dotnet/dotnet run \
   --project coldtrace-platform/coldtrace-platform.csproj \
@@ -120,12 +125,21 @@ DATABASE_URL=127.0.0.1
 DATABASE_SCHEMA=coldtrace_platform
 DATABASE_USER=coldtrace_app
 DATABASE_PASSWORD=<from Secret Manager>
-CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app,http://localhost:5173
+JWT_SECRET_NAME=coldtrace-jwt-secret
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app
+AI_ASSISTANCE_ENABLED=false
+AI_MODEL_PROVIDER=disabled
+AI_MODEL_NAME=
+OLLAMA_BASE_URL=http://localhost:11434
+OPENAI_API_KEY=<from Secret Manager when enabled>
+AI_REQUEST_TIMEOUT=30s
 ```
 
-`CORS_ALLOWED_ORIGINS` is a comma-separated allowlist for browser clients. Keep the stable Vercel production domain in the list and add temporary deployment URLs only when they must be tested directly.
+`CORS_ALLOWED_ORIGINS` is a comma-separated exact allowlist for browser clients. Development defaults to the two Vite origins when it is omitted; every other environment requires it. Keep the stable Vercel production domain in the list and add temporary deployment URLs only when they must be tested directly.
 
-The Cloud Run service account must have `roles/cloudsql.client`. The sidecar runs `gcr.io/cloud-sql-connectors/cloud-sql-proxy:2` against the Cloud SQL instance connection name and exposes MySQL locally on port `3306`.
+API controllers require a valid bearer token by default. The explicit anonymous routes are sign-in, first-tenant organization sign-up, subscription plan catalog reads, and the signed Stripe webhook. Swagger/OpenAPI assets remain public for course validation.
+
+The Cloud Run service account must have `roles/cloudsql.client` and `roles/secretmanager.secretAccessor`. The sidecar runs `gcr.io/cloud-sql-connectors/cloud-sql-proxy:2` against the Cloud SQL instance connection name and exposes MySQL locally on port `3306`.
 
 The Cloud Run manifest is versioned as a template in:
 
@@ -139,9 +153,13 @@ Deployment is automated through:
 scripts/deploy-cloud-run.sh
 ```
 
-The current schema contains 18 domain tables plus EF Core's `__EFMigrationsHistory` table:
+The current schema contains 22 domain tables plus EF Core's `__EFMigrationsHistory` table:
 
 ```text
+ai_resolution_plan_required_evidences
+ai_resolution_plan_steps
+ai_resolution_plan_uncertainty_notes
+ai_resolution_plans
 asset_settings
 asset_settings_asset_types
 asset_settings_iot_device_types
@@ -172,9 +190,28 @@ All organization-owned operational resources are scoped under `/api/v1/organizat
 | Roles and users | `/api/v1/roles`, `/api/v1/organizations/{organizationId}/users` |
 | Assets | `/api/v1/organizations/{organizationId}/locations`, `/gateways`, `/assets`, `/iot-devices`, `/asset-settings` |
 | Monitoring | `/api/v1/organizations/{organizationId}/sensor-readings` |
-| Alerts | `/api/v1/organizations/{organizationId}/incidents`, `/notifications` |
+| Alerts | `/api/v1/organizations/{organizationId}/incidents`, `/incidents/{incidentId}/ai-resolution-plans`, `/incidents/{incidentId}/ai-resolution-plans/{planId}/approvals`, `/incidents/{incidentId}/ai-resolution-plans/{planId}/rejections`, `/notifications` |
 | Maintenance | `/api/v1/organizations/{organizationId}/maintenance-schedules`, `/technical-service-requests` |
 | Reports | `/api/v1/organizations/{organizationId}/reports` |
+| AI Assistance | `/api/v1/ai-assistance/provider-status` |
+
+Plan-limited writes and paid AI operations are enforced server-side before persistence. When the current subscription plan does not allow the operation, the API returns `409 Conflict` with RFC 7807 `ProblemDetails` and the same entitlement metadata exposed by the Spring Boot implementation:
+
+```text
+organizationId
+planCode
+subscriptionStatus
+entitlementKey
+entitlementCategory
+entitlementEnabled
+limit
+used
+remaining
+lockedReason
+requiredPlanCode
+```
+
+Current backend checks cover organization-scoped creation of locations, assets, IoT devices, users, reports, maintenance schedules, technical service requests, AI incident guidance, and AI report summaries.
 
 See [docs/API_REFERENCE.md](docs/API_REFERENCE.md) for the current route and payload reference.
 
@@ -186,7 +223,8 @@ Core commands:
 
 ```bash
 /Users/mauriciopajes/.dotnet/dotnet build coldtrace-platform/coldtrace-platform.csproj
-DRY_RUN=true scripts/deploy-cloud-run.sh
+/Users/mauriciopajes/.dotnet/dotnet test coldtrace-platform.IdentityAccess.Tests/ColdTrace.Platform.IdentityAccess.Tests.csproj
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app DRY_RUN=true scripts/deploy-cloud-run.sh
 ```
 
 See [docs/SMOKE_TESTING.md](docs/SMOKE_TESTING.md) for the current smoke flow and [docs](docs) for ticket-level manual checklists.

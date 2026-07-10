@@ -3,6 +3,7 @@ using ColdTrace.Platform.AssetManagement.Domain.Services;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Commands;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.Shared.Application.Patterns;
 using ColdTrace.Platform.Shared.Domain.Repositories;
@@ -17,6 +18,7 @@ public class AssetCommandService(
     IAssetRepository assetRepository,
     ILocationRepository locationRepository,
     IOrganizationRepository organizationRepository,
+    ISubscriptionBillingContextFacade subscriptionBillingContextFacade,
     IUnitOfWork unitOfWork,
     ILogger<AssetCommandService> logger)
     : IAssetCommandService
@@ -59,6 +61,12 @@ public class AssetCommandService(
                 command.Uuid);
             return new Result<Asset, CreateAssetError>.Failure(CreateAssetError.DuplicateUuid);
         }
+
+        await subscriptionBillingContextFacade.EnsureEntitlementAsync(
+            command.OrganizationId,
+            ISubscriptionBillingContextFacade.EntitlementAssets,
+            "AssetPlanLimitExceeded",
+            cancellationToken);
 
         try
         {
@@ -184,6 +192,64 @@ public class AssetCommandService(
                 command.AssetId,
                 command.OrganizationId);
             return new Result<Asset, UpdateAssetError>.Failure(UpdateAssetError.UnexpectedError);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<DeleteAssetCommand, DeleteAssetError>> Handle(
+        DeleteAssetCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
+        if (organization is null)
+        {
+            logger.LogWarning(
+                "Organization not found for asset deletion: {OrganizationId}",
+                command.OrganizationId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Failure(
+                DeleteAssetError.OrganizationNotFound);
+        }
+
+        var asset = await assetRepository.FindByIdAndOrganizationIdAsync(
+            command.AssetId,
+            command.OrganizationId,
+            cancellationToken);
+        if (asset is null)
+        {
+            logger.LogWarning(
+                "Asset not found for deletion: {OrganizationId} {AssetId}",
+                command.OrganizationId,
+                command.AssetId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Failure(DeleteAssetError.AssetNotFound);
+        }
+
+        try
+        {
+            assetRepository.Remove(asset);
+            await unitOfWork.CompleteAsync(cancellationToken);
+            logger.LogInformation(
+                "Asset deleted: {AssetId} {OrganizationId}",
+                command.AssetId,
+                command.OrganizationId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Success(command);
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Asset deletion blocked by a database constraint: {OrganizationId} {AssetId}",
+                command.OrganizationId,
+                command.AssetId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Failure(DeleteAssetError.DeleteBlocked);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Unexpected error deleting asset {AssetId} for organization {OrganizationId}",
+                command.AssetId,
+                command.OrganizationId);
+            return new Result<DeleteAssetCommand, DeleteAssetError>.Failure(DeleteAssetError.UnexpectedError);
         }
     }
 

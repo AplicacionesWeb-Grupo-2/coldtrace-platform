@@ -1,5 +1,7 @@
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
+using ColdTrace.Platform.Billing.Domain.Model.Aggregates;
+using ColdTrace.Platform.Billing.Domain.Model.Entities;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates;
 using ColdTrace.Platform.IdentityAccess.Domain.Model.ValueObjects;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Model.Aggregates;
@@ -96,6 +98,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
         builder.Entity<User>().Property(user => user.FirstName).IsRequired().HasMaxLength(120);
         builder.Entity<User>().Property(user => user.LastName).IsRequired().HasMaxLength(120);
         builder.Entity<User>().Property(user => user.Email).IsRequired().HasMaxLength(256);
+        builder.Entity<User>().Property(user => user.PasswordHash).HasMaxLength(60);
         builder.Entity<User>().HasIndex(user => user.Email).IsUnique();
         builder.Entity<User>()
             .HasOne(user => user.Organization)
@@ -107,6 +110,106 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .WithMany()
             .HasForeignKey(user => user.RoleId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<PasswordResetRequest>().HasKey(request => request.Id);
+        builder.Entity<PasswordResetRequest>().Property(request => request.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<PasswordResetRequest>().Property(request => request.Email).IsRequired().HasMaxLength(256);
+        builder.Entity<PasswordResetRequest>().Property(request => request.UserId).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.TokenHash).IsRequired().HasMaxLength(128);
+        builder.Entity<PasswordResetRequest>().Property(request => request.RequestedAt).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.ExpiresAt).IsRequired();
+        builder.Entity<PasswordResetRequest>().Property(request => request.ConsumedAt);
+        builder.Entity<PasswordResetRequest>().HasIndex(request => request.TokenHash).IsUnique();
+        builder.Entity<PasswordResetRequest>().HasIndex(request => request.UserId);
+        builder.Entity<PasswordResetRequest>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(request => request.UserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_password_reset_requests_users_user_id");
+
+        builder.Entity<ExternalIdentity>().HasKey(identity => identity.Id);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Provider).IsRequired()
+            .HasConversion(
+                provider => provider.ToCode(),
+                value => SocialProviderExtensions.FromCode(value))
+            .HasMaxLength(32);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.ProviderSubject).IsRequired()
+            .HasMaxLength(255);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.Email).HasMaxLength(255);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.UserId).IsRequired();
+        builder.Entity<ExternalIdentity>().Property(identity => identity.CreatedAt);
+        builder.Entity<ExternalIdentity>().Property(identity => identity.UpdatedAt);
+        builder.Entity<ExternalIdentity>()
+            .HasIndex(identity => new { identity.Provider, identity.ProviderSubject })
+            .IsUnique()
+            .HasDatabaseName("uk_external_identities_provider_subject");
+        builder.Entity<ExternalIdentity>()
+            .HasOne<User>()
+            .WithMany()
+            .HasForeignKey(identity => identity.UserId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("f_k_external_identities_users_user_id");
+
+        builder.Entity<OrganizationSubscription>().HasKey(subscription => subscription.Id);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Id).IsRequired()
+            .ValueGeneratedOnAdd();
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.PlanCode).IsRequired()
+            .HasMaxLength(40);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Status).IsRequired()
+            .HasMaxLength(30);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Provider).IsRequired()
+            .HasMaxLength(30);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.ProviderCustomerId)
+            .HasMaxLength(255);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.ProviderSubscriptionId)
+            .HasMaxLength(255);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.CurrentPeriodStart);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.CurrentPeriodEnd);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.CancelAtPeriodEnd)
+            .IsRequired();
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.Metadata)
+            .HasMaxLength(2000);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.CreatedAt);
+        builder.Entity<OrganizationSubscription>().Property(subscription => subscription.UpdatedAt);
+        builder.Entity<OrganizationSubscription>()
+            .HasIndex(subscription => subscription.OrganizationId)
+            .IsUnique();
+        builder.Entity<OrganizationSubscription>()
+            .HasIndex(subscription => subscription.ProviderCustomerId);
+        builder.Entity<OrganizationSubscription>()
+            .HasIndex(subscription => subscription.ProviderSubscriptionId);
+        builder.Entity<OrganizationSubscription>()
+            .HasOne(subscription => subscription.Organization)
+            .WithMany()
+            .HasForeignKey(subscription => subscription.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_organization_subscriptions_organizations_organization_id");
+
+        builder.Entity<BillingWebhookEvent>().HasKey(webhookEvent => webhookEvent.Id);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.Id).IsRequired()
+            .ValueGeneratedOnAdd();
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.Provider).IsRequired()
+            .HasMaxLength(30);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.EventId).IsRequired()
+            .HasMaxLength(120);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.EventType).IsRequired()
+            .HasMaxLength(120);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.Status).IsRequired()
+            .HasMaxLength(30);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.OrganizationId);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.ProviderCustomerId)
+            .HasMaxLength(255);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.ProviderSubscriptionId)
+            .HasMaxLength(255);
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.ProcessedAt).IsRequired();
+        builder.Entity<BillingWebhookEvent>().Property(webhookEvent => webhookEvent.Metadata)
+            .HasMaxLength(2000);
+        builder.Entity<BillingWebhookEvent>()
+            .HasIndex(webhookEvent => new { webhookEvent.Provider, webhookEvent.EventId })
+            .IsUnique()
+            .HasDatabaseName("uk_billing_webhook_events_provider_event");
 
         builder.Entity<Location>().HasKey(location => location.Id);
         builder.Entity<Location>().Property(location => location.Id).IsRequired().ValueGeneratedOnAdd();
@@ -231,7 +334,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(settings => settings.Asset)
             .WithMany()
             .HasForeignKey(settings => settings.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_asset_settings_assets_asset_id");
 
         builder.Entity<IotDevice>().HasKey(device => device.Id);
@@ -293,7 +396,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(device => device.Asset)
             .WithMany()
             .HasForeignKey(device => device.AssetId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_iot_devices_assets_asset_id");
 
         builder.Entity<SensorReading>().HasKey(reading => reading.Id);
@@ -339,7 +442,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(reading => reading.IotDevice)
             .WithMany()
             .HasForeignKey(reading => reading.IotDeviceId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_sensor_readings_iot_devices_iot_device_id");
         builder.Entity<SensorReading>()
             .HasOne(reading => reading.Gateway)
@@ -390,8 +493,86 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(incident => incident.Asset)
             .WithMany()
             .HasForeignKey(incident => incident.AssetId)
-            .OnDelete(DeleteBehavior.SetNull)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_incidents_assets_asset_id");
+
+        builder.Entity<AiResolutionPlan>().HasKey(plan => plan.Id);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.Status).IsRequired().HasMaxLength(32);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.Summary).IsRequired().HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ProbableCause).IsRequired().HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().OwnsMany(plan => plan.RecommendedSteps, stepsBuilder =>
+        {
+            stepsBuilder.ToTable("ai_resolution_plan_steps");
+            stepsBuilder.Property<int>("AiResolutionPlanId").HasColumnName("ai_resolution_plan_id").IsRequired();
+            stepsBuilder.Property(step => step.Sequence).HasColumnName("sequence").IsRequired().ValueGeneratedNever();
+            stepsBuilder.Property(step => step.Action).HasColumnName("action").IsRequired().HasMaxLength(1024);
+            stepsBuilder.Property(step => step.Rationale).HasColumnName("rationale").IsRequired().HasMaxLength(1024);
+            stepsBuilder.Property(step => step.ExpectedOutcome).HasColumnName("expected_outcome").IsRequired()
+                .HasMaxLength(1024);
+            stepsBuilder.HasKey("AiResolutionPlanId", nameof(AiResolutionPlanStep.Sequence));
+            stepsBuilder.WithOwner()
+                .HasForeignKey("AiResolutionPlanId")
+                .HasConstraintName("f_k_ai_resolution_plan_steps_ai_resolution_plan_id");
+        });
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.CorrectiveActionDraft).IsRequired()
+            .HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ResolutionNotesDraft).IsRequired()
+            .HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.EscalationRecommended).IsRequired();
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.EscalationUrgency).IsRequired().HasMaxLength(32);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.EscalationReason).IsRequired().HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().OwnsMany(plan => plan.RequiredEvidenceItems, evidenceBuilder =>
+        {
+            evidenceBuilder.ToTable("ai_resolution_plan_required_evidence");
+            evidenceBuilder.Property<int>("Id").HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
+            evidenceBuilder.Property<int>("AiResolutionPlanId").HasColumnName("ai_resolution_plan_id").IsRequired();
+            evidenceBuilder.Property(item => item.Value).HasColumnName("value").IsRequired().HasMaxLength(512);
+            evidenceBuilder.HasKey("Id");
+            evidenceBuilder.WithOwner()
+                .HasForeignKey("AiResolutionPlanId")
+                .HasConstraintName("f_k_ai_resolution_plan_required_evidence_ai_resolution_plan_id");
+        });
+        builder.Entity<AiResolutionPlan>().OwnsMany(plan => plan.UncertaintyNoteItems, notesBuilder =>
+        {
+            notesBuilder.ToTable("ai_resolution_plan_uncertainty_notes");
+            notesBuilder.Property<int>("Id").HasColumnName("id").IsRequired().ValueGeneratedOnAdd();
+            notesBuilder.Property<int>("AiResolutionPlanId").HasColumnName("ai_resolution_plan_id").IsRequired();
+            notesBuilder.Property(item => item.Value).HasColumnName("value").IsRequired().HasMaxLength(512);
+            notesBuilder.HasKey("Id");
+            notesBuilder.WithOwner()
+                .HasForeignKey("AiResolutionPlanId")
+                .HasConstraintName("f_k_ai_resolution_plan_uncertainty_notes_ai_resolution_plan_id");
+        });
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ModelProvider).IsRequired().HasMaxLength(64);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ModelName).IsRequired().HasMaxLength(128);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ProviderMetadata).HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.GeneratedAt).IsRequired();
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ApprovedAt);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.ApprovedBy).HasMaxLength(256);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.RejectedAt);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.RejectedBy).HasMaxLength(256);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.RejectionReason).HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.FinalCorrectiveAction).HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.FinalResolutionNotes).HasMaxLength(1024);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.CreatedAt);
+        builder.Entity<AiResolutionPlan>().Property(plan => plan.UpdatedAt);
+        builder.Entity<AiResolutionPlan>()
+            .HasIndex(plan => new { plan.OrganizationId, plan.IncidentId, plan.GeneratedAt });
+        builder.Entity<AiResolutionPlan>()
+            .HasIndex(plan => new { plan.OrganizationId, plan.Status });
+        builder.Entity<AiResolutionPlan>()
+            .HasOne(plan => plan.Organization)
+            .WithMany()
+            .HasForeignKey(plan => plan.OrganizationId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_ai_resolution_plans_organizations_organization_id");
+        builder.Entity<AiResolutionPlan>()
+            .HasOne(plan => plan.Incident)
+            .WithMany()
+            .HasForeignKey(plan => plan.IncidentId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("f_k_ai_resolution_plans_incidents_incident_id");
 
         builder.Entity<Notification>().HasKey(notification => notification.Id);
         builder.Entity<Notification>().Property(notification => notification.Id).IsRequired().ValueGeneratedOnAdd();
@@ -468,7 +649,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(s => s.Asset)
             .WithMany()
             .HasForeignKey(s => s.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_maintenance_schedules_assets_asset_id");
 
         builder.Entity<TechnicalServiceRequest>().HasKey(r => r.Id);
@@ -498,7 +679,7 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
             .HasOne(r => r.Asset)
             .WithMany()
             .HasForeignKey(r => r.AssetId)
-            .OnDelete(DeleteBehavior.Cascade)
+            .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("f_k_technical_service_requests_assets_asset_id");
 
         UseDateTimeOffsetPrecision(builder);

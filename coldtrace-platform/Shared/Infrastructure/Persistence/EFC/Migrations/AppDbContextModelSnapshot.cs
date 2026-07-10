@@ -19,6 +19,144 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                 .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("ColdTrace.Platform.Alerts.Domain.Model.Aggregates.AiResolutionPlan", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("ApprovedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("approved_at");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("approved_by");
+
+                    b.Property<string>("CorrectiveActionDraft")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("corrective_action_draft");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("EscalationReason")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("escalation_reason");
+
+                    b.Property<bool>("EscalationRecommended")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("escalation_recommended");
+
+                    b.Property<string>("EscalationUrgency")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("escalation_urgency");
+
+                    b.Property<string>("FinalCorrectiveAction")
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("final_corrective_action");
+
+                    b.Property<string>("FinalResolutionNotes")
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("final_resolution_notes");
+
+                    b.Property<DateTimeOffset>("GeneratedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("generated_at");
+
+                    b.Property<int>("IncidentId")
+                        .HasColumnType("int")
+                        .HasColumnName("incident_id");
+
+                    b.Property<string>("ModelName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("model_name");
+
+                    b.Property<string>("ModelProvider")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("model_provider");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("ProbableCause")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("probable_cause");
+
+                    b.Property<string>("ProviderMetadata")
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("provider_metadata");
+
+                    b.Property<DateTimeOffset?>("RejectedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("rejected_at");
+
+                    b.Property<string>("RejectedBy")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("rejected_by");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("rejection_reason");
+
+                    b.Property<string>("ResolutionNotesDraft")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("resolution_notes_draft");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)")
+                        .HasColumnName("summary");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_ai_resolution_plans");
+
+                    b.HasIndex("IncidentId")
+                        .HasDatabaseName("i_x_ai_resolution_plans_incident_id");
+
+                    b.HasIndex("OrganizationId", "Status")
+                        .HasDatabaseName("i_x_ai_resolution_plans_organization_id_status");
+
+                    b.HasIndex("OrganizationId", "IncidentId", "GeneratedAt")
+                        .HasDatabaseName("i_x_ai_resolution_plans_organization_id_incident_id_generated_at");
+
+                    b.ToTable("ai_resolution_plans");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.Alerts.Domain.Model.Aggregates.Incident", b =>
                 {
                     b.Property<int>("Id")
@@ -35,6 +173,15 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnType("varchar(256)")
                         .HasColumnName("acknowledged_by");
 
+                    b.Property<int?>("AssetId")
+                        .HasColumnType("int")
+                        .HasColumnName("asset_id");
+
+                    b.Property<string>("AssetName")
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("asset_name");
+
                     b.Property<string>("CorrectiveAction")
                         .HasMaxLength(1024)
                         .HasColumnType("varchar(1024)")
@@ -48,15 +195,6 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)")
                         .HasColumnName("corrective_action_registered_by");
-
-                    b.Property<int?>("AssetId")
-                        .HasColumnType("int")
-                        .HasColumnName("asset_id");
-
-                    b.Property<string>("AssetName")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("asset_name");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
                         .HasColumnType("datetime(6)")
@@ -305,66 +443,6 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("assets");
                 });
 
-            modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int")
-                        .HasColumnName("location_id");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Network")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("varchar(120)")
-                        .HasColumnName("network");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int")
-                        .HasColumnName("organization_id");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)")
-                        .HasColumnName("status");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("Uuid")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)")
-                        .HasColumnName("uuid");
-
-                    b.HasKey("Id")
-                        .HasName("p_k_gateways");
-
-                    b.HasIndex("LocationId")
-                        .HasDatabaseName("i_x_gateways_location_id");
-
-                    b.HasIndex("OrganizationId", "Uuid")
-                        .IsUnique()
-                        .HasDatabaseName("i_x_gateways_organization_id_uuid");
-
-                    b.ToTable("gateways");
-                });
-
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.AssetSettings", b =>
                 {
                     b.Property<int>("Id")
@@ -372,13 +450,13 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
-                    b.Property<int?>("AssetId")
-                        .HasColumnType("int")
-                        .HasColumnName("asset_id");
-
                     b.Property<int>("AlertThresholdMinutes")
                         .HasColumnType("int")
                         .HasColumnName("alert_threshold_minutes");
+
+                    b.Property<int?>("AssetId")
+                        .HasColumnType("int")
+                        .HasColumnName("asset_id");
 
                     b.Property<int>("CalibrationFrequencyDays")
                         .HasColumnType("int")
@@ -453,6 +531,66 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("asset_settings");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int")
+                        .HasColumnName("location_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Network")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("network");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<string>("Uuid")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("uuid");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_gateways");
+
+                    b.HasIndex("LocationId")
+                        .HasDatabaseName("i_x_gateways_location_id");
+
+                    b.HasIndex("OrganizationId", "Uuid")
+                        .IsUnique()
+                        .HasDatabaseName("i_x_gateways_organization_id_uuid");
+
+                    b.ToTable("gateways");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", b =>
                 {
                     b.Property<int>("Id")
@@ -484,10 +622,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnType("int")
                         .HasColumnName("gateway_id");
 
-                    b.Property<DateOnly>("LastCalibrationDate")
-                        .HasConversion(new ValueConverter<DateOnly, DateTime>(
-                            date => date.ToDateTime(TimeOnly.MinValue),
-                            dateTime => DateOnly.FromDateTime(dateTime)))
+                    b.Property<DateTime>("LastCalibrationDate")
                         .HasColumnType("date")
                         .HasColumnName("last_calibration_date");
 
@@ -509,16 +644,13 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasColumnType("varchar(200)")
                         .HasColumnName("name");
 
+                    b.Property<DateTime>("NextCalibrationDate")
+                        .HasColumnType("date")
+                        .HasColumnName("next_calibration_date");
+
                     b.Property<int>("OrganizationId")
                         .HasColumnType("int")
                         .HasColumnName("organization_id");
-
-                    b.Property<DateOnly>("NextCalibrationDate")
-                        .HasConversion(new ValueConverter<DateOnly, DateTime>(
-                            date => date.ToDateTime(TimeOnly.MinValue),
-                            dateTime => DateOnly.FromDateTime(dateTime)))
-                        .HasColumnType("date")
-                        .HasColumnName("next_calibration_date");
 
                     b.Property<int>("ReadingFrequencySeconds")
                         .HasColumnType("int")
@@ -554,99 +686,6 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasDatabaseName("i_x_iot_devices_organization_id_uuid");
 
                     b.ToTable("iot_devices");
-                });
-
-            modelBuilder.Entity("ColdTrace.Platform.Monitoring.Domain.Model.Aggregates.SensorReading", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int")
-                        .HasColumnName("asset_id");
-
-                    b.Property<int?>("BatteryLevel")
-                        .HasColumnType("int")
-                        .HasColumnName("battery_level");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("GatewayId")
-                        .HasColumnType("int")
-                        .HasColumnName("gateway_id");
-
-                    b.Property<double?>("Humidity")
-                        .HasPrecision(8, 2)
-                        .HasColumnType("double")
-                        .HasColumnName("humidity");
-
-                    b.Property<bool?>("ImageCaptured")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("image_captured");
-
-                    b.Property<int>("IotDeviceId")
-                        .HasColumnType("int")
-                        .HasColumnName("iot_device_id");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int")
-                        .HasColumnName("location_id");
-
-                    b.Property<bool?>("MotionDetected")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("motion_detected");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int")
-                        .HasColumnName("organization_id");
-
-                    b.Property<bool>("OutOfRange")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("out_of_range");
-
-                    b.Property<DateTimeOffset>("RecordedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("recorded_at");
-
-                    b.Property<int?>("SignalStrength")
-                        .HasColumnType("int")
-                        .HasColumnName("signal_strength");
-
-                    b.Property<double?>("Temperature")
-                        .HasPrecision(8, 2)
-                        .HasColumnType("double")
-                        .HasColumnName("temperature");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("p_k_sensor_readings");
-
-                    b.HasIndex("AssetId")
-                        .HasDatabaseName("i_x_sensor_readings_asset_id");
-
-                    b.HasIndex("GatewayId")
-                        .HasDatabaseName("i_x_sensor_readings_gateway_id");
-
-                    b.HasIndex("IotDeviceId")
-                        .HasDatabaseName("i_x_sensor_readings_iot_device_id");
-
-                    b.HasIndex("OrganizationId")
-                        .HasDatabaseName("i_x_sensor_readings_organization_id");
-
-                    b.HasIndex("OrganizationId", "RecordedAt")
-                        .HasDatabaseName("i_x_sensor_readings_organization_id_recorded_at");
-
-                    b.HasIndex("OrganizationId", "AssetId", "RecordedAt")
-                        .HasDatabaseName("i_x_sensor_readings_organization_id_asset_id_recorded_at");
-
-                    b.ToTable("sensor_readings");
                 });
 
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Location", b =>
@@ -706,6 +745,199 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("locations");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.Billing.Domain.Model.Aggregates.OrganizationSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("CancelAtPeriodEnd")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("cancel_at_period_end");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("CurrentPeriodEnd")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("current_period_end");
+
+                    b.Property<DateTimeOffset?>("CurrentPeriodStart")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("current_period_start");
+
+                    b.Property<string>("Metadata")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("metadata");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<string>("PlanCode")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("plan_code");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("provider");
+
+                    b.Property<string>("ProviderCustomerId")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("provider_customer_id");
+
+                    b.Property<string>("ProviderSubscriptionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("provider_subscription_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("status");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_organization_subscriptions");
+
+                    b.HasIndex("OrganizationId")
+                        .IsUnique()
+                        .HasDatabaseName("i_x_organization_subscriptions_organization_id");
+
+                    b.HasIndex("ProviderCustomerId")
+                        .HasDatabaseName("i_x_organization_subscriptions_provider_customer_id");
+
+                    b.HasIndex("ProviderSubscriptionId")
+                        .HasDatabaseName("i_x_organization_subscriptions_provider_subscription_id");
+
+                    b.ToTable("organization_subscriptions");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.Billing.Domain.Model.Entities.BillingWebhookEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("event_id");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("varchar(120)")
+                        .HasColumnName("event_type");
+
+                    b.Property<string>("Metadata")
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)")
+                        .HasColumnName("metadata");
+
+                    b.Property<int?>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<DateTimeOffset>("ProcessedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("processed_at");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("provider");
+
+                    b.Property<string>("ProviderCustomerId")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("provider_customer_id");
+
+                    b.Property<string>("ProviderSubscriptionId")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("provider_subscription_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("status");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_billing_webhook_events");
+
+                    b.HasIndex("Provider", "EventId")
+                        .IsUnique()
+                        .HasDatabaseName("uk_billing_webhook_events_provider_event");
+
+                    b.ToTable("billing_webhook_events");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.ExternalIdentity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)")
+                        .HasColumnName("provider");
+
+                    b.Property<string>("ProviderSubject")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("provider_subject");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_external_identities");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("i_x_external_identities_user_id");
+
+                    b.HasIndex("Provider", "ProviderSubject")
+                        .IsUnique()
+                        .HasDatabaseName("uk_external_identities_provider_subject");
+
+                    b.ToTable("external_identities");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", b =>
                 {
                     b.Property<int>("Id")
@@ -756,6 +988,54 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasDatabaseName("i_x_organizations_tax_id");
 
                     b.ToTable("organizations");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.PasswordResetRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset?>("ConsumedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("consumed_at");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)")
+                        .HasColumnName("email");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("expires_at");
+
+                    b.Property<DateTimeOffset>("RequestedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("requested_at");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)")
+                        .HasColumnName("token_hash");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_password_reset_requests");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique()
+                        .HasDatabaseName("i_x_password_reset_requests_token_hash");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("i_x_password_reset_requests_user_id");
+
+                    b.ToTable("password_reset_requests");
                 });
 
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Role", b =>
@@ -851,6 +1131,11 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.Property<int?>("OrganizationUserId")
                         .HasColumnType("int")
                         .HasColumnName("organization_user_id");
+
+                    b.Property<string>("PasswordHash")
+                        .HasMaxLength(60)
+                        .HasColumnType("varchar(60)")
+                        .HasColumnName("password_hash");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int")
@@ -1041,6 +1326,99 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("technical_service_requests");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.Monitoring.Domain.Model.Aggregates.SensorReading", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int")
+                        .HasColumnName("asset_id");
+
+                    b.Property<int?>("BatteryLevel")
+                        .HasColumnType("int")
+                        .HasColumnName("battery_level");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("GatewayId")
+                        .HasColumnType("int")
+                        .HasColumnName("gateway_id");
+
+                    b.Property<double?>("Humidity")
+                        .HasPrecision(8, 2)
+                        .HasColumnType("double")
+                        .HasColumnName("humidity");
+
+                    b.Property<bool?>("ImageCaptured")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("image_captured");
+
+                    b.Property<int>("IotDeviceId")
+                        .HasColumnType("int")
+                        .HasColumnName("iot_device_id");
+
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int")
+                        .HasColumnName("location_id");
+
+                    b.Property<bool?>("MotionDetected")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("motion_detected");
+
+                    b.Property<int>("OrganizationId")
+                        .HasColumnType("int")
+                        .HasColumnName("organization_id");
+
+                    b.Property<bool>("OutOfRange")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("out_of_range");
+
+                    b.Property<DateTimeOffset>("RecordedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("recorded_at");
+
+                    b.Property<int?>("SignalStrength")
+                        .HasColumnType("int")
+                        .HasColumnName("signal_strength");
+
+                    b.Property<double?>("Temperature")
+                        .HasPrecision(8, 2)
+                        .HasColumnType("double")
+                        .HasColumnName("temperature");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_sensor_readings");
+
+                    b.HasIndex("AssetId")
+                        .HasDatabaseName("i_x_sensor_readings_asset_id");
+
+                    b.HasIndex("GatewayId")
+                        .HasDatabaseName("i_x_sensor_readings_gateway_id");
+
+                    b.HasIndex("IotDeviceId")
+                        .HasDatabaseName("i_x_sensor_readings_iot_device_id");
+
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("i_x_sensor_readings_organization_id");
+
+                    b.HasIndex("OrganizationId", "RecordedAt")
+                        .HasDatabaseName("i_x_sensor_readings_organization_id_recorded_at");
+
+                    b.HasIndex("OrganizationId", "AssetId", "RecordedAt")
+                        .HasDatabaseName("i_x_sensor_readings_organization_id_asset_id_recorded_at");
+
+                    b.ToTable("sensor_readings");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.Reports.Domain.Model.Aggregates.Report", b =>
                 {
                     b.Property<int>("Id")
@@ -1135,12 +1513,137 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.ToTable("reports");
                 });
 
+            modelBuilder.Entity("ColdTrace.Platform.Alerts.Domain.Model.Aggregates.AiResolutionPlan", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.Alerts.Domain.Model.Aggregates.Incident", "Incident")
+                        .WithMany()
+                        .HasForeignKey("IncidentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_ai_resolution_plans_incidents_incident_id");
+
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_ai_resolution_plans_organizations_organization_id");
+
+                    b.OwnsMany("ColdTrace.Platform.Alerts.Domain.Model.Aggregates.AiResolutionPlanRequiredEvidence", "RequiredEvidenceItems", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasColumnName("id");
+
+                            b1.Property<int>("AiResolutionPlanId")
+                                .HasColumnType("int")
+                                .HasColumnName("ai_resolution_plan_id");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(512)
+                                .HasColumnType("varchar(512)")
+                                .HasColumnName("value");
+
+                            b1.HasKey("Id")
+                                .HasName("p_k_ai_resolution_plan_required_evidences");
+
+                            b1.HasIndex("AiResolutionPlanId")
+                                .HasDatabaseName("i_x_ai_resolution_plan_required_evidences_ai_resolution_plan_id");
+
+                            b1.ToTable("ai_resolution_plan_required_evidences", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AiResolutionPlanId")
+                                .HasConstraintName("f_k_ai_resolution_plan_required_evidence_ai_resolution_plan_id");
+                        });
+
+                    b.OwnsMany("ColdTrace.Platform.Alerts.Domain.Model.Aggregates.AiResolutionPlanStep", "RecommendedSteps", b1 =>
+                        {
+                            b1.Property<int>("AiResolutionPlanId")
+                                .HasColumnType("int")
+                                .HasColumnName("ai_resolution_plan_id");
+
+                            b1.Property<int>("Sequence")
+                                .HasColumnType("int")
+                                .HasColumnName("sequence");
+
+                            b1.Property<string>("Action")
+                                .IsRequired()
+                                .HasMaxLength(1024)
+                                .HasColumnType("varchar(1024)")
+                                .HasColumnName("action");
+
+                            b1.Property<string>("ExpectedOutcome")
+                                .IsRequired()
+                                .HasMaxLength(1024)
+                                .HasColumnType("varchar(1024)")
+                                .HasColumnName("expected_outcome");
+
+                            b1.Property<string>("Rationale")
+                                .IsRequired()
+                                .HasMaxLength(1024)
+                                .HasColumnType("varchar(1024)")
+                                .HasColumnName("rationale");
+
+                            b1.HasKey("AiResolutionPlanId", "Sequence")
+                                .HasName("p_k_ai_resolution_plan_steps");
+
+                            b1.ToTable("ai_resolution_plan_steps", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AiResolutionPlanId")
+                                .HasConstraintName("f_k_ai_resolution_plan_steps_ai_resolution_plan_id");
+                        });
+
+                    b.OwnsMany("ColdTrace.Platform.Alerts.Domain.Model.Aggregates.AiResolutionPlanUncertaintyNote", "UncertaintyNoteItems", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasColumnName("id");
+
+                            b1.Property<int>("AiResolutionPlanId")
+                                .HasColumnType("int")
+                                .HasColumnName("ai_resolution_plan_id");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(512)
+                                .HasColumnType("varchar(512)")
+                                .HasColumnName("value");
+
+                            b1.HasKey("Id")
+                                .HasName("p_k_ai_resolution_plan_uncertainty_notes");
+
+                            b1.HasIndex("AiResolutionPlanId")
+                                .HasDatabaseName("i_x_ai_resolution_plan_uncertainty_notes_ai_resolution_plan_id");
+
+                            b1.ToTable("ai_resolution_plan_uncertainty_notes", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AiResolutionPlanId")
+                                .HasConstraintName("f_k_ai_resolution_plan_uncertainty_notes_ai_resolution_plan_id");
+                        });
+
+                    b.Navigation("Incident");
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("RecommendedSteps");
+
+                    b.Navigation("RequiredEvidenceItems");
+
+                    b.Navigation("UncertaintyNoteItems");
+                });
+
             modelBuilder.Entity("ColdTrace.Platform.Alerts.Domain.Model.Aggregates.Incident", b =>
                 {
                     b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
                         .WithMany()
                         .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("f_k_incidents_assets_asset_id");
 
                     b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
@@ -1199,6 +1702,19 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.AssetSettings", b =>
                 {
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("f_k_asset_settings_assets_asset_id");
+
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_asset_settings_organizations_organization_id");
+
                     b.OwnsMany("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.AssetSettingsAssetType", "AssetTypeEntries", b1 =>
                         {
                             b1.Property<int>("AssetSettingsId")
@@ -1241,19 +1757,6 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                                 .HasConstraintName("f_k_asset_settings_iot_device_types_asset_settings_id");
                         });
 
-                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
-                        .WithMany()
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("f_k_asset_settings_assets_asset_id");
-
-                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("f_k_asset_settings_organizations_organization_id");
-
                     b.Navigation("Asset");
 
                     b.Navigation("AssetTypeEntries");
@@ -1286,6 +1789,26 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
 
             modelBuilder.Entity("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", b =>
                 {
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("f_k_iot_devices_assets_asset_id");
+
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", "Gateway")
+                        .WithMany()
+                        .HasForeignKey("GatewayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_iot_devices_gateways_gateway_id");
+
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_iot_devices_organizations_organization_id");
+
                     b.OwnsMany("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDeviceMeasurementParameter", "MeasurementParameterEntries", b1 =>
                         {
                             b1.Property<int>("IotDeviceId")
@@ -1307,70 +1830,11 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                                 .HasConstraintName("f_k_iot_device_measurement_parameters_iot_device_id");
                         });
 
-                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
-                        .WithMany()
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("f_k_iot_devices_assets_asset_id");
-
-                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", "Gateway")
-                        .WithMany()
-                        .HasForeignKey("GatewayId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("f_k_iot_devices_gateways_gateway_id");
-
-                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("f_k_iot_devices_organizations_organization_id");
-
                     b.Navigation("Asset");
 
                     b.Navigation("Gateway");
 
                     b.Navigation("MeasurementParameterEntries");
-
-                    b.Navigation("Organization");
-                });
-
-            modelBuilder.Entity("ColdTrace.Platform.Monitoring.Domain.Model.Aggregates.SensorReading", b =>
-                {
-                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
-                        .WithMany()
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("f_k_sensor_readings_assets_asset_id");
-
-                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", "Gateway")
-                        .WithMany()
-                        .HasForeignKey("GatewayId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("f_k_sensor_readings_gateways_gateway_id");
-
-                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", "IotDevice")
-                        .WithMany()
-                        .HasForeignKey("IotDeviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("f_k_sensor_readings_iot_devices_iot_device_id");
-
-                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
-                        .WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("f_k_sensor_readings_organizations_organization_id");
-
-                    b.Navigation("Asset");
-
-                    b.Navigation("Gateway");
-
-                    b.Navigation("IotDevice");
 
                     b.Navigation("Organization");
                 });
@@ -1385,6 +1849,38 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasConstraintName("f_k_locations_organizations_organization_id");
 
                     b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.Billing.Domain.Model.Aggregates.OrganizationSubscription", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_organization_subscriptions_organizations_organization_id");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.PasswordResetRequest", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_password_reset_requests_users_user_id");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.ExternalIdentity", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_external_identities_users_user_id");
                 });
 
             modelBuilder.Entity("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Role", b =>
@@ -1618,7 +2114,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
                         .WithMany()
                         .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("f_k_maintenance_schedules_assets_asset_id");
 
@@ -1639,7 +2135,7 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                     b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
                         .WithMany()
                         .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("f_k_technical_service_requests_assets_asset_id");
 
@@ -1651,6 +2147,45 @@ namespace ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Migrations
                         .HasConstraintName("f_k_technical_service_requests_organizations_organization_id");
 
                     b.Navigation("Asset");
+
+                    b.Navigation("Organization");
+                });
+
+            modelBuilder.Entity("ColdTrace.Platform.Monitoring.Domain.Model.Aggregates.SensorReading", b =>
+                {
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Asset", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_sensor_readings_assets_asset_id");
+
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.Gateway", "Gateway")
+                        .WithMany()
+                        .HasForeignKey("GatewayId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_sensor_readings_gateways_gateway_id");
+
+                    b.HasOne("ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates.IotDevice", "IotDevice")
+                        .WithMany()
+                        .HasForeignKey("IotDeviceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("f_k_sensor_readings_iot_devices_iot_device_id");
+
+                    b.HasOne("ColdTrace.Platform.IdentityAccess.Domain.Model.Aggregates.Organization", "Organization")
+                        .WithMany()
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_sensor_readings_organizations_organization_id");
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Gateway");
+
+                    b.Navigation("IotDevice");
 
                     b.Navigation("Organization");
                 });

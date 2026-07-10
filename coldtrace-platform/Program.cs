@@ -1,8 +1,27 @@
+using ColdTrace.Platform.AiAssistance.Application.Internal.CommandServices;
+using ColdTrace.Platform.AiAssistance.Application.Internal.QueryServices;
+using ColdTrace.Platform.AiAssistance.Domain.Services;
+using ColdTrace.Platform.AiAssistance.Infrastructure.Configuration;
+using ColdTrace.Platform.AiAssistance.Infrastructure.Providers;
 using ColdTrace.Platform.Alerts.Application.Internal.CommandServices;
 using ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
 using ColdTrace.Platform.Alerts.Domain.Services;
 using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Billing.Application.ACL;
+using ColdTrace.Platform.Billing.Application.Internal.CommandServices;
+using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Checkout;
+using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Portal;
+using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Webhook;
+using ColdTrace.Platform.Billing.Application.Internal.QueryServices;
+using ColdTrace.Platform.Billing.Application.Internal.Services;
+using ColdTrace.Platform.Billing.Domain.Model.Commands;
+using ColdTrace.Platform.Billing.Domain.Repositories;
+using ColdTrace.Platform.Billing.Domain.Services;
+using ColdTrace.Platform.Billing.Infrastructure.Configuration;
+using ColdTrace.Platform.Billing.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Billing.Infrastructure.Stripe;
+using ColdTrace.Platform.Billing.Interfaces.ACL;
 using ColdTrace.Platform.AssetManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Services;
@@ -25,73 +44,95 @@ using ColdTrace.Platform.Reports.Domain.Services;
 using ColdTrace.Platform.Reports.Infrastructure.Persistence.EFC.Repositories;
 using ColdTrace.Platform.Resources;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices;
+using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices.Social;
 using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
 using ColdTrace.Platform.IdentityAccess.Domain.Services;
 using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
 using ColdTrace.Platform.IdentityAccess.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Hashing.BCrypt.Services;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Authorization.Configuration;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.OAuth.Configuration;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.OAuth.Services;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Configuration;
+using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Services;
 using ColdTrace.Platform.Shared.Domain.Repositories;
+using ColdTrace.Platform.Shared.Infrastructure.Configuration;
+using ColdTrace.Platform.Shared.Infrastructure.Documentation.OpenApi;
 using ColdTrace.Platform.Shared.Interfaces.ASP.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Localization;
+using Microsoft.OpenApi;
+using Microsoft.Extensions.Options;
 using MySql.Data.MySqlClient;
 
 
 var builder = WebApplication.CreateBuilder(args);
-const string corsPolicyName = "ColdTraceCorsPolicy";
 
 // Configure Lower Case URLs
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-// Configure CORS for browser-based clients.
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(corsPolicyName, policy =>
-    {
-        var allowedOrigins = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS")
-            ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        if (allowedOrigins is { Length: > 0 })
-        {
-            policy.WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-            return;
-        }
-
-        policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+// Configure exact browser origins from the environment, with local-only development defaults.
+builder.Services.AddColdTraceCors(builder.Configuration, builder.Environment);
 
 // Localization Configuration
 builder.Services.AddLocalization();
 
 // Configure Kebab Case Route Naming Convention
 builder.Services.AddControllers(options => options.Conventions.Add(new KebabCaseRouteNamingConvention()))
-    .AddDataAnnotationsLocalization();
+    .AddDataAnnotationsLocalization(options =>
+        options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)));
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+    options.InvalidModelStateResponseFactory = RestProblemDetailsFactory.CreateValidationProblemResponse);
 
 // Register RFC 7807 ProblemDetails payloads for centralized exception handling.
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = context =>
     {
-        if (context.ProblemDetails.Status is null or >= 500)
+        if (context.Exception is PlanLimitExceededException planLimitExceededException)
         {
             var localizer = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
-            context.ProblemDetails.Title ??= localizer["UnexpectedServerError"].Value;
-            context.ProblemDetails.Detail ??= localizer["UnexpectedErrorProcessingRequest"].Value;
+            var message = localizer[planLimitExceededException.MessageResourceKey].Value;
+
+            context.HttpContext.Response.StatusCode = StatusCodes.Status409Conflict;
+            context.ProblemDetails.Status = StatusCodes.Status409Conflict;
+            context.ProblemDetails.Title = message;
+            context.ProblemDetails.Detail = message;
+            context.ProblemDetails.Extensions["code"] =
+                RestErrorCodes.FromResourceKey(planLimitExceededException.MessageResourceKey);
+            context.ProblemDetails.AppendPlanEntitlementProperties(planLimitExceededException.Entitlement);
         }
+
+        RestProblemDetailsFactory.ApplyDefaults(context);
     };
 });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Configure Swagger/OpenAPI with bearer authentication for protected operations.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => options.EnableAnnotations());
+builder.Services.AddSwaggerGen(options =>
+{
+    const string bearerScheme = "bearerAuth";
+    options.EnableAnnotations();
+    options.AddSecurityDefinition(bearerScheme, new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Enter the JWT returned by POST /api/v1/authentication/sign-in."
+    });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference(bearerScheme, document)] = []
+    });
+    options.OperationFilter<AllowAnonymousOperationFilter>();
+});
 
 // Configure Database Context and route EF logs through the app logger pipeline.
 builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
@@ -115,28 +156,77 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 // Shared Bounded Context Injection Configuration
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Billing Bounded Context Injection Configuration
+builder.Services.AddOptions<BillingOptions>()
+    .Bind(builder.Configuration.GetSection(BillingOptions.SectionName))
+    .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddScoped<IOrganizationSubscriptionRepository, OrganizationSubscriptionRepository>();
+builder.Services.AddScoped<IBillingWebhookEventRepository, BillingWebhookEventRepository>();
+builder.Services.AddScoped<ISubscriptionPlanQueryService, SubscriptionPlanQueryService>();
+builder.Services.AddScoped<OrganizationSubscriptionUsageService>();
+builder.Services.AddScoped<EntitlementPolicyService>();
+builder.Services.AddScoped<ICheckoutSessionProviderService, StripeCheckoutSessionProviderService>();
+builder.Services.AddScoped<IPortalSessionProviderService, StripePortalSessionProviderService>();
+builder.Services.AddScoped<IBillingWebhookProviderService, StripeBillingWebhookProviderService>();
+builder.Services.AddScoped<IOrganizationSubscriptionCommandService, OrganizationSubscriptionCommandService>();
+builder.Services.AddScoped<IOrganizationSubscriptionQueryService, OrganizationSubscriptionQueryService>();
+builder.Services.AddScoped<IBillingCheckoutSessionCommandService, BillingCheckoutSessionCommandService>();
+builder.Services.AddScoped<IBillingPortalSessionCommandService, BillingPortalSessionCommandService>();
+builder.Services.AddScoped<IBillingWebhookCommandService, BillingWebhookCommandService>();
+builder.Services.AddScoped<ISubscriptionBillingContextFacade, SubscriptionBillingContextFacade>();
+
+// AI Assistance Bounded Context Injection Configuration
+builder.Services.AddOptions<AiOptions>()
+    .Bind(builder.Configuration.GetSection(AiOptions.SectionName))
+    .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddSingleton<IChatClient>(serviceProvider =>
+    AiChatClientFactory.Create(serviceProvider.GetRequiredService<IOptions<AiOptions>>().Value));
+builder.Services.AddScoped<IAiChatClientAdapter, ServiceProviderAiChatClientAdapter>();
+builder.Services.AddScoped<IAiProviderStatusQueryService, AiProviderStatusQueryService>();
+builder.Services.AddScoped<IAiStructuredOutputService, MicrosoftExtensionsAiStructuredOutputService>();
+builder.Services.AddScoped<IDashboardAiInterpretationCommandService, DashboardAiInterpretationCommandService>();
+
 // Alerts Bounded Context Injection Configuration
 builder.Services.AddScoped<IIncidentRepository, IncidentRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IAiResolutionPlanRepository, AiResolutionPlanRepository>();
 builder.Services.AddScoped<IIncidentCommandService, IncidentCommandService>();
+builder.Services.AddScoped<IAiResolutionPlanCommandService, AiResolutionPlanCommandService>();
 builder.Services.AddScoped<IIncidentQueryService, IncidentQueryService>();
+builder.Services.AddScoped<IAiResolutionPlanQueryService, AiResolutionPlanQueryService>();
 builder.Services.AddScoped<INotificationQueryService, NotificationQueryService>();
 
 // Reports Bounded Context Injection Configuration
 builder.Services.AddScoped<IReportRepository, ReportRepository>();
 builder.Services.AddScoped<IReportCommandService, ReportCommandService>();
+builder.Services.AddScoped<IReportAiSummaryCommandService, ReportAiSummaryCommandService>();
 builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
 
 // Identity Access Bounded Context Injection Configuration
+builder.Services.AddColdTraceJwtBearerAuthentication(builder.Configuration);
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IPasswordResetRequestRepository, PasswordResetRequestRepository>();
+builder.Services.AddScoped<IExternalIdentityRepository, ExternalIdentityRepository>();
 builder.Services.AddScoped<IOrganizationCommandService, OrganizationCommandService>();
 builder.Services.AddScoped<IOrganizationQueryService, OrganizationQueryService>();
 builder.Services.AddScoped<IOrganizationSignUpCommandService, OrganizationSignUpCommandService>();
 builder.Services.AddScoped<IUserCommandService, UserCommandService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<IRoleQueryService, RoleQueryService>();
+builder.Services.AddScoped<IPasswordResetRequestCommandService, PasswordResetRequestCommandService>();
+builder.Services.AddScoped<ISocialAuthenticationCommandService, SocialAuthenticationCommandService>();
+builder.Services.AddScoped<ISocialIdentityProfileCommandService, SocialIdentityProfileCommandService>();
+builder.Services.AddScoped<ISocialOrganizationSignUpCommandService, SocialOrganizationSignUpCommandService>();
+builder.Services.AddScoped<IHashingService, HashingService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddOptions<SocialAuthenticationOptions>()
+    .Bind(builder.Configuration.GetSection(SocialAuthenticationOptions.SectionName))
+    .PostConfigure(options => options.ExpandEnvironmentVariables());
+builder.Services.AddHttpClient(OidcExternalIdentityProviderService.HttpClientName, client =>
+    client.Timeout = TimeSpan.FromSeconds(10));
+builder.Services.AddSingleton<IExternalIdentityProviderService, OidcExternalIdentityProviderService>();
 
 // Asset Management Bounded Context Injection Configuration
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
@@ -177,16 +267,20 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AppDbContext>();
     ApplyPendingMigrations(context);
+    var organizationSubscriptionCommandService =
+        services.GetRequiredService<IOrganizationSubscriptionCommandService>();
+    await organizationSubscriptionCommandService.Handle(new SeedBaseOrganizationSubscriptionsCommand());
 }
 
 app.UseExceptionHandler();
+app.UseStatusCodePages();
 
-// Swagger UI is enabled in all environments for course delivery and manual API smoke validation.
+// Intentional public exception: Swagger assets execute before authentication for course API validation.
 app.UseSwagger();
 app.UseSwaggerUI();
 
 // Localization Configuration
-string[] supportedCultures = ["en", "en-US", "es", "es-PE"];
+string[] supportedCultures = ["en", "es"];
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
     .AddSupportedCultures(supportedCultures)
@@ -198,15 +292,18 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
-app.UseCors(corsPolicyName);
+app.UseCors(CorsPolicyConfiguration.PolicyName);
 
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Browser preflight carries no credentials and exposes no resource data.
 app.MapMethods("/{*path}", ["OPTIONS"], () => Results.NoContent())
-    .RequireCors(corsPolicyName);
+    .AllowAnonymous()
+    .RequireCors(CorsPolicyConfiguration.PolicyName);
 
 app.MapControllers()
-    .RequireCors(corsPolicyName);
+    .RequireCors(CorsPolicyConfiguration.PolicyName);
 
 app.Run();
 

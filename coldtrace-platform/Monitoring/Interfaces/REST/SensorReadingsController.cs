@@ -30,7 +30,8 @@ public class SensorReadingsController(
         Description = "Gets persisted telemetry readings for an organization with optional filters",
         OperationId = "GetSensorReadings")]
     [SwaggerResponse(200, "Sensor readings found", typeof(IEnumerable<SensorReadingResource>))]
-    [SwaggerResponse(404, "Organization not found", typeof(string))]
+    [SwaggerResponse(400, "The date range is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetSensorReadingsByOrganizationId(
         [FromRoute] int organizationId,
@@ -40,7 +41,7 @@ public class SensorReadingsController(
         [FromQuery] DateTimeOffset? to,
         CancellationToken cancellationToken = default)
     {
-        if (from is not null && to is not null && from > to) return BadRequest(localizer["InvalidRequest"].Value);
+        if (from is not null && to is not null && from > to) return this.ValidationProblemResponse(localizer, "InvalidRequest");
 
         var result = await sensorReadingQueryService.Handle(
             new GetSensorReadingsByOrganizationIdQuery(organizationId, assetId, iotDeviceId, from, to),
@@ -55,7 +56,7 @@ public class SensorReadingsController(
         Description = "Gets one sensor reading that belongs to the provided organization",
         OperationId = "GetSensorReadingById")]
     [SwaggerResponse(200, "Sensor reading found", typeof(SensorReadingResource))]
-    [SwaggerResponse(404, "Organization or sensor reading not found", typeof(string))]
+    [SwaggerResponse(404, "Organization or sensor reading not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GetSensorReadingById(
         [FromRoute] int organizationId,
@@ -77,8 +78,8 @@ public class SensorReadingsController(
         Description = "Persists telemetry from an assigned online IoT device and evaluates it against asset settings",
         OperationId = "CreateSensorReading")]
     [SwaggerResponse(201, "The sensor reading was created", typeof(SensorReadingResource))]
-    [SwaggerResponse(400, "The request payload is invalid", typeof(string))]
-    [SwaggerResponse(404, "Organization, asset, device or gateway not found", typeof(string))]
+    [SwaggerResponse(400, "The request payload is invalid", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization, asset, device or gateway not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> CreateSensorReading(
         [FromRoute] int organizationId,
@@ -100,16 +101,13 @@ public class SensorReadingsController(
         {
             logger.LogWarning(ex, "Invalid sensor reading creation request for organization {OrganizationId}",
                 organizationId);
-            return BadRequest(localizer["InvalidSensorReadingRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidSensorReadingRequest");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error while creating sensor reading for organization {OrganizationId}",
                 organizationId);
-            return Problem(
-                title: localizer["UnexpectedServerError"].Value,
-                detail: localizer["UnexpectedErrorCreatingSensorReading"].Value,
-                statusCode: 500);
+            return this.ProblemResponse(localizer, "UnexpectedErrorCreatingSensorReading", 500);
         }
     }
 
@@ -119,8 +117,8 @@ public class SensorReadingsController(
         Description = "Generates and persists realistic readings for eligible assigned online IoT devices",
         OperationId = "GenerateDemoSensorReadings")]
     [SwaggerResponse(201, "Sensor readings generated", typeof(IEnumerable<SensorReadingResource>))]
-    [SwaggerResponse(400, "No eligible device or invalid generation request", typeof(string))]
-    [SwaggerResponse(404, "Organization or asset not found", typeof(string))]
+    [SwaggerResponse(400, "No eligible device or invalid generation request", typeof(ValidationProblemDetails))]
+    [SwaggerResponse(404, "Organization or asset not found", typeof(ProblemDetails))]
     [SwaggerResponse(500, "Unexpected server error", typeof(ProblemDetails))]
     public async Task<ActionResult> GenerateDemoSensorReadings(
         [FromRoute] int organizationId,
@@ -139,7 +137,7 @@ public class SensorReadingsController(
         catch (ArgumentException ex)
         {
             logger.LogWarning(ex, "Invalid demo generation request for organization {OrganizationId}", organizationId);
-            return BadRequest(localizer["InvalidSensorReadingRequest"].Value);
+            return this.ValidationProblemResponse(localizer, "InvalidSensorReadingRequest");
         }
     }
 }
