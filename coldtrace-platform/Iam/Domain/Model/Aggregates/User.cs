@@ -3,7 +3,7 @@ using ColdTrace.Platform.Iam.Domain.Model.Commands;
 namespace ColdTrace.Platform.Iam.Domain.Model.Aggregates;
 
 /// <summary>
-///     User aggregate for the identity access context.
+///     User aggregate for the IAM bounded context.
 /// </summary>
 public class User
 {

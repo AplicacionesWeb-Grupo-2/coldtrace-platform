@@ -79,7 +79,7 @@ public class SocialAuthenticationCommandService(
         {
             logger.LogError(ex, "Social authentication failed for provider {Provider}", command.Provider.ToCode());
             return Failure(SocialAuthenticationError.Unexpected(
-                "identity-access.authentication.error.social-authentication-failed"));
+                "iam.authentication.error.social-authentication-failed"));
         }
     }
 

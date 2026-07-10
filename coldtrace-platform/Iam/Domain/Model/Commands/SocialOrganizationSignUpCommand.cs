@@ -20,13 +20,13 @@ public record SocialOrganizationSignUpCommand
         IdToken = NormalizeOptional(idToken);
         AuthorizationCode = NormalizeOptional(authorizationCode);
         if (IdToken is null && AuthorizationCode is null)
-            throw new ArgumentException("identity-access.authentication.error.social-token.required");
+            throw new ArgumentException("iam.authentication.error.social-token.required");
         RedirectUri = NormalizeOptional(redirectUri);
         Nonce = NormalizeOptional(nonce);
         OrganizationName = RequireNonBlank(
             organizationName,
-            "identity-access.organization.error.commercialName.required");
-        FullName = RequireNonBlank(fullName, "identity-access.user.error.firstName.required");
+            "iam.organization.error.commercialName.required");
+        FullName = RequireNonBlank(fullName, "iam.user.error.firstName.required");
     }
 
     public SocialProvider Provider { get; init; }

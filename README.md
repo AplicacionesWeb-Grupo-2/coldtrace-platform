@@ -2,7 +2,7 @@
 
 ASP.NET Core Web API for the ColdTrace cold-chain monitoring platform.
 
-The backend exposes organization-scoped REST endpoints for identity access, asset management, telemetry, alerts, maintenance operations, and reports. Swagger/OpenAPI is enabled for course delivery, manual validation, and frontend integration.
+The backend exposes organization-scoped REST endpoints for IAM, asset management, telemetry, alerts, maintenance operations, and reports. Swagger/OpenAPI is enabled for course delivery, manual validation, and frontend integration.
 
 ## Stack
 

@@ -13,7 +13,7 @@ public static class ActionResultFromSignInResultAssembler
 {
     private const string InvalidCredentialsCode = "INVALID_CREDENTIALS";
     private const string InvalidCredentialsMessage = "Invalid email or password";
-    private const string InvalidCredentialsDetails = "identity-access.authentication.error.invalid-credentials";
+    private const string InvalidCredentialsDetails = "iam.authentication.error.invalid-credentials";
 
     /// <summary>
     ///     Converts a sign-in result into an HTTP action result.

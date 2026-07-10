@@ -18,7 +18,7 @@ public record SocialSignInCommand
         IdToken = NormalizeOptional(idToken);
         AuthorizationCode = NormalizeOptional(authorizationCode);
         if (IdToken is null && AuthorizationCode is null)
-            throw new ArgumentException("identity-access.authentication.error.social-token.required");
+            throw new ArgumentException("iam.authentication.error.social-token.required");
         RedirectUri = NormalizeOptional(redirectUri);
         Nonce = NormalizeOptional(nonce);
     }

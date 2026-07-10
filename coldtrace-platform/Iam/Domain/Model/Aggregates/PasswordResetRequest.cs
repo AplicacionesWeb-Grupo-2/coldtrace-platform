@@ -1,7 +1,7 @@
 namespace ColdTrace.Platform.Iam.Domain.Model.Aggregates;
 
 /// <summary>
-///     Password reset metadata retained by the identity access context.
+///     Password reset metadata retained by the IAM bounded context.
 /// </summary>
 public class PasswordResetRequest
 {
