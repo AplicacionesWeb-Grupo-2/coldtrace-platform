@@ -1,12 +1,13 @@
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Monitoring.Application.Errors;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Monitoring.Domain.Model.Errors;
 using ColdTrace.Platform.Monitoring.Domain.Model.Aggregates;
 using ColdTrace.Platform.Monitoring.Domain.Model.Commands;
 using ColdTrace.Platform.Monitoring.Domain.Repositories;
-using ColdTrace.Platform.Monitoring.Domain.Services;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Monitoring.Application.CommandServices;
+using ColdTrace.Platform.Monitoring.Application.QueryServices;
+using ColdTrace.Platform.Shared.Application.Model;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 
 namespace ColdTrace.Platform.Monitoring.Application.Internal.CommandServices;
@@ -16,7 +17,7 @@ namespace ColdTrace.Platform.Monitoring.Application.Internal.CommandServices;
 /// </summary>
 public class SensorReadingCommandService(
     ISensorReadingRepository sensorReadingRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     IAssetRepository assetRepository,
     IIotDeviceRepository iotDeviceRepository,
     IGatewayRepository gatewayRepository,
@@ -95,8 +96,7 @@ public class SensorReadingCommandService(
         GenerateDemoSensorReadingsCommand command,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(command.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(command.OrganizationId, cancellationToken))
             return new Result<IEnumerable<SensorReading>, GenerateDemoSensorReadingsError>.Failure(
                 GenerateDemoSensorReadingsError.OrganizationNotFound);
 
@@ -215,8 +215,7 @@ public class SensorReadingCommandService(
         int iotDeviceId,
         CancellationToken cancellationToken)
     {
-        var organization = await organizationRepository.FindByIdAsync(organizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(organizationId, cancellationToken))
             return new Result<ReadingContext, CreateSensorReadingError>.Failure(
                 CreateSensorReadingError.OrganizationNotFound);
 

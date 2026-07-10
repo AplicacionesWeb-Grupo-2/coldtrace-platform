@@ -1,0 +1,232 @@
+<root>
+    <resheader name='resmimetype'>
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name='version'>
+        <value>1.3</value>
+    </resheader>
+    <resheader name='reader'>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name='writer'>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    
+    <data name='UnexpectedErrorProcessingRequest' xml:space='preserve'>
+        <value>An unexpected error occurred while processing your request.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='OrganizationNotFound' xml:space='preserve'>
+        <value>Organization was not found.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='AssetNotFound' xml:space='preserve'>
+        <value>Asset was not found.</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <data name='InvalidMaintenanceScheduleRequest' xml:space='preserve'>
+        <value>The maintenance schedule request is invalid.</value>
+    </data>
+    <data name='MaintenanceScheduleNotFound' xml:space='preserve'>
+        <value>Maintenance schedule was not found.</value>
+    </data>
+    <data name='MaintenanceScheduleDuplicateActive' xml:space='preserve'>
+        <value>The asset already has an active maintenance schedule.</value>
+    </data>
+    <data name='MaintenanceScheduleInvalidTransition' xml:space='preserve'>
+        <value>Maintenance schedule lifecycle transition is invalid.</value>
+    </data>
+    <data name='UnexpectedErrorCreatingMaintenanceSchedule' xml:space='preserve'>
+        <value>An unexpected error occurred while creating the maintenance schedule.</value>
+    </data>
+    <data name='UnexpectedErrorGettingMaintenanceSchedules' xml:space='preserve'>
+        <value>An unexpected error occurred while getting maintenance schedules.</value>
+    </data>
+    <data name='UnexpectedErrorUpdatingMaintenanceSchedule' xml:space='preserve'>
+        <value>An unexpected error occurred while updating the maintenance schedule.</value>
+    </data>
+    <data name='InvalidTechnicalServiceRequest' xml:space='preserve'>
+        <value>The technical service request is invalid.</value>
+    </data>
+    <data name='TechnicalServiceRequestNotFound' xml:space='preserve'>
+        <value>Technical service request was not found.</value>
+    </data>
+    <data name='TechnicalServiceRequestInvalidTransition' xml:space='preserve'>
+        <value>Technical service request lifecycle transition is invalid.</value>
+    </data>
+    <data name='UnexpectedErrorCreatingTechnicalServiceRequest' xml:space='preserve'>
+        <value>An unexpected error occurred while creating the technical service request.</value>
+    </data>
+    <data name='UnexpectedErrorGettingTechnicalServiceRequests' xml:space='preserve'>
+        <value>An unexpected error occurred while getting technical service requests.</value>
+    </data>
+    <data name='UnexpectedErrorUpdatingTechnicalServiceRequest' xml:space='preserve'>
+        <value>An unexpected error occurred while updating the technical service request.</value>
+    </data>
+    <data name='MaintenanceSchedulePlanLimitExceeded' xml:space='preserve'>
+        <value>Current subscription plan does not allow maintenance scheduling</value>
+    </data>
+    <data name='TechnicalServiceRequestPlanLimitExceeded' xml:space='preserve'>
+        <value>Current subscription plan does not allow technical service requests</value>
+    </data>
+    
+    
+    
+    
+    
+    
+    
+</root>

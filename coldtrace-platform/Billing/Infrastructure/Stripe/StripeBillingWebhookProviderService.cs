@@ -2,7 +2,7 @@ using System.Text.Json;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Webhook;
 using ColdTrace.Platform.Billing.Domain.Model.ValueObjects;
 using ColdTrace.Platform.Billing.Infrastructure.Configuration;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Shared.Application.Model;
 using Microsoft.Extensions.Options;
 using Stripe;
 using BillingSubscriptionStatuses = ColdTrace.Platform.Billing.Domain.Model.ValueObjects.SubscriptionStatuses;

@@ -24,7 +24,7 @@ All request and response bodies use JSON. Most operational endpoints are scoped 
 /api/v1/organizations/{organizationId}
 ```
 
-## Identity Access
+## IAM
 
 | Method | Path | Description |
 | --- | --- | --- |

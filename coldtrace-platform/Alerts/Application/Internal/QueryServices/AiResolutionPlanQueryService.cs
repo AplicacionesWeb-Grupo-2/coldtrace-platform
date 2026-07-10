@@ -1,10 +1,11 @@
-using ColdTrace.Platform.Alerts.Application.Errors;
+using ColdTrace.Platform.Alerts.Domain.Model.Errors;
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Model.Queries;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
-using ColdTrace.Platform.Alerts.Domain.Services;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Alerts.Application.CommandServices;
+using ColdTrace.Platform.Alerts.Application.QueryServices;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 
@@ -14,7 +15,7 @@ namespace ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 public class AiResolutionPlanQueryService(
     IAiResolutionPlanRepository aiResolutionPlanRepository,
     IIncidentRepository incidentRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     ILogger<AiResolutionPlanQueryService> logger)
     : IAiResolutionPlanQueryService
 {
@@ -22,8 +23,7 @@ public class AiResolutionPlanQueryService(
         GetAiResolutionPlansByIncidentIdAndOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for AI resolution plan history: {OrganizationId}",

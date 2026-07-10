@@ -1,14 +1,20 @@
+using ColdTrace.Platform.Shared.Interfaces.Rest.ProblemDetails;
 using ColdTrace.Platform.AiAssistance.Application.Internal.CommandServices;
 using ColdTrace.Platform.AiAssistance.Application.Internal.QueryServices;
-using ColdTrace.Platform.AiAssistance.Domain.Services;
+using ColdTrace.Platform.AiAssistance.Application.CommandServices;
+using ColdTrace.Platform.AiAssistance.Application.QueryServices;
+using ColdTrace.Platform.AiAssistance.Application.Internal.OutboundServices;
 using ColdTrace.Platform.AiAssistance.Infrastructure.Configuration;
 using ColdTrace.Platform.AiAssistance.Infrastructure.Providers;
+using ColdTrace.Platform.AiAssistance.Resources;
 using ColdTrace.Platform.Alerts.Application.Internal.CommandServices;
 using ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
-using ColdTrace.Platform.Alerts.Domain.Services;
-using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EFC.Repositories;
-using ColdTrace.Platform.Billing.Application.ACL;
+using ColdTrace.Platform.Alerts.Application.CommandServices;
+using ColdTrace.Platform.Alerts.Application.QueryServices;
+using ColdTrace.Platform.Alerts.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using ColdTrace.Platform.Alerts.Resources;
+using ColdTrace.Platform.Billing.Application.Acl;
 using ColdTrace.Platform.Billing.Application.Internal.CommandServices;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Checkout;
 using ColdTrace.Platform.Billing.Application.Internal.OutboundServices.Portal;
@@ -17,60 +23,72 @@ using ColdTrace.Platform.Billing.Application.Internal.QueryServices;
 using ColdTrace.Platform.Billing.Application.Internal.Services;
 using ColdTrace.Platform.Billing.Domain.Model.Commands;
 using ColdTrace.Platform.Billing.Domain.Repositories;
-using ColdTrace.Platform.Billing.Domain.Services;
+using ColdTrace.Platform.Billing.Application.CommandServices;
+using ColdTrace.Platform.Billing.Application.QueryServices;
 using ColdTrace.Platform.Billing.Infrastructure.Configuration;
-using ColdTrace.Platform.Billing.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Billing.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
 using ColdTrace.Platform.Billing.Infrastructure.Stripe;
-using ColdTrace.Platform.Billing.Interfaces.ACL;
+using ColdTrace.Platform.Billing.Interfaces.Acl;
+using ColdTrace.Platform.Billing.Resources;
 using ColdTrace.Platform.AssetManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
-using ColdTrace.Platform.AssetManagement.Domain.Services;
+using ColdTrace.Platform.AssetManagement.Application.CommandServices;
+using ColdTrace.Platform.AssetManagement.Application.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.AssetManagement.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.AssetManagement.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using ColdTrace.Platform.AssetManagement.Resources;
 using ColdTrace.Platform.Monitoring.Application.Internal.CommandServices;
 using ColdTrace.Platform.Monitoring.Application.Internal.QueryServices;
 using ColdTrace.Platform.Monitoring.Domain.Repositories;
-using ColdTrace.Platform.Monitoring.Domain.Services;
-using ColdTrace.Platform.Monitoring.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Monitoring.Application.CommandServices;
+using ColdTrace.Platform.Monitoring.Application.QueryServices;
+using ColdTrace.Platform.Monitoring.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using ColdTrace.Platform.Monitoring.Resources;
 using ColdTrace.Platform.MaintenanceManagement.Application.Internal.CommandServices;
 using ColdTrace.Platform.MaintenanceManagement.Application.Internal.QueryServices;
-using ColdTrace.Platform.MaintenanceManagement.Domain.Services;
+using ColdTrace.Platform.MaintenanceManagement.Application.CommandServices;
+using ColdTrace.Platform.MaintenanceManagement.Application.QueryServices;
 using ColdTrace.Platform.MaintenanceManagement.Domain.Repositories;
-using ColdTrace.Platform.MaintenanceManagement.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.MaintenanceManagement.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using ColdTrace.Platform.MaintenanceManagement.Resources;
 using ColdTrace.Platform.Reports.Application.Internal.CommandServices;
 using ColdTrace.Platform.Reports.Application.Internal.QueryServices;
 using ColdTrace.Platform.Reports.Domain.Repositories;
-using ColdTrace.Platform.Reports.Domain.Services;
-using ColdTrace.Platform.Reports.Infrastructure.Persistence.EFC.Repositories;
-using ColdTrace.Platform.Resources;
-using ColdTrace.Platform.IdentityAccess.Application.Internal.CommandServices;
-using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices;
-using ColdTrace.Platform.IdentityAccess.Application.Internal.OutboundServices.Social;
-using ColdTrace.Platform.IdentityAccess.Application.Internal.QueryServices;
-using ColdTrace.Platform.IdentityAccess.Domain.Services;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.IdentityAccess.Infrastructure.Persistence.EFC.Repositories;
-using ColdTrace.Platform.IdentityAccess.Infrastructure.Hashing.BCrypt.Services;
-using ColdTrace.Platform.IdentityAccess.Infrastructure.Authorization.Configuration;
-using ColdTrace.Platform.IdentityAccess.Infrastructure.OAuth.Configuration;
-using ColdTrace.Platform.IdentityAccess.Infrastructure.OAuth.Services;
-using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Configuration;
-using ColdTrace.Platform.IdentityAccess.Infrastructure.Tokens.Jwt.Services;
+using ColdTrace.Platform.Reports.Application.CommandServices;
+using ColdTrace.Platform.Reports.Application.QueryServices;
+using ColdTrace.Platform.Reports.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using ColdTrace.Platform.Reports.Resources;
+using ColdTrace.Platform.Shared.Resources;
+using ColdTrace.Platform.Iam.Application.Internal.CommandServices;
+using ColdTrace.Platform.Iam.Application.Acl;
+using ColdTrace.Platform.Iam.Application.Internal.OutboundServices;
+using ColdTrace.Platform.Iam.Application.Internal.OutboundServices.Social;
+using ColdTrace.Platform.Iam.Application.Internal.QueryServices;
+using ColdTrace.Platform.Iam.Application.CommandServices;
+using ColdTrace.Platform.Iam.Application.QueryServices;
+using ColdTrace.Platform.Iam.Domain.Repositories;
+using ColdTrace.Platform.Iam.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using ColdTrace.Platform.Iam.Infrastructure.Hashing.BCrypt.Services;
+using ColdTrace.Platform.Iam.Infrastructure.Pipeline.Middleware.Attributes;
+using ColdTrace.Platform.Iam.Infrastructure.Pipeline.Middleware.Extensions;
+using ColdTrace.Platform.Iam.Infrastructure.OAuth.Configuration;
+using ColdTrace.Platform.Iam.Infrastructure.OAuth.Services;
+using ColdTrace.Platform.Iam.Infrastructure.Tokens.Jwt.Configuration;
+using ColdTrace.Platform.Iam.Infrastructure.Tokens.Jwt.Services;
+using ColdTrace.Platform.Iam.Resources;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
 using ColdTrace.Platform.Shared.Domain.Repositories;
 using ColdTrace.Platform.Shared.Infrastructure.Configuration;
 using ColdTrace.Platform.Shared.Infrastructure.Documentation.OpenApi;
-using ColdTrace.Platform.Shared.Interfaces.ASP.Configuration;
-using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Configuration;
-using ColdTrace.Platform.Shared.Infrastructure.Persistence.EFC.Repositories;
+using ColdTrace.Platform.Shared.Infrastructure.Interfaces.AspNetCore.Configuration;
+using ColdTrace.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Configuration;
+using ColdTrace.Platform.Shared.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Localization;
 using Microsoft.OpenApi;
 using Microsoft.Extensions.Options;
-using MySql.Data.MySqlClient;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -83,6 +101,15 @@ builder.Services.AddColdTraceCors(builder.Configuration, builder.Environment);
 
 // Localization Configuration
 builder.Services.AddLocalization();
+builder.Services.AddSingleton<IStringLocalizer<SharedResource>, StringLocalizer<SharedResource>>();
+builder.Services.AddSingleton<IStringLocalizer<IamMessages>, StringLocalizer<IamMessages>>();
+builder.Services.AddSingleton<IStringLocalizer<AssetManagementMessages>, StringLocalizer<AssetManagementMessages>>();
+builder.Services.AddSingleton<IStringLocalizer<MonitoringMessages>, StringLocalizer<MonitoringMessages>>();
+builder.Services.AddSingleton<IStringLocalizer<AlertsMessages>, StringLocalizer<AlertsMessages>>();
+builder.Services.AddSingleton<IStringLocalizer<ReportsMessages>, StringLocalizer<ReportsMessages>>();
+builder.Services.AddSingleton<IStringLocalizer<BillingMessages>, StringLocalizer<BillingMessages>>();
+builder.Services.AddSingleton<IStringLocalizer<MaintenanceManagementMessages>, StringLocalizer<MaintenanceManagementMessages>>();
+builder.Services.AddSingleton<IStringLocalizer<AiAssistanceMessages>, StringLocalizer<AiAssistanceMessages>>();
 
 // Configure Kebab Case Route Naming Convention
 builder.Services.AddControllers(options => options.Conventions.Add(new KebabCaseRouteNamingConvention()))
@@ -202,9 +229,10 @@ builder.Services.AddScoped<IReportCommandService, ReportCommandService>();
 builder.Services.AddScoped<IReportAiSummaryCommandService, ReportAiSummaryCommandService>();
 builder.Services.AddScoped<IReportQueryService, ReportQueryService>();
 
-// Identity Access Bounded Context Injection Configuration
-builder.Services.AddColdTraceJwtBearerAuthentication(builder.Configuration);
+// IAM Bounded Context Injection Configuration
+builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
 builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IIamContextFacade, IamContextFacade>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordResetRequestRepository, PasswordResetRequestRepository>();
@@ -266,7 +294,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<AppDbContext>();
-    ApplyPendingMigrations(context);
+    context.Database.Migrate();
     var organizationSubscriptionCommandService =
         services.GetRequiredService<IOrganizationSubscriptionCommandService>();
     await organizationSubscriptionCommandService.Handle(new SeedBaseOrganizationSubscriptionsCommand());
@@ -294,100 +322,15 @@ app.UseRouting();
 
 app.UseCors(CorsPolicyConfiguration.PolicyName);
 
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseRequestAuthorization();
 
 // Browser preflight carries no credentials and exposes no resource data.
 app.MapMethods("/{*path}", ["OPTIONS"], () => Results.NoContent())
     .AllowAnonymous()
+    .WithMetadata(new AllowAnonymousAttribute())
     .RequireCors(CorsPolicyConfiguration.PolicyName);
 
 app.MapControllers()
     .RequireCors(CorsPolicyConfiguration.PolicyName);
 
 app.Run();
-
-static void ApplyPendingMigrations(DbContext context)
-{
-    EnsureMySqlDatabaseExists(context);
-    EnsureMySqlMigrationsHistoryTableExists(context);
-
-    var migrations = context.Database.GetMigrations().ToList();
-    var appliedMigrations = GetAppliedMigrationIds(context);
-    if (migrations.Count == 0 || migrations.All(appliedMigrations.Contains)) return;
-
-    if (appliedMigrations.Count == 0)
-        context.Database.Migrate();
-    else
-        ApplyPendingMigrationsWithScript(context, migrations, appliedMigrations);
-}
-
-static void ApplyPendingMigrationsWithScript(
-    DbContext context,
-    IReadOnlyList<string> migrations,
-    HashSet<string> appliedMigrations)
-{
-    var fromMigration = migrations.LastOrDefault(appliedMigrations.Contains) ?? Migration.InitialDatabase;
-    var script = context.GetService<IMigrator>()
-        .GenerateScript(fromMigration, toMigration: null, MigrationsSqlGenerationOptions.Default);
-    if (string.IsNullOrWhiteSpace(script)) return;
-
-    var connectionString = context.Database.GetConnectionString();
-    if (string.IsNullOrWhiteSpace(connectionString)) return;
-
-    using var connection = new MySqlConnection(connectionString);
-    connection.Open();
-    new MySqlScript(connection, script).Execute();
-}
-
-static HashSet<string> GetAppliedMigrationIds(DbContext context)
-{
-    var connectionString = context.Database.GetConnectionString();
-    if (string.IsNullOrWhiteSpace(connectionString)) return [];
-
-    using var connection = new MySqlConnection(connectionString);
-    connection.Open();
-
-    using var command = connection.CreateCommand();
-    command.CommandText = "SELECT `MigrationId` FROM `__EFMigrationsHistory`;";
-
-    using var reader = command.ExecuteReader();
-    var appliedMigrations = new HashSet<string>(StringComparer.Ordinal);
-    while (reader.Read()) appliedMigrations.Add(reader.GetString(0));
-
-    return appliedMigrations;
-}
-
-static void EnsureMySqlDatabaseExists(DbContext context)
-{
-    var connectionStringBuilder = new MySqlConnectionStringBuilder(context.Database.GetConnectionString());
-    var database = connectionStringBuilder.Database;
-    if (string.IsNullOrWhiteSpace(database)) return;
-
-    connectionStringBuilder.Database = string.Empty;
-    using var connection = new MySqlConnection(connectionStringBuilder.ConnectionString);
-    connection.Open();
-
-    using var command = connection.CreateCommand();
-    command.CommandText = $"CREATE DATABASE IF NOT EXISTS `{database.Replace("`", "``")}`;";
-    command.ExecuteNonQuery();
-}
-
-static void EnsureMySqlMigrationsHistoryTableExists(DbContext context)
-{
-    var connectionString = context.Database.GetConnectionString();
-    if (string.IsNullOrWhiteSpace(connectionString)) return;
-
-    using var connection = new MySqlConnection(connectionString);
-    connection.Open();
-
-    using var command = connection.CreateCommand();
-    command.CommandText = """
-                          CREATE TABLE IF NOT EXISTS `__EFMigrationsHistory` (
-                              `MigrationId` varchar(150) NOT NULL,
-                              `ProductVersion` varchar(32) NOT NULL,
-                              PRIMARY KEY (`MigrationId`)
-                          ) CHARACTER SET=utf8mb4;
-                          """;
-    command.ExecuteNonQuery();
-}

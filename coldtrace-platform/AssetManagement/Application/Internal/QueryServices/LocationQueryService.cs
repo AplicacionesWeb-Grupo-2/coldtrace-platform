@@ -1,10 +1,11 @@
-using ColdTrace.Platform.AssetManagement.Application.Errors;
-using ColdTrace.Platform.AssetManagement.Domain.Services;
+using ColdTrace.Platform.AssetManagement.Domain.Model.Errors;
+using ColdTrace.Platform.AssetManagement.Application.CommandServices;
+using ColdTrace.Platform.AssetManagement.Application.QueryServices;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Aggregates;
 using ColdTrace.Platform.AssetManagement.Domain.Model.Queries;
 using ColdTrace.Platform.AssetManagement.Domain.Repositories;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 
@@ -13,7 +14,7 @@ namespace ColdTrace.Platform.AssetManagement.Application.Internal.QueryServices;
 /// </summary>
 public class LocationQueryService(
     ILocationRepository locationRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     ILogger<LocationQueryService> logger)
     : ILocationQueryService
 {
@@ -22,8 +23,7 @@ public class LocationQueryService(
         GetLocationsByOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for location query: {OrganizationId}", query.OrganizationId);
             return new Result<IEnumerable<Location>, GetLocationsByOrganizationError>.Failure(
@@ -51,8 +51,7 @@ public class LocationQueryService(
         GetLocationByIdAndOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning(
                 "Organization not found for location by id query: {OrganizationId}",

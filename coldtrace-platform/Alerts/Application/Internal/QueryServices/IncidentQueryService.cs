@@ -1,10 +1,11 @@
-using ColdTrace.Platform.Alerts.Application.Errors;
+using ColdTrace.Platform.Alerts.Domain.Model.Errors;
 using ColdTrace.Platform.Alerts.Domain.Model.Aggregates;
 using ColdTrace.Platform.Alerts.Domain.Model.Queries;
 using ColdTrace.Platform.Alerts.Domain.Repositories;
-using ColdTrace.Platform.Alerts.Domain.Services;
-using ColdTrace.Platform.IdentityAccess.Domain.Repositories;
-using ColdTrace.Platform.Shared.Application.Patterns;
+using ColdTrace.Platform.Alerts.Application.CommandServices;
+using ColdTrace.Platform.Alerts.Application.QueryServices;
+using ColdTrace.Platform.Iam.Interfaces.Acl;
+using ColdTrace.Platform.Shared.Application.Model;
 
 namespace ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 
@@ -13,7 +14,7 @@ namespace ColdTrace.Platform.Alerts.Application.Internal.QueryServices;
 /// </summary>
 public class IncidentQueryService(
     IIncidentRepository incidentRepository,
-    IOrganizationRepository organizationRepository,
+    IIamContextFacade iamContextFacade,
     ILogger<IncidentQueryService> logger)
     : IIncidentQueryService
 {
@@ -22,8 +23,7 @@ public class IncidentQueryService(
         GetIncidentsByOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for incident query: {OrganizationId}", query.OrganizationId);
             return new Result<IEnumerable<Incident>, GetIncidentsByOrganizationError>.Failure(
@@ -51,8 +51,7 @@ public class IncidentQueryService(
         GetIncidentByIdAndOrganizationIdQuery query,
         CancellationToken cancellationToken = default)
     {
-        var organization = await organizationRepository.FindByIdAsync(query.OrganizationId, cancellationToken);
-        if (organization is null)
+        if (!await iamContextFacade.OrganizationExistsAsync(query.OrganizationId, cancellationToken))
         {
             logger.LogWarning("Organization not found for incident detail query: {OrganizationId}",
                 query.OrganizationId);
