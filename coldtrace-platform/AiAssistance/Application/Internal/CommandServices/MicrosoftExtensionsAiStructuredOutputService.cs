@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using ColdTrace.Platform.AiAssistance.Domain.Model.Errors;
 using ColdTrace.Platform.AiAssistance.Application.Prompts;
 using ColdTrace.Platform.AiAssistance.Application.StructuredOutputs;
@@ -25,7 +26,8 @@ public class MicrosoftExtensionsAiStructuredOutputService(
 {
     private static readonly JsonSerializerOptions SerializerOptions = new(JsonSerializerDefaults.Web)
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver()
     };
 
     public Task<Result<IncidentResolutionPlanOutput, AiGenerationError>> GenerateIncidentResolutionPlanAsync(
