@@ -18,5 +18,6 @@ public static class AssetResourceFromEntityAssembler
             entity.Name,
             entity.Capacity,
             entity.Description,
-            entity.Status);
+            entity.Status,
+            entity.CreatedAt);
 }
