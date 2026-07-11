@@ -130,7 +130,7 @@ DATABASE_SCHEMA=coldtrace_platform
 DATABASE_USER=coldtrace_app
 DATABASE_PASSWORD=<from Secret Manager>
 JWT_SECRET_NAME=coldtrace-jwt-secret
-CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app,https://coldtrace-frontend-q1gkddcns-mauricio-pajes-projects.vercel.app
+CORS_ALLOWED_ORIGINS=https://coldtrace-frontend-web.vercel.app,http://localhost:5173,http://127.0.0.1:5173
 AI_ASSISTANCE_ENABLED=false
 AI_MODEL_PROVIDER=disabled
 AI_MODEL_NAME=
@@ -139,7 +139,7 @@ OPENAI_API_KEY=<from Secret Manager when enabled>
 AI_REQUEST_TIMEOUT=30s
 ```
 
-`CORS_ALLOWED_ORIGINS` is a comma-separated exact allowlist for browser clients. Development defaults to the two Vite origins when it is omitted; every other environment requires it. Keep the stable Vercel production domain in the list and add temporary deployment URLs only when they must be tested directly.
+`CORS_ALLOWED_ORIGINS` is a comma-separated exact allowlist for browser clients. Development defaults to the two Vite origins when it is omitted; every other environment requires it. The Cloud Run deployment default keeps the stable Vercel production domain plus `http://localhost:5173` and `http://127.0.0.1:5173`, allowing the local Vue application to test against the deployed API without enabling arbitrary origins.
 
 API controllers require a valid bearer token by default. The explicit anonymous routes are sign-in, first-tenant organization sign-up, subscription plan catalog reads, and the signed Stripe webhook. Swagger/OpenAPI assets remain public for course validation.
 
