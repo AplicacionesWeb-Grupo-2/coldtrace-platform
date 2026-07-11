@@ -15,9 +15,9 @@ public record SocialOrganizationSignUpResource(
     string? RedirectUri,
     [property: SwaggerSchema(Description = "Optional nonce expected in the ID token")]
     string? Nonce,
-    [property: Required]
+    [param: Required]
     [property: SwaggerSchema(Description = "Organization name")]
     string OrganizationName,
-    [property: Required]
+    [param: Required]
     [property: SwaggerSchema(Description = "First user full name")]
     string FullName);
