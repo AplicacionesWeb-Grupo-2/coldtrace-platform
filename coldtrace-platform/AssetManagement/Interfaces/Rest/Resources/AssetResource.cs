@@ -15,4 +15,5 @@ public record AssetResource(
     [SwaggerParameter(Description = "Asset display name")] string Name,
     [SwaggerParameter(Description = "Asset capacity")] double Capacity,
     [SwaggerParameter(Description = "Optional asset description")] string? Description,
-    [SwaggerParameter(Description = "Asset operational status")] string Status);
+    [SwaggerParameter(Description = "Asset operational status")] string Status,
+    [SwaggerParameter(Description = "Asset registration timestamp")] DateTimeOffset? CreatedAt);
